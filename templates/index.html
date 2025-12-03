@@ -99,6 +99,26 @@
                     data-lat="{{ center_lat }}"
                     data-lon="{{ center_lon }}"></iframe>
             </div>
+            <div class="change-nh" role="region" aria-label="Change New Haven quick actions">
+                <div class="change-nh__title">Change New Haven</div>
+                <div class="change-nh__actions">
+                    <a class="change-nh__btn" href="tel:+12039465128" title="Zoning (Call)">
+                        <span class="change-nh__icon">☎️</span><span class="change-nh__label">Zoning</span>
+                    </a>
+                    <a class="change-nh__btn" href="https://newhavenct.legistar.com" target="_blank" rel="noopener" title="Legistar">
+                        <span class="change-nh__icon">📄</span><span class="change-nh__label">Legistar</span>
+                    </a>
+                    <a class="change-nh__btn" href="https://cityofnewhaven.com/civicax/citycalendar/calendarjson" target="_blank" rel="noopener" title="Calendar JSON">
+                        <span class="change-nh__icon">🗓️</span><span class="change-nh__label">Calendar</span>
+                    </a>
+                    <a class="change-nh__btn" href="https://www.newhavenct.gov/government/departments-divisions/city-plan" target="_blank" rel="noopener" title="City Plan Dept">
+                        <span class="change-nh__icon">🏛️</span><span class="change-nh__label">City Plan</span>
+                    </a>
+                    <a class="change-nh__btn" href="https://maps.newhavenct.gov/" target="_blank" rel="noopener" title="Maps">
+                        <span class="change-nh__icon">🗺️</span><span class="change-nh__label">Maps</span>
+                    </a>
+                </div>
+            </div>
             <ul class="list list--supporting">
                 {% for item in civics_actions %}
                 <li class="list__item">
@@ -176,6 +196,21 @@
         </section>
 
         <aside class="panel panel--right">
+            <div class="boards">
+                <h3 class="filters__title">Upcoming Boards & Commissions</h3>
+                <ul class="list">
+                    {% for b in boards_upcoming %}
+                    <li class="list__item">
+                        <a class="list__link" href="{{ b.link or '#' }}" target="_blank" rel="noopener">
+                            <span class="list__source">{{ b.source }} · {{ b.date }}</span>
+                            <span class="list__title">{{ b.title }}</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="list__item list__item--empty">No upcoming meetings.</li>
+                    {% endfor %}
+                </ul>
+            </div>
             <h2 class="panel__title">Today in Elm City</h2>
 
             <div class="weather">
@@ -302,6 +337,7 @@
             {% endfor %}
         </div>
     </section>
+    {% include "components/change_new_haven_live.html" %}
     <footer class="footer-mini">
         <nav class="footer-mini__nav">
             <a href="{{ url_for('about') }}">About</a>

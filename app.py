@@ -10,7 +10,14 @@ from flask import jsonify, request
 from config import Config
 from services import events as events_service
 from services import rss as rss_service
-from services.civics import fetch_recent_matters, compute_civics_stats, fetch_tax_rate
+from services.civics import (
+    fetch_recent_matters,
+    compute_civics_stats,
+    fetch_tax_rate,
+    fetch_city_calendar,
+    fetch_legistar_events,
+)
+from modules.change_new_haven_live.routes import bp as change_bp
 from services import weather as weather_service
 from services import nws as nws_service
 from feeds.aggregator import aggregate_all, aggregate_filtered
@@ -29,6 +36,8 @@ def create_app() -> Flask:
         format="%(asctime)s %(levelname)s %(name)s %(message)s",
     )
     app.logger.setLevel(logging.INFO)
+    # Register blueprints
+    app.register_blueprint(change_bp)
 
     @app.route("/")
     def index():
@@ -310,6 +319,41 @@ def create_app() -> Flask:
         for k in list(feed_history.keys()):
             feed_history[k] = feed_history[k][:20]
 
+        # Boards & Commissions upcoming (calendar JSON + Legistar events)
+        cal_upcoming = fetch_city_calendar(limit=6)
+        legis_upcoming = fetch_legistar_events(city_slug=city_slug, limit=6)
+        boards_upcoming = []
+        boards_upcoming.extend(
+            [
+                {
+                    "title": i.get("title"),
+                    "date": i.get("date_display"),
+                    "location": i.get("location"),
+                    "source": "City Calendar",
+                    "link": i.get("link"),
+                }
+                for i in cal_upcoming
+            ]
+        )
+        boards_upcoming.extend(
+            [
+                {
+                    "title": i.get("title"),
+                    "date": i.get("date_display"),
+                    "location": i.get("location"),
+                    "source": i.get("body") or "Legistar",
+                    "link": i.get("link"),
+                }
+                for i in legis_upcoming
+            ]
+        )
+        # sort by date string to keep near-future first
+        try:
+            boards_upcoming.sort(key=lambda x: x.get("date") or "")
+        except Exception:
+            pass
+        boards_upcoming = boards_upcoming[:8]
+
         return render_template(
             "index.html",
             app_name=app.config["APP_NAME"],
@@ -332,6 +376,7 @@ def create_app() -> Flask:
             feed_history=feed_history,
             week_grid=week_grid,
             time_str=time_str,
+            boards_upcoming=boards_upcoming,
         )
 
     @app.route("/feeds")

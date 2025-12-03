@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Optional, Tuple
 import requests
 
 _CACHE: Dict[str, Tuple[float, Any]] = {}
+CITY_CAL_JSON = "https://cityofnewhaven.com/civicax/citycalendar/calendarjson"
 
 
 def _get_cache(key: str, ttl: int) -> Optional[Any]:
@@ -188,5 +189,120 @@ def fetch_tax_rate(
     except Exception:
         _set_cache(cache_key, None)
         return None
+
+def fetch_city_calendar(limit: int = 8, ttl_seconds: int = 300) -> List[Dict[str, Any]]:
+    """
+    Fetch upcoming meetings/events from the city's Calendar JSON endpoint.
+    Output keys: title, date_iso, date_display, link, location
+    """
+    cache_key = f"civics:calendar:{limit}"
+    cached = _get_cache(cache_key, ttl_seconds)
+    if cached is not None:
+        return cached
+    url = os.getenv("CITY_CALENDAR_JSON", CITY_CAL_JSON)
+    try:
+        data = _get(url)
+    except Exception:
+        _set_cache(cache_key, [])
+        return []
+    results: List[Dict[str, Any]] = []
+    for ev in (data or [])[: limit * 2]:
+        try:
+            title = ev.get("Title") or ev.get("title") or ""
+            when = ev.get("StartDate") or ev.get("start") or ev.get("Date")
+            link = ev.get("Link") or ev.get("Url") or ev.get("url") or ""
+            location = ev.get("Location") or ev.get("location") or ""
+            # Normalize date
+            dt = None
+            if when:
+                try:
+                    # Try ISO first
+                    if isinstance(when, str) and when.endswith("Z"):
+                        from datetime import datetime, timezone
+                        dt = datetime.fromisoformat(when.replace("Z", "+00:00"))
+                    else:
+                        from dateutil import parser  # type: ignore
+                        dt = parser.parse(str(when))
+                except Exception:
+                    dt = None
+            if not dt:
+                continue
+            from datetime import timezone
+            iso = dt.astimezone(timezone.utc).isoformat()
+            disp = dt.strftime("%Y-%m-%d %I:%M %p")
+            results.append(
+                {"title": title, "date_iso": iso, "date_display": disp, "link": link, "location": location}
+            )
+        except Exception:
+            continue
+    # Sort ascending by date
+    try:
+        results.sort(key=lambda x: x.get("date_iso") or "")
+    except Exception:
+        pass
+    results = results[:limit]
+    _set_cache(cache_key, results)
+    return results
+
+
+def fetch_legistar_events(city_slug: str = "newhaven", limit: int = 8, ttl_seconds: int = 300) -> List[Dict[str, Any]]:
+    """
+    Fetch upcoming Legistar events (boards & commissions meetings).
+    Output keys: title, date_iso, date_display, body, link, location
+    """
+    cache_key = f"civics:legistar_events:{city_slug}:{limit}"
+    cached = _get_cache(cache_key, ttl_seconds)
+    if cached is not None:
+        return cached
+    base = os.getenv("LEGISTAR_BASE", f"https://webapi.legistar.com/v1/{city_slug}")
+    url = f"{base}/events"
+    params = {"$top": limit, "$orderby": "EventDate asc"}
+    try:
+        data = _get(url, params=params)
+    except Exception:
+        _set_cache(cache_key, [])
+        return []
+    results: List[Dict[str, Any]] = []
+    for ev in (data or [])[: limit * 2]:
+        try:
+            title = ev.get("EventComment") or ev.get("EventBodyName") or "Meeting"
+            body = ev.get("EventBodyName") or ""
+            when = ev.get("EventDate")
+            location = ev.get("EventLocation") or ""
+            event_id = ev.get("EventId")
+            ui_host = os.getenv("LEGISTAR_UI_HOST", f"https://{city_slug}ct.legistar.com")
+            link = f"{ui_host}/MeetingDetail.aspx?ID={event_id}" if event_id else ""
+            dt = None
+            if when:
+                try:
+                    if isinstance(when, str) and when.endswith("Z"):
+                        from datetime import datetime, timezone
+                        dt = datetime.fromisoformat(when.replace("Z", "+00:00"))
+                    elif isinstance(when, str) and when.startswith("/Date("):
+                        ms = int(when[6:19])
+                        from datetime import datetime, timezone
+                        dt = datetime.fromtimestamp(ms / 1000, tz=timezone.utc)
+                    else:
+                        from dateutil import parser  # type: ignore
+                        dt = parser.parse(str(when))
+                except Exception:
+                    dt = None
+            if not dt:
+                continue
+            from datetime import timezone
+            iso = dt.astimezone(timezone.utc).isoformat()
+            disp = dt.strftime("%Y-%m-%d %I:%M %p")
+            results.append(
+                {"title": title, "date_iso": iso, "date_display": disp, "body": body, "link": link, "location": location}
+            )
+        except Exception:
+            continue
+    try:
+        results.sort(key=lambda x: x.get("date_iso") or "")
+    except Exception:
+        pass
+    results = results[:limit]
+    _set_cache(cache_key, results)
+    return results
 
 

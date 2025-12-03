@@ -3,5 +3,7 @@ feedparser~=6.0
 requests~=2.32
 python-dotenv~=1.0
 ics~=0.7
+beautifulsoup4~=4.12
+python-dateutil~=2.9
 
 

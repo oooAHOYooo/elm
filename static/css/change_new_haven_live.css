@@ -1,0 +1,39 @@
+.cnn-live-widget {
+  padding: 8px;
+  background: #0f172a;
+  color: #ffffff;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: 8px;
+}
+.cnn-live-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 8px;
+}
+.cnn-live-card {
+  background: #1e293b;
+  padding: 10px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #ffffff;
+  transition: 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.cnn-live-card:hover {
+  background: #334155;
+  transform: translateY(-2px);
+}
+.cnn-live-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.cnn-live-category {
+  font-size: 12px;
+  opacity: 0.85;
+}
+.cnn-live-error {
+  color: #ffb4ab;
+}
+
+
