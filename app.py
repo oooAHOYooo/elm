@@ -5,11 +5,14 @@ from typing import Any, Dict, List
 
 from dotenv import load_dotenv
 from flask import Flask, render_template
+from flask import jsonify, request
 
 from config import Config
 from services import events as events_service
 from services import rss as rss_service
 from services import weather as weather_service
+from services import nws as nws_service
+from feeds.aggregator import aggregate_all, aggregate_filtered
 
 
 load_dotenv()
@@ -45,18 +48,149 @@ def create_app() -> Flask:
             request_timeout=timeout,
         )
 
-        featured_story = articles[0] if articles else None
-        supporting_items = articles[1:6] if len(articles) > 1 else []
-        right_rail_items = articles[6:10] if len(articles) > 6 else []
-        bottom_strip_items = articles[:12] if articles else []
+        # Pull InfoNewHaven + City feeds and merge
+        agg = aggregate_all()
+        agg_items = agg.get("items", [])
+
+        # Normalize aggregator items to match template expectations
+        def iso_to_display(iso_str: str) -> str:
+            try:
+                from datetime import datetime
+                dt = datetime.fromisoformat(iso_str.replace("Z", "+00:00"))
+                return dt.astimezone(tz).strftime("%Y-%m-%d %I:%M %p")
+            except Exception:
+                return ""
+
+        unified_news: List[Dict[str, Any]] = []
+        unified_events: List[Dict[str, Any]] = []
+
+        # Existing RSS articles as news
+        for a in articles:
+            unified_news.append(
+                {
+                    "title": a.get("title"),
+                    "link": a.get("link"),
+                    "summary": a.get("summary"),
+                    "source": a.get("source"),
+                    "published": a.get("published"),
+                    "published_display": a.get("published_display"),
+                    "category": "news",
+                    "image": a.get("image"),
+                }
+            )
+
+        # Aggregator items (news + events)
+        for it in agg_items:
+            category = it.get("category") or "news"
+            source_meta = it.get("source") or {}
+            source_name = source_meta.get("name") or "Source"
+            date_iso = it.get("date")
+            item = {
+                "title": it.get("title"),
+                "link": it.get("link"),
+                "summary": it.get("summary"),
+                "source": source_name,
+                "published": None,
+                "published_display": iso_to_display(date_iso) if date_iso else "",
+                "category": category,
+                "image": None,
+                "date_iso": date_iso,
+                "location": it.get("location"),
+            }
+            if category in {"events", "city_events", "city_calendar_items"}:
+                unified_events.append(item)
+            else:
+                unified_news.append(item)
+
+        # De-duplicate by link
+        seen_links = set()
+        deduped_news: List[Dict[str, Any]] = []
+        for i in unified_news:
+            link = i.get("link")
+            if link and link in seen_links:
+                continue
+            if link:
+                seen_links.add(link)
+            deduped_news.append(i)
+
+        # Sort by published_display/iso recency; fall back to insertion order
+        def sort_key(i: Dict[str, Any]):
+            from datetime import datetime
+            try:
+                # Prefer iso via published_display parsed back in local tz
+                disp = i.get("published_display")
+                if disp:
+                    # Parse with local tz format used above
+                    return datetime.strptime(disp, "%Y-%m-%d %I:%M %p").timestamp()
+            except Exception:
+                pass
+            try:
+                pub = i.get("published")
+                if pub:
+                    return pub.timestamp()
+            except Exception:
+                pass
+            return 0.0
+
+        deduped_news.sort(key=sort_key, reverse=True)
+
+        # Compact selection for dashboard
+        featured_story = deduped_news[0] if deduped_news else None
+        supporting_items = deduped_news[1:5] if len(deduped_news) > 1 else []
+        right_rail_items = deduped_news[5:9] if len(deduped_news) > 5 else []
+        bottom_news = deduped_news[:6]
 
         lat = float(app.config["WEATHER_LAT"])
         lon = float(app.config["WEATHER_LON"])
         weather: Dict[str, Any] = weather_service.fetch_weather(
             lat=lat, lon=lon, request_timeout=timeout
         )
+        # NWS alerts + forecast (compact dashboard snippets)
+        nws_alerts = nws_service.fetch_nws_alerts(zone="ctz010")
+        nws_fc = nws_service.fetch_nws_forecast(lat=lat, lon=lon)
+        nws_periods = nws_fc.get("periods", [])[:2] if nws_fc else []
 
-        upcoming_events = events_service.get_upcoming_events(tz=tz, max_events=6)
+        # This week's events (next 7 days)
+        def within_next_seven_days(iso_str: str) -> bool:
+            try:
+                from datetime import datetime, timedelta
+                if not iso_str:
+                    return False
+                dt = datetime.fromisoformat(iso_str.replace("Z", "+00:00")).astimezone(tz)
+                return today <= dt <= (today + timedelta(days=7))
+            except Exception:
+                return False
+
+        week_events = [e for e in unified_events if within_next_seven_days(e.get("date_iso") or "")]
+        # sort ascending by date within the week
+        def week_sort_key(i: Dict[str, Any]):
+            try:
+                from datetime import datetime
+                iso = i.get("date_iso")
+                if iso:
+                    return datetime.fromisoformat(iso.replace("Z", "+00:00")).timestamp()
+            except Exception:
+                pass
+            return 0.0
+        week_events.sort(key=week_sort_key)
+        week_events = week_events[:8]
+
+        # Prefer aggregator events; fallback to stub if none
+        upcoming_events = unified_events[:6] if unified_events else [
+            {
+                "title": e.title,
+                "link": e.link,
+                "summary": e.description,
+                "source": "Local Events",
+                "published": None,
+                "published_display": e.start.strftime("%Y-%m-%d %I:%M %p"),
+                "category": "events",
+                "image": None,
+                "location": e.location,
+                "start": e.start,
+            }
+            for e in events_service.get_upcoming_events(tz=tz, max_events=6)
+        ]
 
         categories = [
             {"key": "news", "label": "News"},
@@ -64,18 +198,75 @@ def create_app() -> Flask:
             {"key": "weather", "label": "Weather"},
         ]
 
+        bottom_strip_items = []
+        # Mix some news and events compactly
+        for n in bottom_news[:6]:
+            n2 = dict(n)
+            n2["category"] = "news"
+            bottom_strip_items.append(n2)
+        # Add up to 2 weather cards from NWS
+        for p in (nws_periods or [])[:2]:
+            if len(bottom_strip_items) >= 8:
+                break
+            bottom_strip_items.append(
+                {
+                    "category": "weather",
+                    "title": f"{p.get('name')}: {p.get('temperature')}{p.get('temperatureUnit')}",
+                    "summary": p.get("shortForecast"),
+                }
+            )
+        for ev in upcoming_events[:6 - len(bottom_strip_items)]:
+            ev2 = dict(ev)
+            ev2["category"] = "events"
+            bottom_strip_items.append(ev2)
+
         return render_template(
             "index.html",
             app_name=app.config["APP_NAME"],
             date_str=date_str,
+            center_lat=lat,
+            center_lon=lon,
             featured_story=featured_story,
             supporting_items=supporting_items,
             right_rail_items=right_rail_items,
             bottom_strip_items=bottom_strip_items,
             weather=weather,
+            nws_alerts=nws_alerts[:3],
+            nws_periods=nws_periods,
+            week_events=week_events,
             events=upcoming_events,
             categories=categories,
         )
+
+    @app.route("/feeds")
+    def feeds_api():
+        # Optional ?category=events|who_knew_blog|food_drink|music_arts|news
+        category = request.args.get("category")
+        data = aggregate_filtered(category=category) if category else aggregate_all()
+        return jsonify(data)
+
+    @app.route("/feeds/raw")
+    def feeds_raw():
+        # Debugging endpoint returns full aggregate
+        return jsonify(aggregate_all())
+
+    @app.route("/feeds/view")
+    def feeds_view():
+        # Minimal page that fetches /feeds and shows category filters
+        return render_template("feeds.html", app_name=app.config["APP_NAME"])
+
+    @app.route("/api/nws/alerts")
+    def api_nws_alerts():
+        zone = request.args.get("zone", "ctz010")
+        data = nws_service.fetch_nws_alerts(zone=zone)
+        return jsonify({"zone": zone, "alerts": data})
+
+    @app.route("/api/nws/forecast")
+    def api_nws_forecast():
+        lat = float(request.args.get("lat", app.config["WEATHER_LAT"]))
+        lon = float(request.args.get("lon", app.config["WEATHER_LON"]))
+        data = nws_service.fetch_nws_forecast(lat=lat, lon=lon)
+        return jsonify({"lat": lat, "lon": lon, **data})
 
     return app
 

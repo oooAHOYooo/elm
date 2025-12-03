@@ -1,124 +1,233 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="dashboard">
-  <header class="masthead">
-    <div class="masthead__title">
-      <h1>{{ app_name or "Elm City Daily" }}</h1>
-      <p class="masthead__date">{{ date_str }}</p>
-    </div>
-    <div class="masthead__lines" aria-hidden="true"></div>
-  </header>
-
-  <main class="grid">
-    <section class="panel panel--left">
-      <h2 class="panel__title">Around Town</h2>
-      <div class="mapbox" role="img" aria-label="Map of New Haven area">
-        <div class="mapbox__grid"></div>
-        <div class="mapbox__marker">New Haven</div>
-      </div>
-      <ul class="list list--supporting">
-        {% for item in supporting_items %}
-        <li class="list__item">
-          <a class="list__link" href="{{ item.link }}" target="_blank" rel="noopener">
-            <span class="list__source">{{ item.source }}</span>
-            <span class="list__title">{{ item.title }}</span>
-          </a>
-        </li>
-        {% else %}
-        <li class="list__item list__item--empty">No supporting items available.</li>
-        {% endfor %}
-      </ul>
-    </section>
-
-    <section class="panel panel--center">
-      <h2 class="panel__title">Featured Story</h2>
-      {% if featured_story %}
-      <article class="feature">
-        <a class="feature__link" href="{{ featured_story.link }}" target="_blank" rel="noopener">
-          <h3 class="feature__title">{{ featured_story.title }}</h3>
-          <p class="feature__summary">{{ featured_story.summary }}</p>
-          <p class="feature__meta">
-            <span>{{ featured_story.source }}</span>
-            <span aria-hidden="true">·</span>
-            <span>{{ featured_story.published_display }}</span>
-          </p>
-        </a>
-      </article>
-      {% else %}
-      <div class="feature feature--empty">No featured story available.</div>
-      {% endif %}
-    </section>
-
-    <aside class="panel panel--right">
-      <h2 class="panel__title">Today in Elm City</h2>
-
-      <div class="weather">
-        <div class="weather__icon">{{ weather.weather_icon }}</div>
-        <div class="weather__meta">
-          <div class="weather__label">{{ weather.weather_desc }}</div>
-          <div class="weather__temps">
-            {% if weather.current_temp is not none %}
-            <span class="temp temp--current">{{ weather.current_temp|round|int }}°</span>
-            {% endif %}
-            {% if weather.high_temp is not none and weather.low_temp is not none %}
-            <span class="temp temp--range">H {{ weather.high_temp|round|int }}° · L {{ weather.low_temp|round|int }}°</span>
-            {% endif %}
-          </div>
-          {% if weather.precip_probability is not none %}
-          <div class="weather__precip">Precip: {{ weather.precip_probability }}%</div>
-          {% endif %}
+    <header class="masthead">
+        <div class="masthead__title">
+            <h1>{{ app_name or "Elm City Daily" }}</h1>
+            <p class="masthead__date">{{ date_str }}</p>
         </div>
-      </div>
+        <div class="masthead__lines" aria-hidden="true"></div>
+    </header>
 
-      <div class="filters">
-        <h3 class="filters__title">Filters</h3>
-        <label class="checkbox">
-          <input type="checkbox" class="js-filter" data-category="news" checked />
-          <span>News</span>
-        </label>
-        <label class="checkbox">
-          <input type="checkbox" class="js-filter" data-category="events" checked />
-          <span>Events</span>
-        </label>
-        <label class="checkbox">
-          <input type="checkbox" class="js-filter" data-category="weather" checked />
-          <span>Weather</span>
-        </label>
-      </div>
+    <main class="grid">
+        <section class="panel panel--left">
+            <h2 class="panel__title">Around Town</h2>
+            <div class="map-controls">
+                <label for="js-map-select" class="sr-only">Map Layer</label>
+                <select id="js-map-select" class="map-controls__select"
+                    aria-label="Select map type">
+                    <option value="mapnik">General Map</option>
+                    <option value="opentopomap">Topographic</option>
+                    <option value="cyclemap">Cycle Routes</option>
+                    <option value="transportmap">Public Transport</option>
+                </select>
+            </div>
+            <div class="mapbox" role="region" aria-label="Map of New Haven">
+                <iframe id="js-map-frame" title="New Haven Map" loading="lazy"
+                    data-lat="{{ center_lat }}"
+                    data-lon="{{ center_lon }}"></iframe>
+            </div>
+            <ul class="list list--supporting">
+                {% for item in supporting_items %}
+                <li class="list__item">
+                    <a class="list__link" href="{{ item.link }}" target="_blank"
+                        rel="noopener">
+                        <span class="list__source">{{ item.source }}</span>
+                        <span class="list__title">{{ item.title }}</span>
+                    </a>
+                </li>
+                {% else %}
+                <li class="list__item list__item--empty">No supporting items
+                    available.</li>
+                {% endfor %}
+            </ul>
+        </section>
 
-      <ul class="list list--rail">
-        {% for item in right_rail_items %}
-        <li class="list__item">
-          <a class="list__link" href="{{ item.link }}" target="_blank" rel="noopener">
-            <span class="list__source">{{ item.source }}</span>
-            <span class="list__title">{{ item.title }}</span>
-          </a>
-        </li>
-        {% endfor %}
-      </ul>
-    </aside>
-  </main>
+        <section class="panel panel--center">
+            <h2 class="panel__title">Featured Story</h2>
+            {% if featured_story %}
+            <article class="feature">
+                <a class="feature__link" href="{{ featured_story.link }}"
+                    target="_blank" rel="noopener">
+                    <h3 class="feature__title">{{ featured_story.title }}</h3>
+                    <p class="feature__summary">{{ featured_story.summary }}</p>
+                    <p class="feature__meta">
+                        <span>{{ featured_story.source }}</span>
+                        <span aria-hidden="true">·</span>
+                        <span>{{ featured_story.published_display }}</span>
+                    </p>
+                </a>
+            </article>
+            {% else %}
+            <div class="feature feature--empty">No featured story
+                available.</div>
+            {% endif %}
+            <div class="events-week">
+                <h3 class="panel__title">This Week</h3>
+                {% if week_events and week_events|length > 0 %}
+                <div class="events-table" role="table"
+                    aria-label="Events this week">
+                    <div class="events-table__row events-table__row--head"
+                        role="row">
+                        <div class="events-table__cell"
+                            role="columnheader">Date</div>
+                        <div class="events-table__cell"
+                            role="columnheader">Title</div>
+                        <div class="events-table__cell"
+                            role="columnheader">Source</div>
+                        <div class="events-table__cell"
+                            role="columnheader">Location</div>
+                    </div>
+                    {% for ev in week_events %}
+                    <div class="events-table__row" role="row">
+                        <div class="events-table__cell" role="cell"
+                            data-label="Date">{{ ev.published_display }}</div>
+                        <div class="events-table__cell" role="cell"
+                            data-label="Title">
+                            <a href="{{ ev.link }}" target="_blank"
+                                rel="noopener" class="events-table__link">{{
+                                ev.title }}</a>
+                        </div>
+                        <div class="events-table__cell" role="cell"
+                            data-label="Source">{{ ev.source }}</div>
+                        <div class="events-table__cell" role="cell"
+                            data-label="Location">{{ ev.location or "" }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="list__item list__item--empty">No events this
+                    week.</div>
+                {% endif %}
+            </div>
+        </section>
 
-  <section class="strip">
-    <div class="strip__inner">
-      {% for item in bottom_strip_items %}
-      <a class="card" href="{{ item.link }}" target="_blank" rel="noopener" data-category="news">
-        <div class="card__badge">News</div>
-        <div class="card__title">{{ item.title }}</div>
-        <div class="card__meta">{{ item.source }}</div>
-      </a>
-      {% endfor %}
+        <aside class="panel panel--right">
+            <h2 class="panel__title">Today in Elm City</h2>
 
-      {% for ev in events %}
-      <div class="card" data-category="events">
-        <div class="card__badge">Event</div>
-        <div class="card__title">{{ ev.title }}</div>
-        <div class="card__meta">{{ ev.location }} · {{ ev.start.strftime("%a %b %d") }}</div>
-      </div>
-      {% endfor %}
-    </div>
-  </section>
+            <div class="weather">
+                <div class="weather__icon">{{ weather.weather_icon }}</div>
+                <div class="weather__meta">
+                    <div class="weather__label">{{ weather.weather_desc }}</div>
+                    <div class="weather__temps">
+                        {% if weather.current_temp is not none %}
+                        <span class="temp temp--current">{{
+                            weather.current_temp|round|int }}°</span>
+                        {% endif %}
+                        {% if weather.high_temp is not none and weather.low_temp
+                        is not none %}
+                        <span class="temp temp--range">H {{
+                            weather.high_temp|round|int }}° · L {{
+                            weather.low_temp|round|int }}°</span>
+                        {% endif %}
+                    </div>
+                    {% if weather.precip_probability is not none %}
+                    <div class="weather__precip">Precip: {{
+                        weather.precip_probability }}%</div>
+                    {% endif %}
+                </div>
+            </div>
+            {% if nws_periods and nws_periods|length > 0 %}
+            <div class="weather weather--nws">
+                <div class="weather__icon">🌀</div>
+                <div class="weather__meta">
+                    <div class="weather__label">NWS Forecast</div>
+                    <ul class="list">
+                        {% for p in nws_periods %}
+                        <li class="list__item">
+                            <span class="list__source">{{ p.name }}</span>
+                            <span class="list__title">{{ p.temperature }}{{
+                                p.temperatureUnit }} · {{ p.shortForecast
+                                }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="filters">
+                <h3 class="filters__title">Filters</h3>
+                <label class="checkbox">
+                    <input type="checkbox" class="js-filter"
+                        data-category="news" checked />
+                    <span>News</span>
+                </label>
+                <label class="checkbox">
+                    <input type="checkbox" class="js-filter"
+                        data-category="events" checked />
+                    <span>Events</span>
+                </label>
+                <label class="checkbox">
+                    <input type="checkbox" class="js-filter"
+                        data-category="weather" checked />
+                    <span>Weather</span>
+                </label>
+            </div>
+            <div class="alerts">
+                <h3 class="filters__title">NWS Alerts</h3>
+                <ul class="list list--rail">
+                    {% if nws_alerts and nws_alerts|length > 0 %}
+                    {% for al in nws_alerts %}
+                    <li class="list__item">
+                        <a class="list__link" href="{{ al.link }}"
+                            target="_blank"
+                            rel="noopener">
+                            <span class="list__source">{{ al.event }}</span>
+                            <span class="list__title">{{ al.title }}</span>
+                        </a>
+                    </li>
+                    {% endfor %}
+                    {% else %}
+                    <li class="list__item list__item--empty">No active
+                        alerts.</li>
+                    {% endif %}
+                </ul>
+            </div>
+
+            <ul class="list list--rail">
+                {% for item in right_rail_items %}
+                <li class="list__item">
+                    <a class="list__link" href="{{ item.link }}" target="_blank"
+                        rel="noopener">
+                        <span class="list__source">{{ item.source }}</span>
+                        <span class="list__title">{{ item.title }}</span>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </aside>
+    </main>
+
+    <section class="strip">
+        <div class="strip__inner">
+            {% for item in bottom_strip_items %}
+            {% if item.category == 'events' %}
+            <div class="card" data-category="events">
+                <div class="card__badge">Event</div>
+                <div class="card__title">{{ item.title }}</div>
+                <div class="card__meta">
+                    {% if item.location %}{{ item.location }} · {% endif %}
+                    {% if item.published_display %}{{ item.published_display
+                    }}{% endif %}
+                </div>
+            </div>
+            {% elif item.category == 'weather' %}
+            <div class="card" data-category="weather">
+                <div class="card__badge">Weather</div>
+                <div class="card__title">{{ item.title }}</div>
+                <div class="card__meta">{{ item.summary }}</div>
+            </div>
+            {% else %}
+            <a class="card" href="{{ item.link }}" target="_blank"
+                rel="noopener" data-category="news">
+                <div class="card__badge">News</div>
+                <div class="card__title">{{ item.title }}</div>
+                <div class="card__meta">{{ item.source }}</div>
+            </a>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </section>
 </div>
 {% endblock %}
-
-

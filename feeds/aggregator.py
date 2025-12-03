@@ -1,0 +1,61 @@
+import logging
+from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+from .feed_parser import parse_rss, parse_ical
+from .sources import RSS_SOURCES, ICAL_SOURCES, SOURCE_CREDIT
+from utils.cache import TTLCache
+
+_logger = logging.getLogger(__name__)
+_cache = TTLCache(ttl_seconds=600)
+
+
+def _sort_key(item: Dict[str, Any]) -> float:
+    try:
+        if item.get("date"):
+            return datetime.fromisoformat(item["date"].replace("Z", "+00:00")).timestamp()
+    except Exception:
+        pass
+    return 0.0
+
+
+def aggregate_all(timeout_rss: int = 6, timeout_ical: int = 8) -> Dict[str, Any]:
+    cached = _cache.get("feeds:all")
+    if cached:
+        return cached
+
+    items: List[Dict[str, Any]] = []
+
+    # RSS sources
+    for name, url in RSS_SOURCES.items():
+        items.extend(parse_rss(url, timeout=timeout_rss, source_key=name))
+
+    # iCal sources
+    for name, url in ICAL_SOURCES.items():
+        items.extend(parse_ical(url, timeout=timeout_ical))
+
+    # Sort newest first
+    items.sort(key=_sort_key, reverse=True)
+
+    result = {
+        "updated": datetime.utcnow().isoformat() + "Z",
+        "source_credit": SOURCE_CREDIT,
+        "items": items,
+    }
+
+    _cache.set("feeds:all", result)
+    return result
+
+
+def aggregate_filtered(category: Optional[str] = None) -> Dict[str, Any]:
+    data = aggregate_all()
+    if not category:
+        return data
+    filtered = [i for i in data["items"] if (i.get("category") == category)]
+    return {
+        "updated": data["updated"],
+        "source_credit": data["source_credit"],
+        "items": filtered,
+    }
+
+

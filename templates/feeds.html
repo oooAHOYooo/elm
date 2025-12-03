@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>{{ app_name or "Elm City Daily" }} Feeds</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body class="bg-neutral-50 text-neutral-900">
+        <div class="max-w-5xl mx-auto p-4">
+            <header
+                class="flex items-end justify-between border-b border-neutral-200 pb-3">
+                <div>
+                    <h1 class="text-2xl font-semibold tracking-wide">{{ app_name
+                        or "Elm City Daily" }}</h1>
+                    <p class="text-sm text-neutral-500">InfoNewHaven aggregated
+                        feeds</p>
+                </div>
+                <nav class="flex gap-2">
+                    <button data-cat
+                        class="js-cat px-3 py-1.5 rounded border text-sm bg-white">All</button>
+                    <button data-cat="who_knew_blog"
+                        class="js-cat px-3 py-1.5 rounded border text-sm bg-white">Who
+                        Knew</button>
+                    <button data-cat="food_drink"
+                        class="js-cat px-3 py-1.5 rounded border text-sm bg-white">Food
+                        & Drink</button>
+                    <button data-cat="music_arts"
+                        class="js-cat px-3 py-1.5 rounded border text-sm bg-white">Music
+                        & Arts</button>
+                    <button data-cat="events"
+                        class="js-cat px-3 py-1.5 rounded border text-sm bg-white">Events</button>
+                    <button data-cat="city_news"
+                        class="js-cat px-3 py-1.5 rounded border text-sm bg-white">City
+                        News</button>
+                    <button data-cat="city_events"
+                        class="js-cat px-3 py-1.5 rounded border text-sm bg-white">City
+                        Calendar</button>
+                </nav>
+            </header>
+
+            <section class="mt-4">
+                <ul id="feedList"
+                    class="divide-y divide-neutral-200 bg-white border rounded">
+                    <li class="p-4 text-neutral-500 text-sm">Loading…</li>
+                </ul>
+            </section>
+
+            <footer class="mt-6 text-xs text-neutral-500">
+                This product uses feeds provided by <a
+                    href="https://www.infonewhaven.com"
+                    class="underline">InfoNewHaven.com</a>.
+                Visit | Stay | Play | Live Here in the Elm City.
+            </footer>
+        </div>
+
+        <script>
+      const list = document.getElementById("feedList");
+      const buttons = Array.from(document.querySelectorAll(".js-cat"));
+      let currentCategory = "";
+
+      function renderItems(items) {
+        if (!items || items.length === 0) {
+          list.innerHTML = '<li class="p-4 text-neutral-500 text-sm">No items.</li>';
+          return;
+        }
+        list.innerHTML = items.map(item => `
+          <li class="p-4 hover:bg-neutral-50">
+            <div class="flex items-center justify-between gap-4">
+              <div>
+                <a href="${item.link || '#'}" class="font-medium underline decoration-neutral-300 decoration-2 underline-offset-2" target="_blank" rel="noopener">${item.title || 'Untitled'}</a>
+                <p class="text-sm text-neutral-600 mt-1">${(item.summary || '').substring(0, 200)}</p>
+                <p class="text-xs text-neutral-500 mt-1">${item.source?.name || ''} • ${item.date || ''} • ${item.category || ''}</p>
+              </div>
+              <span class="text-xs px-2 py-1 rounded border bg-neutral-100">${item.category || ''}</span>
+            </div>
+          </li>
+        `).join('');
+      }
+
+      async function load(category = "") {
+        try {
+          const url = category ? \`/feeds?category=\${encodeURIComponent(category)}\` : "/feeds";
+          const res = await fetch(url, { headers: { "Accept": "application/json" } });
+          const data = await res.json();
+          renderItems(data.items || []);
+        } catch (e) {
+          list.innerHTML = '<li class="p-4 text-red-600 text-sm">Failed to load feeds.</li>';
+        }
+      }
+
+      buttons.forEach(btn => {
+        btn.addEventListener("click", () => {
+          buttons.forEach(b => b.classList.remove("bg-neutral-900", "text-white"));
+          btn.classList.add("bg-neutral-900", "text-white");
+          currentCategory = btn.getAttribute("data-cat") || "";
+          load(currentCategory);
+        });
+      });
+
+      // init
+      load("");
+    </script>
+    </body>
+</html>
