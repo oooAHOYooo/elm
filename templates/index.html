@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="dashboard">
+<div class="dashboard" id="js-fit">
     <header class="masthead">
         <div class="masthead__title">
             <h1>{{ app_name or "Elm City Daily" }}</h1>
@@ -11,7 +11,79 @@
 
     <main class="grid">
         <section class="panel panel--left">
-            <h2 class="panel__title">Around Town</h2>
+            <h2 class="panel__title">City by the Numbers</h2>
+            <div class="stats stats--compact">
+                <div class="stat">
+                    <div class="stat__value">{{ civics_stats.introduced }}</div>
+                    <div class="stat__label">Matters ({{ civics_stats.since[:10] if civics_stats.since }})</div>
+                </div>
+                <div class="stat">
+                    <div class="stat__value">{{ civics_stats.adopted }}</div>
+                    <div class="stat__label">Adopted</div>
+                </div>
+                <div class="stat">
+                    <div class="stat__value">{{ civics_stats.failed }}</div>
+                    <div class="stat__label">Failed</div>
+                </div>
+                <div class="stat">
+                    <div class="stat__value">{{ civics_stats.projects_open }}</div>
+                    <div class="stat__label">Projects</div>
+                </div>
+                {% if tax_info and tax_info.mill_rate %}
+                <div class="stat">
+                    <div class="stat__value">{{ '%.2f'|format(tax_info.mill_rate) }}</div>
+                    <div class="stat__label">Mill (FY {{ tax_info.fiscal_year }})</div>
+                </div>
+                {% endif %}
+            </div>
+            <div class="history">
+                <details>
+                    <summary>Who Knew Blog</summary>
+                    <ul class="list">
+                        {% for i in (feed_history.who_knew_blog or []) %}
+                        <li class="list__item">
+                            <a class="list__link" href="{{ i.link }}" target="_blank" rel="noopener">
+                                <span class="list__source">{{ i.date[:10] if i.date }}</span>
+                                <span class="list__title">{{ i.title }}</span>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="list__item list__item--empty">No history.</li>
+                        {% endfor %}
+                    </ul>
+                </details>
+                <details>
+                    <summary>Food & Drink</summary>
+                    <ul class="list">
+                        {% for i in (feed_history.food_drink or []) %}
+                        <li class="list__item">
+                            <a class="list__link" href="{{ i.link }}" target="_blank" rel="noopener">
+                                <span class="list__source">{{ i.date[:10] if i.date }}</span>
+                                <span class="list__title">{{ i.title }}</span>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="list__item list__item--empty">No history.</li>
+                        {% endfor %}
+                    </ul>
+                </details>
+                <details>
+                    <summary>Music & Arts</summary>
+                    <ul class="list">
+                        {% for i in (feed_history.music_arts or []) %}
+                        <li class="list__item">
+                            <a class="list__link" href="{{ i.link }}" target="_blank" rel="noopener">
+                                <span class="list__source">{{ i.date[:10] if i.date }}</span>
+                                <span class="list__title">{{ i.title }}</span>
+                            </a>
+                        </li>
+                        {% else %}
+                        <li class="list__item list__item--empty">No history.</li>
+                        {% endfor %}
+                    </ul>
+                </details>
+            </div>
+            <h2 class="panel__title">Recent Council Actions</h2>
             <div class="map-controls">
                 <label for="js-map-select" class="sr-only">Map Layer</label>
                 <select id="js-map-select" class="map-controls__select"
@@ -28,77 +100,78 @@
                     data-lon="{{ center_lon }}"></iframe>
             </div>
             <ul class="list list--supporting">
-                {% for item in supporting_items %}
+                {% for item in civics_actions %}
                 <li class="list__item">
-                    <a class="list__link" href="{{ item.link }}" target="_blank"
+                    <a class="list__link" href="{{ item.link or '#' }}" target="_blank"
                         rel="noopener">
-                        <span class="list__source">{{ item.source }}</span>
+                        <span class="list__source">{{ item.source }} · {{ item.published_display }}</span>
                         <span class="list__title">{{ item.title }}</span>
                     </a>
                 </li>
                 {% else %}
-                <li class="list__item list__item--empty">No supporting items
-                    available.</li>
+                <li class="list__item list__item--empty">No recent council actions available.</li>
                 {% endfor %}
             </ul>
         </section>
 
         <section class="panel panel--center">
-            <h2 class="panel__title">Featured Story</h2>
-            {% if featured_story %}
-            <article class="feature">
-                <a class="feature__link" href="{{ featured_story.link }}"
-                    target="_blank" rel="noopener">
-                    <h3 class="feature__title">{{ featured_story.title }}</h3>
-                    <p class="feature__summary">{{ featured_story.summary }}</p>
-                    <p class="feature__meta">
-                        <span>{{ featured_story.source }}</span>
-                        <span aria-hidden="true">·</span>
-                        <span>{{ featured_story.published_display }}</span>
-                    </p>
-                </a>
-            </article>
-            {% else %}
-            <div class="feature feature--empty">No featured story
-                available.</div>
-            {% endif %}
-            <div class="events-week">
-                <h3 class="panel__title">This Week</h3>
-                {% if week_events and week_events|length > 0 %}
-                <div class="events-table" role="table"
-                    aria-label="Events this week">
-                    <div class="events-table__row events-table__row--head"
-                        role="row">
-                        <div class="events-table__cell"
-                            role="columnheader">Date</div>
-                        <div class="events-table__cell"
-                            role="columnheader">Title</div>
-                        <div class="events-table__cell"
-                            role="columnheader">Source</div>
-                        <div class="events-table__cell"
-                            role="columnheader">Location</div>
-                    </div>
-                    {% for ev in week_events %}
-                    <div class="events-table__row" role="row">
-                        <div class="events-table__cell" role="cell"
-                            data-label="Date">{{ ev.published_display }}</div>
-                        <div class="events-table__cell" role="cell"
-                            data-label="Title">
-                            <a href="{{ ev.link }}" target="_blank"
-                                rel="noopener" class="events-table__link">{{
-                                ev.title }}</a>
+            <div class="center-grid">
+                <div class="center-grid__main">
+                    <h2 class="panel__title">This Week</h2>
+                    {% if week_events and week_events|length > 0 %}
+                    <div class="agenda agenda--vertical" aria-label="Agenda this week">
+                        {% for day in week_grid[:5] %}
+                        <div class="agenda-v__row">
+                            <div class="agenda-v__label">{{ day.label }}</div>
+                            <div class="agenda-v__items">
+                                {% for it in day['items'] %}
+                                <div class="agenda-v__item"
+                                    data-title="{{ it.title }}"
+                                    data-time="{{ it.time }}"
+                                    data-link="{{ it.link }}"
+                                    data-location="{{ it.location }}"
+                                    data-source="{{ it.source }}"
+                                    data-date="{{ it.date }}"
+                                    data-summary="{{ it.summary | e }}">
+                                    <span class="agenda-v__time">{{ it.time }}</span>
+                                    <a class="agenda__link" href="{{ it.link }}" target="_blank" rel="noopener">{{ it.title }}</a>
+                                </div>
+                                {% else %}
+                                <div class="agenda-v__item agenda__item--empty">—</div>
+                                {% endfor %}
+                            </div>
                         </div>
-                        <div class="events-table__cell" role="cell"
-                            data-label="Source">{{ ev.source }}</div>
-                        <div class="events-table__cell" role="cell"
-                            data-label="Location">{{ ev.location or "" }}</div>
+                        {% endfor %}
                     </div>
-                    {% endfor %}
+                    {% else %}
+                    <div class="list__item list__item--empty">No events this week.</div>
+                    {% endif %}
                 </div>
-                {% else %}
-                <div class="list__item list__item--empty">No events this
-                    week.</div>
-                {% endif %}
+                <div class="center-grid__side">
+                    <h2 class="panel__title">Details</h2>
+                    <article class="feature detail" id="js-detail">
+                        <h3 class="detail__title" id="js-detail-title">Select an item from This Week.</h3>
+                        <div class="detail__grid">
+                            <div class="detail__row">
+                                <div class="detail__label">When</div>
+                                <div class="detail__value" id="js-detail-when">—</div>
+                            </div>
+                            <div class="detail__row">
+                                <div class="detail__label">Where</div>
+                                <div class="detail__value" id="js-detail-where">—</div>
+                            </div>
+                            <div class="detail__row">
+                                <div class="detail__label">Source</div>
+                                <div class="detail__value" id="js-detail-source">—</div>
+                            </div>
+                        </div>
+                        <div class="detail__section">
+                            <div class="detail__label">About</div>
+                            <p class="detail__summary" id="js-detail-summary"></p>
+                        </div>
+                        <p class="feature__meta"><a id="js-detail-link" class="detail__link" href="#" target="_blank" rel="noopener" style="display:none;">Open link</a></p>
+                    </article>
+                </div>
             </div>
         </section>
 
@@ -229,5 +302,13 @@
             {% endfor %}
         </div>
     </section>
+    <footer class="footer-mini">
+        <nav class="footer-mini__nav">
+            <a href="{{ url_for('about') }}">About</a>
+            <a href="{{ url_for('feeds_view') }}">Feeds</a>
+            <a href="{{ url_for('feeds_api') }}">API</a>
+        </nav>
+        <div class="footer-mini__meta">{{ app_name }} · {{ date_str }} · {{ time_str }}</div>
+    </footer>
 </div>
 {% endblock %}

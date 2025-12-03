@@ -1,11 +1,12 @@
 :root {
-    --paper: #efe6d5;
-    --ink: #2a2a2a;
-    --muted-ink: #5a5a5a;
-    --line: rgba(0, 0, 0, 0.12);
-    --accent: #6c7a60;
-    --accent-soft: #a6b39a;
-    --badge: #d9c7a0;
+    /* Warm infographic-inspired palette */
+    --paper: #f5efe6;        /* soft cream */
+    --ink: #1c1b1a;          /* deep charcoal */
+    --muted-ink: #5a524b;    /* warm muted */
+    --line: rgba(28, 27, 26, 0.14);
+    --accent: #d65b47;       /* coral */
+    --accent-soft: #79a7ac;  /* dusty teal */
+    --badge: #f0cd83;        /* mustard */
 }
 
 *,
@@ -21,16 +22,24 @@ body {
 
 body {
     margin: 0;
-    font-family: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+    font-family: "Newsreader", Georgia, Cambria, "Times New Roman", Times, serif;
     color: var(--ink);
     background:
         linear-gradient(0deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.35)),
         repeating-linear-gradient(0deg,
             var(--paper),
             var(--paper) 3px,
-            #f5eddd 3px,
-            #f5eddd 6px);
+            #f5f1e6 3px,
+            #f5f1e6 6px);
     background-attachment: fixed;
+}
+
+/* Global link treatment — understated, editorial underline */
+a {
+    color: inherit;
+    text-decoration-color: var(--accent-soft);
+    text-underline-offset: 2px;
+    text-decoration-thickness: 2px;
 }
 
 .dashboard {
@@ -55,14 +64,17 @@ body {
 .masthead__title h1 {
     margin: 0;
     font-size: 28px;
-    letter-spacing: 1px;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-weight: 600;
 }
 
 .masthead__date {
     margin: 2px 0 0;
     font-size: 13px;
     color: var(--muted-ink);
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 .masthead__lines {
@@ -113,12 +125,14 @@ body {
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--accent);
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-weight: 600;
 }
 
 .mapbox {
     position: relative;
     border: 1px solid var(--line);
-    background: #f3ead7;
+    background: #efe7d7;
     height: 220px;
     margin-bottom: 10px;
     overflow: hidden;
@@ -222,6 +236,7 @@ body {
 .list__source {
     font-variant: all-small-caps;
     color: var(--muted-ink);
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 .list__title {
@@ -230,7 +245,7 @@ body {
 
 .feature {
     border: 1px solid var(--line);
-    background: #f7efdf;
+    background: #f7f2e8;
     padding: 12px;
     flex: 1 1 auto;
     display: flex;
@@ -246,23 +261,71 @@ body {
 .feature__title {
     margin: 0 0 6px;
     font-size: 20px;
+    font-family: "Newsreader", Georgia, Cambria, "Times New Roman", Times, serif;
+    font-weight: 700;
 }
 
 .feature__summary {
     margin: 0 0 8px;
     color: var(--muted-ink);
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 .feature__meta {
     margin: 0;
     color: var(--muted-ink);
     font-size: 12px;
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 .feature--empty {
     display: grid;
     place-items: center;
     color: var(--muted-ink);
+}
+
+/* Detail panel (label grid, inspired by product label) */
+.detail {
+    gap: 8px;
+}
+.detail__title {
+    margin: 0 0 4px;
+    font-family: "Newsreader", Georgia, Cambria, "Times New Roman", Times, serif;
+    font-size: 22px;
+    font-weight: 700;
+}
+.detail__grid {
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 6px 0;
+    display: grid;
+    gap: 4px;
+}
+.detail__row {
+    display: grid;
+    grid-template-columns: 84px 1fr;
+    align-items: start;
+    gap: 8px;
+}
+.detail__label {
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 11px;
+    color: var(--muted-ink);
+}
+.detail__value {
+    font-size: 13px;
+}
+.detail__section {
+    margin-top: 6px;
+}
+.detail__summary {
+    margin: 4px 0 0;
+}
+.detail__link {
+    font-size: 12px;
+    text-decoration: underline;
+    text-decoration-color: var(--accent-soft);
 }
 
 .weather {
@@ -272,7 +335,7 @@ body {
     align-items: center;
     padding: 8px;
     border: 1px solid var(--line);
-    background: rgba(255, 255, 255, 0.45);
+    background: rgba(255, 255, 255, 0.55);
     margin-bottom: 10px;
 }
 
@@ -283,6 +346,7 @@ body {
 .weather__label {
     font-variant: small-caps;
     color: var(--muted-ink);
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 .temp--current {
@@ -292,11 +356,13 @@ body {
 
 .temp--range {
     color: var(--muted-ink);
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 .weather__precip {
     font-size: 12px;
     color: var(--muted-ink);
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 .filters {
@@ -307,6 +373,8 @@ body {
     margin: 0 0 6px;
     font-size: 13px;
     color: var(--accent);
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-weight: 600;
 }
 
 .checkbox {
@@ -315,6 +383,7 @@ body {
     gap: 6px;
     margin: 3px 0;
     font-size: 14px;
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 .strip {
@@ -336,7 +405,7 @@ body {
     flex-direction: column;
     padding: 10px;
     border: 1px solid var(--line);
-    background: #f7efdf;
+    background: #f7f2e8;
     color: inherit;
     text-decoration: none;
 }
@@ -345,22 +414,26 @@ body {
     align-self: flex-start;
     font-size: 11px;
     background: var(--badge);
-    color: #4a412f;
+    color: #3d2f2a;
     padding: 2px 6px;
     border: 1px solid var(--line);
     margin-bottom: 6px;
     text-transform: uppercase;
     letter-spacing: 0.06em;
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 .card__title {
     font-size: 14px;
     margin: 0 0 4px;
+    font-family: "Newsreader", Georgia, Cambria, "Times New Roman", Times, serif;
+    font-weight: 600;
 }
 
 .card__meta {
     font-size: 12px;
     color: var(--muted-ink);
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 /* Events table (center column) */
@@ -368,7 +441,7 @@ body {
     display: grid;
     grid-auto-rows: minmax(32px, auto);
     border: 1px solid var(--line);
-    background: rgba(255, 255, 255, 0.45);
+    background: rgba(255, 255, 255, 0.55);
     margin-top: 8px;
 }
 
@@ -382,11 +455,12 @@ body {
 }
 
 .events-table__row--head {
-    background: #f3ead7;
+    background: #efe7d7;
     border-top: 0;
     font-variant: all-small-caps;
     color: var(--muted-ink);
     font-size: 12px;
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 .events-table__cell {
@@ -403,6 +477,162 @@ body {
     text-decoration: underline;
 }
 
+/* Center panel subdivision without changing overall layout */
+.center-grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 12px;
+}
+.center-grid__main {
+    display: flex;
+    flex-direction: column;
+}
+.center-grid__side {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Compact civic stats */
+.stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin: 8px 0 10px;
+}
+.stat {
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.55);
+    padding: 8px;
+}
+.stat__value {
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+}
+.stat__label {
+    font-size: 12px;
+    color: var(--muted-ink);
+}
+
+.stats--compact .stat__value {
+    font-size: 16px;
+}
+.stats--compact .stat__label {
+    font-size: 11px;
+}
+
+/* Agenda grid */
+.agenda {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.55);
+}
+.agenda__row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0;
+}
+.agenda__row--head .agenda__cell {
+    font-variant: all-small-caps;
+    font-size: 12px;
+    color: var(--muted-ink);
+    padding: 6px 4px;
+    border-bottom: 1px solid var(--line);
+    text-align: center;
+}
+.agenda__cell {
+    padding: 6px 6px;
+    border-right: 1px dotted var(--line);
+    min-height: 64px;
+}
+.agenda__cell:last-child {
+    border-right: 0;
+}
+.agenda__item {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 6px;
+    align-items: start;
+    margin: 2px 0;
+}
+.agenda__item--empty {
+    color: var(--muted-ink);
+    text-align: center;
+}
+.agenda__time {
+    font-size: 12px;
+    color: var(--muted-ink);
+}
+.agenda__link {
+    color: inherit;
+    text-decoration: none;
+}
+.agenda__link:hover {
+    text-decoration: underline;
+}
+
+/* Tiny footer */
+.footer-mini {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid var(--line);
+    padding: 4px 0 6px;
+}
+.footer-mini__nav a {
+    font-size: 10px;
+    margin-right: 8px;
+    color: inherit;
+    text-decoration: none;
+}
+.footer-mini__nav a:hover {
+    text-decoration: underline;
+}
+.footer-mini__meta {
+    font-size: 10px;
+    color: var(--muted-ink);
+}
+
+/* Vertical agenda (Mon–Fri), poster-like labels */
+.agenda--vertical {
+    border: 1px solid var(--line);
+    background: rgba(255, 255, 255, 0.55);
+}
+.agenda-v__row {
+    display: grid;
+    grid-template-columns: 72px 1fr;
+    border-top: 1px dotted var(--line);
+    padding: 6px 8px;
+    align-items: start;
+}
+.agenda-v__row:first-child {
+    border-top: 0;
+}
+.agenda-v__label {
+    font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 12px;
+    color: var(--ink);
+    display: grid;
+    place-items: center;
+}
+.agenda-v__items {
+    display: grid;
+    gap: 4px;
+}
+.agenda-v__item {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    gap: 8px;
+    align-items: start;
+}
+.agenda-v__time {
+    font-size: 12px;
+    color: var(--muted-ink);
+}
+
 /* Ensure no page scroll on desktop when possible */
 @media (min-width: 1024px) {
 
@@ -414,6 +644,9 @@ body {
 
 /* Responsive layout for mobile */
 @media (max-width: 1023px) {
+    .center-grid {
+        grid-template-columns: 1fr;
+    }
     .grid {
         grid-template-columns: 1fr;
         grid-template-areas:
@@ -427,7 +660,7 @@ body {
     }
 
     .mapbox {
-        height: 200px;
+        height: 160px;
     }
 
     html,
@@ -460,4 +693,50 @@ body {
         color: var(--muted-ink);
         font-size: 12px;
     }
+}
+
+/* Ultra-compact mobile mode (triggered by body.mobile-compact via JS) */
+.mobile-compact,
+.mobile-compact body {
+    overflow: hidden;
+}
+.mobile-compact body {
+    font-size: 12px;
+}
+.mobile-compact .masthead__title h1 {
+    font-size: 18px;
+}
+.mobile-compact .masthead__date {
+    font-size: 11px;
+}
+.mobile-compact .panel__title {
+    font-size: 12px;
+}
+.mobile-compact .mapbox {
+    height: 120px;
+}
+.mobile-compact .list--supporting,
+.mobile-compact .list--rail {
+    max-height: 72px;
+}
+.mobile-compact .events-table__row {
+    grid-template-columns: 1fr;
+}
+.mobile-compact .agenda-v__row {
+    grid-template-columns: 64px 1fr;
+    padding: 4px 6px;
+}
+.mobile-compact .agenda-v__item {
+    grid-template-columns: 52px 1fr;
+    gap: 6px;
+}
+.mobile-compact .feature {
+    padding: 8px;
+}
+.mobile-compact .detail__title {
+    font-size: 18px;
+}
+.mobile-compact .footer-mini__meta,
+.mobile-compact .footer-mini__nav a {
+    font-size: 9px;
 }

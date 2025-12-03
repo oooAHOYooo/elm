@@ -10,6 +10,7 @@ from flask import jsonify, request
 from config import Config
 from services import events as events_service
 from services import rss as rss_service
+from services.civics import fetch_recent_matters, compute_civics_stats, fetch_tax_rate
 from services import weather as weather_service
 from services import nws as nws_service
 from feeds.aggregator import aggregate_all, aggregate_filtered
@@ -34,6 +35,7 @@ def create_app() -> Flask:
         tz = ZoneInfo("America/New_York")
         today = datetime.now(tz)
         date_str = today.strftime("%A, %B %d, %Y")
+        time_str = today.strftime("%I:%M %p")
 
         # Fetch data from services
         feeds: List[str] = app.config["FEED_URLS"]
@@ -41,12 +43,17 @@ def create_app() -> Flask:
         overall_limit: int = int(app.config["RSS_OVERALL_LIMIT"])
         timeout: int = int(app.config["REQUEST_TIMEOUT"])
 
-        articles = rss_service.fetch_rss_feeds(
-            feed_urls=feeds,
-            per_feed_limit=per_feed_limit,
-            overall_limit=overall_limit,
-            request_timeout=timeout,
-        )
+        # Policy: avoid third-party news; only primary sources.
+        # If FEED_URLS is empty, skip entirely.
+        if feeds:
+            articles = rss_service.fetch_rss_feeds(
+                feed_urls=feeds,
+                per_feed_limit=per_feed_limit,
+                overall_limit=overall_limit,
+                request_timeout=timeout,
+            )
+        else:
+            articles = []
 
         # Pull InfoNewHaven + City feeds and merge
         agg = aggregate_all()
@@ -97,7 +104,8 @@ def create_app() -> Flask:
                 "date_iso": date_iso,
                 "location": it.get("location"),
             }
-            if category in {"events", "city_events", "city_calendar_items"}:
+            # Treat culture/music posts as events for now to surface weekly happenings
+            if category in {"events", "city_events", "city_calendar_items", "music_arts"}:
                 unified_events.append(item)
             else:
                 unified_news.append(item)
@@ -134,11 +142,11 @@ def create_app() -> Flask:
 
         deduped_news.sort(key=sort_key, reverse=True)
 
-        # Compact selection for dashboard
-        featured_story = deduped_news[0] if deduped_news else None
-        supporting_items = deduped_news[1:5] if len(deduped_news) > 1 else []
-        right_rail_items = deduped_news[5:9] if len(deduped_news) > 5 else []
-        bottom_news = deduped_news[:6]
+        # Compact selection for dashboard (news suppressed; keep placeholders)
+        featured_story = None
+        supporting_items: List[Dict[str, Any]] = []
+        right_rail_items: List[Dict[str, Any]] = []
+        bottom_news: List[Dict[str, Any]] = []
 
         lat = float(app.config["WEATHER_LAT"])
         lon = float(app.config["WEATHER_LON"])
@@ -173,7 +181,58 @@ def create_app() -> Flask:
                 pass
             return 0.0
         week_events.sort(key=week_sort_key)
-        week_events = week_events[:8]
+        week_events = week_events[:14]
+
+        # Fallback to stub events if no week events from feeds
+        if not week_events:
+            fallback = [
+                {
+                    "title": e.title,
+                    "link": e.link,
+                    "summary": e.description,
+                    "source": "Local Events",
+                    "published": None,
+                    "published_display": e.start.strftime("%Y-%m-%d %I:%M %p"),
+                    "category": "events",
+                    "image": None,
+                    "location": e.location,
+                    "date_iso": e.start.astimezone(ZoneInfo("UTC")).isoformat(),
+                }
+                for e in events_service.get_upcoming_events(tz=tz, max_events=8)
+                if within_next_seven_days(e.start.astimezone(ZoneInfo("UTC")).isoformat())
+            ]
+            week_events = sorted(fallback, key=lambda i: i.get("date_iso", ""))
+
+        # Build compact 7-day grid starting Monday
+        from datetime import timedelta
+        start_of_week = today - timedelta(days=today.weekday())
+        week_grid = []
+        for i in range(7):
+            d = (start_of_week + timedelta(days=i)).date()
+            label = (start_of_week + timedelta(days=i)).strftime("%a")
+            items_for_day = []
+            for ev in week_events:
+                iso = ev.get("date_iso")
+                if not iso:
+                    continue
+                try:
+                    dt_local = datetime.fromisoformat(iso.replace("Z", "+00:00")).astimezone(tz)
+                    if dt_local.date() == d:
+                        items_for_day.append(
+                            {
+                                "time": dt_local.strftime("%-I:%M %p") if hasattr(dt_local, "strftime") else "",
+                                "title": ev.get("title"),
+                                "link": ev.get("link"),
+                                "location": ev.get("location") or "",
+                                "source": ev.get("source") or "",
+                                "date": ev.get("published_display") or dt_local.strftime("%Y-%m-%d %I:%M %p"),
+                                "summary": ev.get("summary") or "",
+                            }
+                        )
+                except Exception:
+                    continue
+            # keep it compact: cap to first 2 items
+            week_grid.append({"label": label, "items": items_for_day[:2]})
 
         # Prefer aggregator events; fallback to stub if none
         upcoming_events = unified_events[:6] if unified_events else [
@@ -199,11 +258,7 @@ def create_app() -> Flask:
         ]
 
         bottom_strip_items = []
-        # Mix some news and events compactly
-        for n in bottom_news[:6]:
-            n2 = dict(n)
-            n2["category"] = "news"
-            bottom_strip_items.append(n2)
+        # Mix events compactly (no news)
         # Add up to 2 weather cards from NWS
         for p in (nws_periods or [])[:2]:
             if len(bottom_strip_items) >= 8:
@@ -219,6 +274,41 @@ def create_app() -> Flask:
             ev2 = dict(ev)
             ev2["category"] = "events"
             bottom_strip_items.append(ev2)
+
+        # Primary-source civics: recent council actions and stats
+        city_slug = "newhaven"
+        matters = fetch_recent_matters(city_slug=city_slug, days_back=120, limit=250)
+        civics_actions = [
+            {
+                "title": f"{m.get('file', '')} · {m.get('title')}",
+                "link": m.get("link"),
+                "source": f"{m.get('status', '')}",
+                "published_display": m.get("date_display"),
+                "location": m.get("type", ""),
+            }
+            for m in matters[:12]
+        ]
+        civics_stats = compute_civics_stats(matters)
+        tax_info = fetch_tax_rate(municipality="New Haven")
+
+        # Public RSS history by category (compact list for dropdowns)
+        feed_history: Dict[str, List[Dict[str, Any]]] = {}
+        for it in agg_items:
+            cat = it.get("category") or "news"
+            if cat not in {"who_knew_blog", "food_drink", "music_arts", "events"}:
+                continue
+            lst = feed_history.setdefault(cat, [])
+            lst.append(
+                {
+                    "title": it.get("title"),
+                    "date": it.get("date"),
+                    "link": it.get("link"),
+                    "source": (it.get("source") or {}).get("name"),
+                }
+            )
+        # Trim history lists
+        for k in list(feed_history.keys()):
+            feed_history[k] = feed_history[k][:20]
 
         return render_template(
             "index.html",
@@ -236,6 +326,12 @@ def create_app() -> Flask:
             week_events=week_events,
             events=upcoming_events,
             categories=categories,
+            civics_actions=civics_actions,
+            civics_stats=civics_stats,
+            tax_info=tax_info,
+            feed_history=feed_history,
+            week_grid=week_grid,
+            time_str=time_str,
         )
 
     @app.route("/feeds")
@@ -254,6 +350,10 @@ def create_app() -> Flask:
     def feeds_view():
         # Minimal page that fetches /feeds and shows category filters
         return render_template("feeds.html", app_name=app.config["APP_NAME"])
+
+    @app.route("/about")
+    def about():
+        return render_template("about.html", app_name=app.config["APP_NAME"])
 
     @app.route("/api/nws/alerts")
     def api_nws_alerts():

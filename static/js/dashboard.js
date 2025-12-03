@@ -44,6 +44,79 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   // initialize map once
   updateMap();
+
+  // Mobile compact mode: scale the dashboard to fit 100vh with no scroll
+  const fitContainer = document.getElementById("js-fit");
+  function fitToViewport() {
+    if (!fitContainer) return;
+    const isCompact = window.innerWidth <= 640;
+    document.body.classList.toggle("mobile-compact", isCompact);
+    // Reset before measuring
+    fitContainer.style.transform = "";
+    fitContainer.style.width = "";
+    if (!isCompact) return;
+    // Compute scale to fit vertically
+    const totalH = fitContainer.scrollHeight;
+    const vh = window.innerHeight;
+    const scale = Math.min(1, vh / Math.max(1, totalH));
+    fitContainer.style.transformOrigin = "top left";
+    fitContainer.style.transform = `scale(${scale})`;
+    // Expand width so scaled content fills viewport width
+    fitContainer.style.width = `${100 / scale}%`;
+  }
+  window.addEventListener("resize", fitToViewport);
+  fitToViewport();
+
+  // Agenda interactions: clicking an item populates the Details panel
+  const agenda = document.querySelector(".agenda");
+  const detail = document.getElementById("js-detail");
+  const dTitle = document.getElementById("js-detail-title");
+  const dSummary = document.getElementById("js-detail-summary");
+  const dWhen = document.getElementById("js-detail-when");
+  const dWhere = document.getElementById("js-detail-where");
+  const dSource = document.getElementById("js-detail-source");
+  const dLink = document.getElementById("js-detail-link");
+
+  function setDetailsFromEl(el) {
+    if (!el || !detail) return;
+    const title = el.dataset.title || "Selected item";
+    const summary = el.dataset.summary || "";
+    const time = el.dataset.time || "";
+    const date = el.dataset.date || "";
+    const source = el.dataset.source || "";
+    const location = el.dataset.location || "";
+    const link = el.dataset.link || "";
+    if (dTitle) dTitle.textContent = title;
+    if (dSummary) dSummary.textContent = summary;
+    if (dWhen) dWhen.textContent = [date, time].filter(Boolean).join(" · ") || "—";
+    if (dWhere) dWhere.textContent = location || "—";
+    if (dSource) dSource.textContent = source || "—";
+    if (dLink) {
+      if (link) {
+        dLink.style.display = "";
+        dLink.href = link;
+      } else {
+        dLink.style.display = "none";
+      }
+    }
+  }
+
+  if (agenda) {
+    agenda.addEventListener("click", (e) => {
+      const target = e.target;
+      if (!(target instanceof Element)) return;
+      // If a link inside, try to populate details and keep link default if cmd/ctrl
+      const item = target.closest(".agenda-v__item");
+      if (item) {
+        // Populate and prevent navigation unless modifier used
+        const isModified = e.metaKey || e.ctrlKey || e.shiftKey || e.altKey;
+        setDetailsFromEl(item);
+        if (!isModified) {
+          e.preventDefault();
+        }
+      }
+    });
+  }
 });
 
 

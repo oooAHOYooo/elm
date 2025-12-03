@@ -1,15 +1,18 @@
 RSS_SOURCES = {
+    # InfoNewHaven (working)
     "who_knew": "https://www.infonewhaven.com/category/who-knew-blog/feed/",
     "food_drink": "https://www.infonewhaven.com/food-drink/feed/",
     "music_arts": "https://www.infonewhaven.com/arts-entertainment/music/feed/",
-    # City of New Haven (Granicus/GovAccess)
-    "city_news": "https://www.newhavenct.gov/Home/Components/News/RSS",
-    "city_events": "https://www.newhavenct.gov/Home/Components/Calendar/Event/RSS",
-    "city_calendar_items": "https://www.newhavenct.gov/Home/Components/Calendar/Item/RSS",
+    # City of New Haven feeds are currently disabled due to 403 responses.
+    # "city_news": "https://www.newhavenct.gov/Home/Components/News/RSS",
+    # "city_events": "https://www.newhavenct.gov/Home/Components/Calendar/Event/RSS",
+    # "city_calendar_items": "https://www.newhavenct.gov/Home/Components/Calendar/Item/RSS",
 }
 
+# InfoNewHaven iCal is currently blocked behind a JS challenge (Sucuri),
+# which prevents server-side fetching. Disable for now.
 ICAL_SOURCES = {
-    "events_calendar": "https://www.infonewhaven.com/things-to-do/new-haven-events-calendar/?ical=1",
+    # "events_calendar": "https://www.infonewhaven.com/things-to-do/new-haven-events-calendar/?ical=1",
 }
 
 SOURCE_CREDIT = {

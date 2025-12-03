@@ -17,7 +17,8 @@ class Config:
         url.strip()
         for url in os.getenv(
             "FEED_URLS",
-            "https://ctmirror.org/feed/,https://www.nhregister.com/news/local/rss,https://www.ctinsider.com/news/new-haven/rss/",
+            # Defaults favor reliable sources; omit endpoints returning 404/403.
+            "https://ctmirror.org/feed/",
         ).split(",")
         if url.strip()
     ]
