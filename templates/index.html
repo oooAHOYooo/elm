@@ -4,8 +4,14 @@
     <header class="masthead">
         <div class="masthead__title">
             <h1>{{ app_name or "Elm City Daily" }}</h1>
-            <p class="masthead__date">{{ date_str }}</p>
+            <div class="masthead__time-temp">
+                <span class="masthead__time">{{ time_str }}</span>
+                {% if weather.current_temp is not none %}
+                <span class="masthead__temp">{{ weather.current_temp|round|int }}°</span>
+                {% endif %}
+            </div>
         </div>
+        <p class="masthead__date">{{ date_str }}</p>
         <div class="masthead__lines" aria-hidden="true"></div>
     </header>
 

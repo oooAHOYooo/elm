@@ -39,6 +39,12 @@
             contentSelector: '.mobile-tab-civics'
         },
         {
+            id: 'change',
+            label: 'Change',
+            icon: '🔧',
+            contentSelector: '.mobile-tab-change'
+        },
+        {
             id: 'cams',
             label: 'Cams',
             icon: '📹',
@@ -184,6 +190,13 @@
         civicsTab.setAttribute('role', 'tabpanel');
         civicsTab.setAttribute('aria-labelledby', 'tab-civics');
 
+        // Change New Haven tab - all Change New Haven links
+        const changeTab = document.createElement('div');
+        changeTab.className = 'mobile-tab-content mobile-tab-change';
+        changeTab.setAttribute('aria-hidden', 'true');
+        changeTab.setAttribute('role', 'tabpanel');
+        changeTab.setAttribute('aria-labelledby', 'tab-change');
+
         // Cams tab - traffic cameras
         const camsTab = document.createElement('div');
         camsTab.className = 'mobile-tab-content mobile-tab-cams';
@@ -255,6 +268,15 @@
                 }
             }
 
+            // Change New Haven: All Change New Haven links
+            if (leftPanel) {
+                const changeNH = leftPanel.querySelector('.change-nh');
+                if (changeNH) {
+                    const changeClone = changeNH.cloneNode(true);
+                    changeTab.appendChild(changeClone);
+                }
+            }
+
             // Cams: Live camera
             if (liveCam) {
                 const camClone = liveCam.cloneNode(true);
@@ -281,6 +303,7 @@
         tabContainer.appendChild(eventsTab);
         tabContainer.appendChild(newsTab);
         tabContainer.appendChild(civicsTab);
+        tabContainer.appendChild(changeTab);
         tabContainer.appendChild(camsTab);
         tabContainer.appendChild(weatherTab);
 
