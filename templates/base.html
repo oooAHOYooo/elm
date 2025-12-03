@@ -11,10 +11,14 @@
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Newsreader:wght@500;600;700&display=swap" rel="stylesheet">
         <link rel="stylesheet"
             href="{{ url_for('static', filename='css/main.css') }}" />
+        <link rel="stylesheet"
+            href="{{ url_for('static', filename='css/mobile-nav.css') }}" />
     </head>
     <body>
         {% block content %}{% endblock %}
         <script src="{{ url_for('static', filename='js/dashboard.js') }}"
+            defer></script>
+        <script src="{{ url_for('static', filename='js/mobile-nav.js') }}"
             defer></script>
     </body>
 </html>

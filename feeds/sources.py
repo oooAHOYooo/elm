@@ -7,6 +7,8 @@ RSS_SOURCES = {
     # "city_news": "https://www.newhavenct.gov/Home/Components/News/RSS",
     # "city_events": "https://www.newhavenct.gov/Home/Components/Calendar/Event/RSS",
     # "city_calendar_items": "https://www.newhavenct.gov/Home/Components/Calendar/Item/RSS",
+    # IAFF Local 825 (scraped, not RSS)
+    "iaff_headlines": "https://newhavenfire.org/index.cfm?zone=/unionactive/iaff_headline_view.cfm",
 }
 
 # InfoNewHaven iCal is currently blocked behind a JS challenge (Sucuri),
@@ -31,6 +33,8 @@ SOURCE_META = {
     "city_news": {"name": "City of New Haven", "url": "https://www.newhavenct.gov"},
     "city_events": {"name": "City of New Haven", "url": "https://www.newhavenct.gov"},
     "city_calendar_items": {"name": "City of New Haven", "url": "https://www.newhavenct.gov"},
+    # IAFF Local 825
+    "iaff_headlines": {"name": "IAFF Local 825", "url": "https://newhavenfire.org"},
 }
 
 

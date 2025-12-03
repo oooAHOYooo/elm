@@ -1,0 +1,353 @@
+/**
+ * Mobile Navigation Styles for Elm City Daily
+ * Bottom navigation bar with tab-based content switching
+ * No scrolling - everything fits perfectly on screen
+ */
+
+/* Mobile-only styles */
+@media (max-width: 768px) {
+    /* Prevent body scroll on mobile */
+    html,
+    body {
+        height: 100%;
+        overflow: hidden;
+        position: fixed;
+        width: 100%;
+    }
+
+    /* Dashboard container adjustments */
+    .dashboard {
+        height: 100vh;
+        height: 100dvh; /* Dynamic viewport height for mobile browsers */
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    /* Compact header for mobile */
+    .masthead {
+        flex-shrink: 0;
+        padding: 12px 16px 8px;
+        border-bottom: 2px solid var(--line);
+    }
+
+    .masthead__title h1 {
+        font-size: 20px;
+        letter-spacing: 0.05em;
+    }
+
+    .masthead__date {
+        font-size: 11px;
+    }
+
+    .masthead__lines {
+        display: none;
+    }
+
+    /* Mobile tabs container */
+    .mobile-tabs-container {
+        flex: 1;
+        position: relative;
+        overflow: hidden;
+        min-height: 0;
+    }
+
+    /* Tab content */
+    .mobile-tab-content {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        padding: 12px 16px;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateX(20px);
+        transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+        background: var(--paper);
+    }
+
+    .mobile-tab-content.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(0);
+        z-index: 1;
+    }
+
+    /* Hide desktop content on mobile */
+    main.grid,
+    section.strip {
+        display: none !important;
+    }
+
+    /* Bottom navigation bar */
+    .mobile-bottom-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-top: 1px solid var(--line);
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding: 8px 4px 12px;
+        z-index: 1000;
+        box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
+        /* Safe area for notched devices */
+        padding-bottom: max(12px, env(safe-area-inset-bottom));
+    }
+
+    /* Navigation items */
+    .mobile-nav-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        padding: 8px 4px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border-radius: 8px;
+        position: relative;
+        min-width: 0;
+        color: var(--muted-ink);
+        font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    .mobile-nav-item:active {
+        transform: scale(0.95);
+    }
+
+    .mobile-nav-item.active {
+        color: var(--accent);
+    }
+
+    .mobile-nav-item.active::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 32px;
+        height: 3px;
+        background: var(--accent);
+        border-radius: 0 0 3px 3px;
+    }
+
+    /* Navigation icons */
+    .mobile-nav-icon {
+        font-size: 24px;
+        line-height: 1;
+        transition: transform 0.2s ease;
+    }
+
+    .mobile-nav-item.active .mobile-nav-icon {
+        transform: scale(1.1);
+    }
+
+    /* Navigation labels */
+    .mobile-nav-label {
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+    }
+
+    /* Content padding to account for bottom nav */
+    .dashboard {
+        padding-bottom: 70px;
+    }
+
+    /* Tab-specific content styling */
+    .mobile-tab-content .panel {
+        background: rgba(255, 255, 255, 0.6);
+        border-radius: 12px;
+        padding: 12px;
+        margin-bottom: 12px;
+        border: 1px solid var(--line);
+    }
+
+    .mobile-tab-content .panel__title {
+        font-size: 16px;
+        margin-bottom: 12px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--line);
+    }
+
+    /* Compact stats for mobile */
+    .mobile-tab-content .stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    .mobile-tab-content .stat {
+        padding: 8px;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 8px;
+        border: 1px solid var(--line);
+    }
+
+    /* List items in mobile tabs */
+    .mobile-tab-content .list {
+        max-height: none;
+    }
+
+    .mobile-tab-content .list__item {
+        padding: 10px 0;
+        border-bottom: 1px solid var(--line);
+    }
+
+    /* Agenda in mobile */
+    .mobile-tab-content .agenda--vertical {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .mobile-tab-content .agenda-v__row {
+        padding: 10px 12px;
+    }
+
+    /* Weather section in mobile */
+    .mobile-tab-content .weather {
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        margin-bottom: 12px;
+    }
+
+    /* Live camera in mobile */
+    .mobile-tab-content #liveCam78 {
+        margin: 0;
+        padding: 12px;
+        border-radius: 12px;
+    }
+
+    .mobile-tab-content #cam78Canvas {
+        max-width: 100%;
+        border-radius: 8px;
+    }
+
+    /* Footer adjustments */
+    .footer-mini {
+        display: none;
+    }
+
+    /* Smooth scrolling */
+    .mobile-tab-content {
+        scroll-behavior: smooth;
+    }
+
+    /* Hide scrollbar but keep functionality */
+    .mobile-tab-content::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .mobile-tab-content::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .mobile-tab-content::-webkit-scrollbar-thumb {
+        background: var(--line);
+        border-radius: 2px;
+    }
+
+    .mobile-tab-content::-webkit-scrollbar-thumb:hover {
+        background: var(--muted-ink);
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 480px) {
+    .masthead {
+        padding: 10px 12px 6px;
+    }
+
+    .masthead__title h1 {
+        font-size: 18px;
+    }
+
+    .mobile-nav-icon {
+        font-size: 22px;
+    }
+
+    .mobile-nav-label {
+        font-size: 9px;
+    }
+
+    .mobile-tab-content {
+        padding: 10px 12px;
+    }
+
+    .mobile-bottom-nav {
+        padding: 6px 2px 10px;
+    }
+}
+
+/* Landscape orientation adjustments */
+@media (max-width: 768px) and (orientation: landscape) {
+    .masthead {
+        padding: 8px 16px 6px;
+    }
+
+    .masthead__title h1 {
+        font-size: 18px;
+    }
+
+    .mobile-bottom-nav {
+        padding: 6px 4px 8px;
+    }
+
+    .mobile-nav-icon {
+        font-size: 20px;
+    }
+
+    .mobile-nav-label {
+        font-size: 9px;
+    }
+}
+
+/* Prevent text selection on nav items for better UX */
+.mobile-nav-item {
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* Loading state */
+.mobile-tab-content:not(.active) {
+    pointer-events: none;
+}
+
+/* Smooth transitions for tab switching */
+@keyframes fadeInSlide {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.mobile-tab-content.active {
+    animation: fadeInSlide 0.3s ease;
+}
+

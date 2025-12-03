@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from .feed_parser import parse_rss, parse_ical
+from .iaff_scraper import fetch_iaff_headlines
 from .sources import RSS_SOURCES, ICAL_SOURCES, SOURCE_CREDIT
 from utils.cache import TTLCache
 
@@ -26,13 +27,23 @@ def aggregate_all(timeout_rss: int = 6, timeout_ical: int = 8) -> Dict[str, Any]
 
     items: List[Dict[str, Any]] = []
 
-    # RSS sources
+    # RSS sources (skip iaff_headlines as it's not an RSS feed)
     for name, url in RSS_SOURCES.items():
+        if name == "iaff_headlines":
+            continue  # Handle separately below
         items.extend(parse_rss(url, timeout=timeout_rss, source_key=name))
 
     # iCal sources
     for name, url in ICAL_SOURCES.items():
         items.extend(parse_ical(url, timeout=timeout_ical))
+
+    # IAFF Headlines special scraper
+    if "iaff_headlines" in RSS_SOURCES:
+        try:
+            iaff_items = fetch_iaff_headlines(RSS_SOURCES["iaff_headlines"])
+            items.extend(iaff_items)
+        except Exception as e:
+            _logger.error("IAFF scraper error: %s", e)
 
     # Sort newest first
     items.sort(key=_sort_key, reverse=True)

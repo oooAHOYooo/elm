@@ -46,9 +46,18 @@ document.addEventListener("DOMContentLoaded", () => {
   updateMap();
 
   // Mobile compact mode: scale the dashboard to fit 100vh with no scroll
+  // Disabled when mobile nav is active (mobile-nav.js handles mobile layout)
   const fitContainer = document.getElementById("js-fit");
   function fitToViewport() {
     if (!fitContainer) return;
+    // Check if mobile nav is active
+    const isMobileNavActive = window.mobileNav && window.mobileNav.isMobile();
+    if (isMobileNavActive) {
+      // Mobile nav handles layout, don't scale
+      fitContainer.style.transform = "";
+      fitContainer.style.width = "";
+      return;
+    }
     const isCompact = window.innerWidth <= 640;
     document.body.classList.toggle("mobile-compact", isCompact);
     // Reset before measuring
@@ -65,6 +74,8 @@ document.addEventListener("DOMContentLoaded", () => {
     fitContainer.style.width = `${100 / scale}%`;
   }
   window.addEventListener("resize", fitToViewport);
+  // Delay to let mobile-nav initialize first
+  setTimeout(fitToViewport, 100);
   fitToViewport();
 
   // Agenda interactions: clicking an item populates the Details panel
