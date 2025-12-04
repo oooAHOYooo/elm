@@ -17,10 +17,10 @@ from services.civics import (
     fetch_city_calendar,
     fetch_legistar_events,
 )
-from modules.change_new_haven_live.routes import bp as change_bp
 from services import weather as weather_service
 from services import nws as nws_service
 from services import traffic_cams as traffic_cams_service
+from services import tides as tides_service
 from feeds.aggregator import aggregate_all, aggregate_filtered
 
 
@@ -37,8 +37,7 @@ def create_app() -> Flask:
         format="%(asctime)s %(levelname)s %(name)s %(message)s",
     )
     app.logger.setLevel(logging.INFO)
-    # Register blueprints
-    app.register_blueprint(change_bp)
+    # Register blueprints (none currently)
 
     @app.route("/")
     def index():
@@ -167,6 +166,45 @@ def create_app() -> Flask:
         nws_alerts = nws_service.fetch_nws_alerts(zone="ctz010")
         nws_fc = nws_service.fetch_nws_forecast(lat=lat, lon=lon)
         nws_periods = nws_fc.get("periods", [])[:2] if nws_fc else []
+
+        # Compute simple daypart temperatures from hourly forecast (local time)
+        daypart_temps: Dict[str, Any] = {}
+        try:
+            from datetime import datetime as _dt
+            from zoneinfo import ZoneInfo as _ZoneInfo
+            hourly = (nws_fc or {}).get("hourly", []) or []
+            buckets = {
+                "morning": [],
+                "afternoon": [],
+                "evening": [],
+                "night": [],
+            }
+            for h in hourly:
+                t_iso = h.get("startTime")
+                temp = h.get("temperature")
+                if t_iso is None or temp is None:
+                    continue
+                try:
+                    dt_local = _dt.fromisoformat(t_iso.replace("Z", "+00:00")).astimezone(_ZoneInfo("America/New_York"))
+                    hour = dt_local.hour
+                    # morning 6–11, afternoon 12–17, evening 18–21, night 22–5
+                    if 6 <= hour <= 11:
+                        buckets["morning"].append(temp)
+                    elif 12 <= hour <= 17:
+                        buckets["afternoon"].append(temp)
+                    elif 18 <= hour <= 21:
+                        buckets["evening"].append(temp)
+                    else:
+                        buckets["night"].append(temp)
+                except Exception:
+                    continue
+            for k, vals in buckets.items():
+                if vals:
+                    daypart_temps[k] = round(sum(vals) / len(vals))
+                else:
+                    daypart_temps[k] = None
+        except Exception:
+            daypart_temps = {"morning": None, "afternoon": None, "evening": None, "night": None}
 
         # This week's events (next 7 days)
         def within_next_seven_days(iso_str: str) -> bool:
@@ -368,6 +406,7 @@ def create_app() -> Flask:
             weather=weather,
             nws_alerts=nws_alerts[:3],
             nws_periods=nws_periods,
+            daypart_temps=daypart_temps,
             week_events=week_events,
             events=upcoming_events,
             categories=categories,
@@ -437,6 +476,13 @@ def create_app() -> Flask:
         lon = float(request.args.get("lon", app.config["WEATHER_LON"]))
         data = nws_service.fetch_nws_forecast(lat=lat, lon=lon)
         return jsonify({"lat": lat, "lon": lon, **data})
+
+    @app.route("/api/tides")
+    def api_tides():
+        station = request.args.get("station", "8465705")
+        day = request.args.get("date", "today")
+        data = tides_service.fetch_tides(station=station, day=day)
+        return jsonify(data)
 
     return app
 

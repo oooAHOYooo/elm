@@ -10,14 +10,25 @@
     </header>
     <main class="panel" style="margin-top:8px;">
         <h2 class="panel__title">About</h2>
-        <p>This dashboard surfaces local civic information from primary public sources.</p>
+        <p>This site surfaces local civic information from primary public
+            sources.</p>
         <ul class="list" style="margin-top:8px;">
-            <li class="list__item"><span class="list__source">Legistar</span> <span class="list__title">Recent matters and actions (New Haven)</span></li>
-            <li class="list__item"><span class="list__source">CT Open Data</span> <span class="list__title">Municipal tax/mill rate dataset</span></li>
-            <li class="list__item"><span class="list__source">InfoNewHaven</span> <span class="list__title">Public RSS feeds for happenings</span></li>
+            <li class="list__item"><span class="list__source">Legistar</span>
+                <span class="list__title">Recent matters and actions (New
+                    Haven)</span></li>
+            <li class="list__item"><span class="list__source">CT Open
+                    Data</span> <span class="list__title">Municipal tax/mill
+                    rate dataset</span></li>
+            <li class="list__item"><span
+                    class="list__source">InfoNewHaven</span> <span
+                    class="list__title">Public RSS feeds for
+                    happenings</span></li>
         </ul>
-        <p class="feature__meta" style="margin-top:10px;">Links: <a class="events-table__link" href="{{ url_for('feeds_view') }}">Feeds Browser</a> · <a class="events-table__link" href="{{ url_for('feeds_api') }}">JSON API</a></p>
+        <p class="feature__meta" style="margin-top:10px;">Links: <a
+                class="events-table__link"
+                href="{{ url_for('feeds_view') }}">Feeds Browser</a> · <a
+                class="events-table__link"
+                href="{{ url_for('feeds_api') }}">JSON API</a></p>
     </main>
 </div>
 {% endblock %}
-

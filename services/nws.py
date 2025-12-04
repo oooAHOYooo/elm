@@ -59,7 +59,7 @@ def fetch_nws_alerts(zone: str = "ctz010", ttl_seconds: int = 300) -> List[Dict[
 def fetch_nws_forecast(lat: float, lon: float, ttl_seconds: int = 900) -> Dict[str, Any]:
     """
     Fetch NWS forecast and hourly forecast using the points API.
-    Returns dict with 'periods' (from daily forecast) and 'hourly' (first 12 hours).
+    Returns dict with 'periods' (from daily forecast) and 'hourly' (first 24 hours).
     """
     key = f"nws_forecast:{lat:.4f},{lon:.4f}"
     cached = _get_cache(key, ttl_seconds)
@@ -96,7 +96,7 @@ def fetch_nws_forecast(lat: float, lon: float, ttl_seconds: int = 900) -> Dict[s
                     "shortForecast": h.get("shortForecast"),
                     "windSpeed": h.get("windSpeed"),
                 }
-                for h in hourly_periods[:12]
+                for h in hourly_periods[:24]
             ],
         }
         _set_cache(key, result)

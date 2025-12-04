@@ -59,6 +59,7 @@ def fetch_weather(lat: float, lon: float, request_timeout: int = 5) -> Dict[str,
         "longitude": lon,
         "current_weather": "true",
         "daily": "temperature_2m_max,temperature_2m_min,precipitation_probability_max",
+        "temperature_unit": "fahrenheit",
         "timezone": "auto",
     }
 

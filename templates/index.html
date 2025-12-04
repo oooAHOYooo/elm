@@ -4,12 +4,6 @@
     <header class="masthead">
         <div class="masthead__title">
             <h1>{{ app_name or "Elm City Daily" }}</h1>
-            <div class="masthead__time-temp">
-                <span class="masthead__time">{{ time_str }}</span>
-                {% if weather.current_temp is not none %}
-                <span class="masthead__temp">{{ weather.current_temp|round|int }}°</span>
-                {% endif %}
-            </div>
         </div>
         <p class="masthead__date">{{ date_str }}</p>
         <div class="masthead__lines" aria-hidden="true"></div>
@@ -17,79 +11,206 @@
 
     <main class="grid">
         <section class="panel panel--left">
-            <h2 class="panel__title">City by the Numbers</h2>
-            <div class="stats stats--compact">
-                <div class="stat">
-                    <div class="stat__value">{{ civics_stats.introduced }}</div>
-                    <div class="stat__label">Matters ({{ civics_stats.since[:10] if civics_stats.since }})</div>
+            <h2 class="panel__title">Local Time & Weather</h2>
+            <div class="weather">
+                <div class="weather__icon" style="display:none;"></div>
+                <div class="weather__meta">
+                    <div class="weather__label">{{ time_str }} · {{
+                        weather.weather_desc }}</div>
+                    <div class="weather__units">
+                        <label for="js-units" class="sr-only">Units</label>
+                        <select id="js-units" aria-label="Units">
+                            <option value="F" selected>°F</option>
+                            <option value="C">°C</option>
+                        </select>
+                    </div>
+                    <div class="weather__temps">
+                        {% if weather.current_temp is not none %}
+                        <span class="temp temp--current"
+                            data-temp-f="{{ weather.current_temp }}">{{
+                            weather.current_temp|round|int }}°</span>
+                        {% endif %}
+                        {% if weather.high_temp is not none and weather.low_temp
+                        is not none %}
+                        <span id="js-hilo" class="temp temp--range"
+                            data-high-f="{{ weather.high_temp }}"
+                            data-low-f="{{ weather.low_temp }}">H {{
+                            weather.high_temp|round|int }}° · L {{
+                            weather.low_temp|round|int }}°</span>
+                        {% endif %}
+                    </div>
+                    {% if daypart_temps %}
+                    <ul class="dayparts">
+                        <li><span>Morning</span><span class="daypart-temp"
+                                data-temp-f="{{ daypart_temps.morning }}">{{
+                                daypart_temps.morning
+                                if daypart_temps.morning is not none else "—"
+                                }}°</span></li>
+                        <li><span>Afternoon</span><span class="daypart-temp"
+                                data-temp-f="{{ daypart_temps.afternoon }}">{{
+                                daypart_temps.afternoon if
+                                daypart_temps.afternoon is not none else "—"
+                                }}°</span></li>
+                        <li><span>Evening</span><span class="daypart-temp"
+                                data-temp-f="{{ daypart_temps.evening }}">{{
+                                daypart_temps.evening
+                                if daypart_temps.evening is not none else "—"
+                                }}°</span></li>
+                        <li><span>Night</span><span class="daypart-temp"
+                                data-temp-f="{{ daypart_temps.night }}">{{
+                                daypart_temps.night if
+                                daypart_temps.night is not none else "—"
+                                }}°</span></li>
+                    </ul>
+                    {% endif %}
                 </div>
-                <div class="stat">
-                    <div class="stat__value">{{ civics_stats.adopted }}</div>
-                    <div class="stat__label">Adopted</div>
-                </div>
-                <div class="stat">
-                    <div class="stat__value">{{ civics_stats.failed }}</div>
-                    <div class="stat__label">Failed</div>
-                </div>
-                <div class="stat">
-                    <div class="stat__value">{{ civics_stats.projects_open }}</div>
-                    <div class="stat__label">Projects</div>
-                </div>
-                {% if tax_info and tax_info.mill_rate %}
-                <div class="stat">
-                    <div class="stat__value">{{ '%.2f'|format(tax_info.mill_rate) }}</div>
-                    <div class="stat__label">Mill (FY {{ tax_info.fiscal_year }})</div>
-                </div>
-                {% endif %}
             </div>
-            <div class="history">
-                <details>
-                    <summary>Who Knew Blog</summary>
-                    <ul class="list">
-                        {% for i in (feed_history.who_knew_blog or []) %}
-                        <li class="list__item">
-                            <a class="list__link" href="{{ i.link }}" target="_blank" rel="noopener">
-                                <span class="list__source">{{ i.date[:10] if i.date }}</span>
-                                <span class="list__title">{{ i.title }}</span>
-                            </a>
-                        </li>
-                        {% else %}
-                        <li class="list__item list__item--empty">No history.</li>
-                        {% endfor %}
-                    </ul>
-                </details>
-                <details>
-                    <summary>Food & Drink</summary>
-                    <ul class="list">
-                        {% for i in (feed_history.food_drink or []) %}
-                        <li class="list__item">
-                            <a class="list__link" href="{{ i.link }}" target="_blank" rel="noopener">
-                                <span class="list__source">{{ i.date[:10] if i.date }}</span>
-                                <span class="list__title">{{ i.title }}</span>
-                            </a>
-                        </li>
-                        {% else %}
-                        <li class="list__item list__item--empty">No history.</li>
-                        {% endfor %}
-                    </ul>
-                </details>
-                <details>
-                    <summary>Music & Arts</summary>
-                    <ul class="list">
-                        {% for i in (feed_history.music_arts or []) %}
-                        <li class="list__item">
-                            <a class="list__link" href="{{ i.link }}" target="_blank" rel="noopener">
-                                <span class="list__source">{{ i.date[:10] if i.date }}</span>
-                                <span class="list__title">{{ i.title }}</span>
-                            </a>
-                        </li>
-                        {% else %}
-                        <li class="list__item list__item--empty">No history.</li>
-                        {% endfor %}
-                    </ul>
-                </details>
+
+            <div class="tides-mini" aria-label="Tidal information">
+                <div class="tides-mini__controls">
+                    <label for="js-tide-date" class="sr-only">Date</label>
+                    <select id="js-tide-date" aria-label="Date">
+                        <option value="today">Today</option>
+                        <option value="tomorrow">Tomorrow</option>
+                    </select>
+                </div>
+                <div id="js-tide-output" class="tides-mini__output">Tides
+                    loading…</div>
             </div>
-            <h2 class="panel__title">Recent Council Actions</h2>
+
+            {# History sections omitted for now #}
+            <div class="change-nh" role="region"
+                aria-label="Change New Haven quick actions">
+                <div class="change-nh__title">Change New Haven</div>
+                <div class="change-nh__actions">
+                    <a class="change-nh__btn" href="tel:+12039465128"
+                        title="Zoning (Call)">
+                        <span class="change-nh__icon">☎️</span><span
+                            class="change-nh__label">Zoning</span>
+                    </a>
+                    <a class="change-nh__btn"
+                        href="https://newhavenct.legistar.com" target="_blank"
+                        rel="noopener" title="Legistar">
+                        <span class="change-nh__icon">📄</span><span
+                            class="change-nh__label">Legistar</span>
+                    </a>
+                    <a class="change-nh__btn"
+                        href="https://cityofnewhaven.com/civicax/citycalendar/calendarjson"
+                        target="_blank" rel="noopener" title="Calendar JSON">
+                        <span class="change-nh__icon">🗓️</span><span
+                            class="change-nh__label">Calendar</span>
+                    </a>
+                    <a class="change-nh__btn"
+                        href="https://www.newhavenct.gov/government/departments-divisions/city-plan"
+                        target="_blank" rel="noopener" title="City Plan Dept">
+                        <span class="change-nh__icon">🏛️</span><span
+                            class="change-nh__label">City Plan</span>
+                    </a>
+                    <a class="change-nh__btn"
+                        href="https://maps.newhavenct.gov/" target="_blank"
+                        rel="noopener" title="Maps">
+                        <span class="change-nh__icon">🗺️</span><span
+                            class="change-nh__label">Maps</span>
+                    </a>
+                </div>
+            </div>
+            {# Recent council actions omitted #}
+        </section>
+
+        <section class="panel panel--center">
+            <div class="center-grid">
+                <div class="center-grid__main">
+                    <h2 class="panel__title">This Week</h2>
+                    {% if week_events and week_events|length > 0 %}
+                    <div class="agenda agenda--vertical"
+                        aria-label="Agenda this week">
+                        {% for day in week_grid[:5] %}
+                        <div class="agenda-v__row">
+                            <div class="agenda-v__label">{{ day.label }}</div>
+                            <div class="agenda-v__items">
+                                {% for it in day['items'] %}
+                                <div class="agenda-v__item"
+                                    data-title="{{ it.title }}"
+                                    data-time="{{ it.time }}"
+                                    data-link="{{ it.link }}"
+                                    data-location="{{ it.location }}"
+                                    data-source="{{ it.source }}"
+                                    data-date="{{ it.date }}"
+                                    data-summary="{{ it.summary | e }}">
+                                    <span class="agenda-v__time">{{ it.time
+                                        }}</span>
+                                    <a class="agenda__link" href="{{ it.link }}"
+                                        target="_blank" rel="noopener">{{
+                                        it.title }}</a>
+                                </div>
+                                {% else %}
+                                <div
+                                    class="agenda-v__item agenda__item--empty">—</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="list__item list__item--empty">No events this
+                        week.</div>
+                    {% endif %}
+                </div>
+                <div class="center-grid__side">
+                    <h2 class="panel__title">Details</h2>
+                    <article class="feature detail" id="js-detail">
+                        <h3 class="detail__title" id="js-detail-title">Select an
+                            item from This Week.</h3>
+                        <div class="detail__grid">
+                            <div class="detail__row">
+                                <div class="detail__label">When</div>
+                                <div class="detail__value"
+                                    id="js-detail-when">—</div>
+                            </div>
+                            <div class="detail__row">
+                                <div class="detail__label">Where</div>
+                                <div class="detail__value"
+                                    id="js-detail-where">—</div>
+                            </div>
+                            <div class="detail__row">
+                                <div class="detail__label">Source</div>
+                                <div class="detail__value"
+                                    id="js-detail-source">—</div>
+                            </div>
+                        </div>
+                        <div class="detail__section">
+                            <div class="detail__label">About</div>
+                            <p class="detail__summary"
+                                id="js-detail-summary"></p>
+                        </div>
+                        <p class="feature__meta"><a id="js-detail-link"
+                                class="detail__link" href="#" target="_blank"
+                                rel="noopener" style="display:none;">Open
+                                link</a></p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <aside class="panel panel--right">
+            <div class="boards">
+                <h3 class="filters__title">Upcoming Boards & Commissions</h3>
+                <ul class="list">
+                    {% for b in boards_upcoming %}
+                    <li class="list__item">
+                        <a class="list__link" href="{{ b.link or '#' }}"
+                            target="_blank" rel="noopener">
+                            <span class="list__source">{{ b.source }} · {{
+                                b.date }}</span>
+                            <span class="list__title">{{ b.title }}</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="list__item list__item--empty">No upcoming
+                        meetings.</li>
+                    {% endfor %}
+                </ul>
+            </div>
             <div class="map-controls">
                 <label for="js-map-select" class="sr-only">Map Layer</label>
                 <select id="js-map-select" class="map-controls__select"
@@ -105,160 +226,35 @@
                     data-lat="{{ center_lat }}"
                     data-lon="{{ center_lon }}"></iframe>
             </div>
-            <div class="change-nh" role="region" aria-label="Change New Haven quick actions">
-                <div class="change-nh__title">Change New Haven</div>
-                <div class="change-nh__actions">
-                    <a class="change-nh__btn" href="tel:+12039465128" title="Zoning (Call)">
-                        <span class="change-nh__icon">☎️</span><span class="change-nh__label">Zoning</span>
-                    </a>
-                    <a class="change-nh__btn" href="https://newhavenct.legistar.com" target="_blank" rel="noopener" title="Legistar">
-                        <span class="change-nh__icon">📄</span><span class="change-nh__label">Legistar</span>
-                    </a>
-                    <a class="change-nh__btn" href="https://cityofnewhaven.com/civicax/citycalendar/calendarjson" target="_blank" rel="noopener" title="Calendar JSON">
-                        <span class="change-nh__icon">🗓️</span><span class="change-nh__label">Calendar</span>
-                    </a>
-                    <a class="change-nh__btn" href="https://www.newhavenct.gov/government/departments-divisions/city-plan" target="_blank" rel="noopener" title="City Plan Dept">
-                        <span class="change-nh__icon">🏛️</span><span class="change-nh__label">City Plan</span>
-                    </a>
-                    <a class="change-nh__btn" href="https://maps.newhavenct.gov/" target="_blank" rel="noopener" title="Maps">
-                        <span class="change-nh__icon">🗺️</span><span class="change-nh__label">Maps</span>
-                    </a>
+            <h2 class="panel__title">City by the Numbers</h2>
+            <div class="stats stats--compact">
+                <div class="stat">
+                    <div class="stat__value">{{ civics_stats.introduced }}</div>
+                    <div class="stat__label">Matters ({{ civics_stats.since[:10]
+                        if civics_stats.since }})</div>
                 </div>
-            </div>
-            <ul class="list list--supporting">
-                {% for item in civics_actions %}
-                <li class="list__item">
-                    <a class="list__link" href="{{ item.link or '#' }}" target="_blank"
-                        rel="noopener">
-                        <span class="list__source">{{ item.source }} · {{ item.published_display }}</span>
-                        <span class="list__title">{{ item.title }}</span>
-                    </a>
-                </li>
-                {% else %}
-                <li class="list__item list__item--empty">No recent council actions available.</li>
-                {% endfor %}
-            </ul>
-        </section>
-
-        <section class="panel panel--center">
-            <div class="center-grid">
-                <div class="center-grid__main">
-                    <h2 class="panel__title">This Week</h2>
-                    {% if week_events and week_events|length > 0 %}
-                    <div class="agenda agenda--vertical" aria-label="Agenda this week">
-                        {% for day in week_grid[:5] %}
-                        <div class="agenda-v__row">
-                            <div class="agenda-v__label">{{ day.label }}</div>
-                            <div class="agenda-v__items">
-                                {% for it in day['items'] %}
-                                <div class="agenda-v__item"
-                                    data-title="{{ it.title }}"
-                                    data-time="{{ it.time }}"
-                                    data-link="{{ it.link }}"
-                                    data-location="{{ it.location }}"
-                                    data-source="{{ it.source }}"
-                                    data-date="{{ it.date }}"
-                                    data-summary="{{ it.summary | e }}">
-                                    <span class="agenda-v__time">{{ it.time }}</span>
-                                    <a class="agenda__link" href="{{ it.link }}" target="_blank" rel="noopener">{{ it.title }}</a>
-                                </div>
-                                {% else %}
-                                <div class="agenda-v__item agenda__item--empty">—</div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        {% endfor %}
-                    </div>
-                    {% else %}
-                    <div class="list__item list__item--empty">No events this week.</div>
-                    {% endif %}
+                <div class="stat">
+                    <div class="stat__value">{{ civics_stats.adopted }}</div>
+                    <div class="stat__label">Adopted</div>
                 </div>
-                <div class="center-grid__side">
-                    <h2 class="panel__title">Details</h2>
-                    <article class="feature detail" id="js-detail">
-                        <h3 class="detail__title" id="js-detail-title">Select an item from This Week.</h3>
-                        <div class="detail__grid">
-                            <div class="detail__row">
-                                <div class="detail__label">When</div>
-                                <div class="detail__value" id="js-detail-when">—</div>
-                            </div>
-                            <div class="detail__row">
-                                <div class="detail__label">Where</div>
-                                <div class="detail__value" id="js-detail-where">—</div>
-                            </div>
-                            <div class="detail__row">
-                                <div class="detail__label">Source</div>
-                                <div class="detail__value" id="js-detail-source">—</div>
-                            </div>
-                        </div>
-                        <div class="detail__section">
-                            <div class="detail__label">About</div>
-                            <p class="detail__summary" id="js-detail-summary"></p>
-                        </div>
-                        <p class="feature__meta"><a id="js-detail-link" class="detail__link" href="#" target="_blank" rel="noopener" style="display:none;">Open link</a></p>
-                    </article>
+                <div class="stat">
+                    <div class="stat__value">{{ civics_stats.failed }}</div>
+                    <div class="stat__label">Failed</div>
                 </div>
-            </div>
-        </section>
-
-        <aside class="panel panel--right">
-            <div class="boards">
-                <h3 class="filters__title">Upcoming Boards & Commissions</h3>
-                <ul class="list">
-                    {% for b in boards_upcoming %}
-                    <li class="list__item">
-                        <a class="list__link" href="{{ b.link or '#' }}" target="_blank" rel="noopener">
-                            <span class="list__source">{{ b.source }} · {{ b.date }}</span>
-                            <span class="list__title">{{ b.title }}</span>
-                        </a>
-                    </li>
-                    {% else %}
-                    <li class="list__item list__item--empty">No upcoming meetings.</li>
-                    {% endfor %}
-                </ul>
-            </div>
-            <h2 class="panel__title">Today in Elm City</h2>
-
-            <div class="weather">
-                <div class="weather__icon">{{ weather.weather_icon }}</div>
-                <div class="weather__meta">
-                    <div class="weather__label">{{ weather.weather_desc }}</div>
-                    <div class="weather__temps">
-                        {% if weather.current_temp is not none %}
-                        <span class="temp temp--current">{{
-                            weather.current_temp|round|int }}°</span>
-                        {% endif %}
-                        {% if weather.high_temp is not none and weather.low_temp
-                        is not none %}
-                        <span class="temp temp--range">H {{
-                            weather.high_temp|round|int }}° · L {{
-                            weather.low_temp|round|int }}°</span>
-                        {% endif %}
-                    </div>
-                    {% if weather.precip_probability is not none %}
-                    <div class="weather__precip">Precip: {{
-                        weather.precip_probability }}%</div>
-                    {% endif %}
+                <div class="stat">
+                    <div class="stat__value">{{ civics_stats.projects_open
+                        }}</div>
+                    <div class="stat__label">Projects</div>
                 </div>
-            </div>
-            {% if nws_periods and nws_periods|length > 0 %}
-            <div class="weather weather--nws">
-                <div class="weather__icon">🌀</div>
-                <div class="weather__meta">
-                    <div class="weather__label">NWS Forecast</div>
-                    <ul class="list">
-                        {% for p in nws_periods %}
-                        <li class="list__item">
-                            <span class="list__source">{{ p.name }}</span>
-                            <span class="list__title">{{ p.temperature }}{{
-                                p.temperatureUnit }} · {{ p.shortForecast
-                                }}</span>
-                        </li>
-                        {% endfor %}
-                    </ul>
+                {% if tax_info and tax_info.mill_rate %}
+                <div class="stat">
+                    <div class="stat__value">{{
+                        '%.2f'|format(tax_info.mill_rate) }}</div>
+                    <div class="stat__label">Mill (FY {{ tax_info.fiscal_year
+                        }})</div>
                 </div>
+                {% endif %}
             </div>
-            {% endif %}
 
             <div class="live-cam-widget">
                 <h3 class="filters__title">Live Traffic — CAM 78</h3>
@@ -351,7 +347,6 @@
             {% endfor %}
         </div>
     </section>
-    {% include "components/change_new_haven_live.html" %}
     <footer class="footer-mini">
         <nav class="footer-mini__nav">
             <a href="{{ url_for('about') }}">About</a>
@@ -359,10 +354,13 @@
             <a href="{{ url_for('cams') }}">Traffic Cams</a>
             <a href="{{ url_for('feeds_api') }}">API</a>
         </nav>
-        <div class="footer-mini__meta">{{ app_name }} · {{ date_str }} · {{ time_str }}</div>
+        <div class="footer-mini__meta">{{ app_name }} · {{ date_str }} · {{
+            time_str }}</div>
     </footer>
 </div>
 
-<link rel="stylesheet" href="{{ url_for('static', filename='css/live_cam_78.css') }}">
-<script src="{{ url_for('static', filename='js/live_cam_78.js') }}" defer></script>
+<link rel="stylesheet"
+    href="{{ url_for('static', filename='css/live_cam_78.css') }}">
+<script src="{{ url_for('static', filename='js/live_cam_78.js') }}"
+    defer></script>
 {% endblock %}

@@ -128,6 +128,92 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   }
+
+  // Tiny tides widget (no scrolling, micro text)
+  const tideDate = document.getElementById("js-tide-date");
+  const tideOutput = document.getElementById("js-tide-output");
+
+  async function fetchTides() {
+    if (!tideDate || !tideOutput) return;
+    const station = "8465705"; // New Haven fixed
+    const day = tideDate.value || "today";
+    try {
+      tideOutput.textContent = "Tides loading…";
+      const resp = await fetch(`/api/tides?station=${encodeURIComponent(station)}&date=${encodeURIComponent(day)}`);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const data = await resp.json();
+      const preds = Array.isArray(data.predictions) ? data.predictions : [];
+      if (preds.length === 0) {
+        tideOutput.textContent = "No tides.";
+        return;
+      }
+      // Render minimal lines: e.g., High 7:12 AM · 5.1 ft
+      const lines = preds.slice(0, 4).map(p => {
+        const t = p.t || "";
+        const type = p.type === "H" ? "High" : "Low";
+        const h = Number(p.v);
+        // Format time as h:mm AM/PM
+        const dt = new Date(t.replace(" ", "T"));
+        const timeStr = dt.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+        const height = isFinite(h) ? `${h.toFixed(1)} ft` : "";
+        return `${type} ${timeStr} · ${height}`;
+      });
+      tideOutput.textContent = lines.join("  ·  ");
+    } catch (err) {
+      tideOutput.textContent = "Tides unavailable.";
+    }
+  }
+  if (tideDate) {
+    tideDate.addEventListener("change", fetchTides);
+    fetchTides();
+  }
+
+  // Temperature units switcher (F/C) for current, H/L, and dayparts
+  const unitsSelect = document.getElementById("js-units");
+  function toC(f) {
+    return (f - 32) * 5 / 9;
+  }
+  function fmt(n) {
+    // Round to nearest integer
+    return Math.round(n);
+  }
+  function applyUnits() {
+    if (!unitsSelect) return;
+    const units = unitsSelect.value || "F";
+    // Current temp(s)
+    document.querySelectorAll("[data-temp-f]").forEach(el => {
+      const fStr = el.getAttribute("data-temp-f");
+      const fVal = fStr ? Number(fStr) : NaN;
+      if (!isFinite(fVal)) return;
+      const val = units === "F" ? fVal : toC(fVal);
+      el.textContent = `${fmt(val)}°`;
+    });
+    // High / Low
+    const hilo = document.getElementById("js-hilo");
+    if (hilo) {
+      const hiStr = hilo.getAttribute("data-high-f");
+      const loStr = hilo.getAttribute("data-low-f");
+      const hiF = hiStr ? Number(hiStr) : NaN;
+      const loF = loStr ? Number(loStr) : NaN;
+      const hi = isFinite(hiF) ? (units === "F" ? hiF : toC(hiF)) : null;
+      const lo = isFinite(loF) ? (units === "F" ? loF : toC(loF)) : null;
+      const hiTxt = hi == null ? "—" : `${fmt(hi)}°`;
+      const loTxt = lo == null ? "—" : `${fmt(lo)}°`;
+      hilo.textContent = `H ${hiTxt} · L ${loTxt}`;
+    }
+    // Persist preference
+    try { localStorage.setItem("units", units); } catch {}
+  }
+  if (unitsSelect) {
+    try {
+      const saved = localStorage.getItem("units");
+      if (saved && (saved === "F" || saved === "C")) {
+        unitsSelect.value = saved;
+      }
+    } catch {}
+    unitsSelect.addEventListener("change", applyUnits);
+    applyUnits();
+  }
 });
 
 
