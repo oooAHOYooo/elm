@@ -11,59 +11,26 @@
 
     <main class="grid">
         <section class="panel panel--left">
-            <h2 class="panel__title">Local Time & Weather</h2>
-            <div class="weather">
-                <div class="weather__icon" style="display:none;"></div>
-                <div class="weather__meta">
-                    <div class="weather__label">{{ time_str }} · {{
-                        weather.weather_desc }}</div>
-                    <div class="weather__units">
-                        <label for="js-units" class="sr-only">Units</label>
-                        <select id="js-units" aria-label="Units">
-                            <option value="F" selected>°F</option>
-                            <option value="C">°C</option>
-                        </select>
-                    </div>
-                    <div class="weather__temps">
-                        {% if weather.current_temp is not none %}
-                        <span class="temp temp--current"
-                            data-temp-f="{{ weather.current_temp }}">{{
-                            weather.current_temp|round|int }}°</span>
-                        {% endif %}
-                        {% if weather.high_temp is not none and weather.low_temp
-                        is not none %}
-                        <span id="js-hilo" class="temp temp--range"
-                            data-high-f="{{ weather.high_temp }}"
-                            data-low-f="{{ weather.low_temp }}">H {{
-                            weather.high_temp|round|int }}° · L {{
-                            weather.low_temp|round|int }}°</span>
-                        {% endif %}
-                    </div>
-                    {% if daypart_temps %}
-                    <ul class="dayparts">
-                        <li><span>Morning</span><span class="daypart-temp"
-                                data-temp-f="{{ daypart_temps.morning }}">{{
-                                daypart_temps.morning
-                                if daypart_temps.morning is not none else "—"
-                                }}°</span></li>
-                        <li><span>Afternoon</span><span class="daypart-temp"
-                                data-temp-f="{{ daypart_temps.afternoon }}">{{
-                                daypart_temps.afternoon if
-                                daypart_temps.afternoon is not none else "—"
-                                }}°</span></li>
-                        <li><span>Evening</span><span class="daypart-temp"
-                                data-temp-f="{{ daypart_temps.evening }}">{{
-                                daypart_temps.evening
-                                if daypart_temps.evening is not none else "—"
-                                }}°</span></li>
-                        <li><span>Night</span><span class="daypart-temp"
-                                data-temp-f="{{ daypart_temps.night }}">{{
-                                daypart_temps.night if
-                                daypart_temps.night is not none else "—"
-                                }}°</span></li>
-                    </ul>
-                    {% endif %}
+            <!-- Mobile Utility Toggle -->
+            <button class="ecd-mobile-accordion-toggle" id="js-utils-toggle" type="button" aria-expanded="false" aria-controls="js-mobile-utils">
+                <span class="ecd-site-title">Elm City Daily</span>
+                <span class="ecd-mobile-status" id="js-mobile-status-text">
+                    <!-- Populated by JS -->
+                </span>
+                <span class="ecd-mobile-chevron" aria-hidden="true">▾</span>
+            </button>
+
+            <div id="js-mobile-utils" class="ecd-header-utilities">
+                <h2 class="panel__title">Local Time & Weather</h2>
+                <div class="weather-mini" aria-label="Weather information">
+                <div class="weather-mini__controls">
+                    <label for="js-units" class="sr-only">Units</label>
+                    <select id="js-units" aria-label="Units">
+                        <option value="F" selected>°F</option>
+                        <option value="C">°C</option>
+                    </select>
                 </div>
+                <div id="js-weather-output" class="weather-mini__output">Weather loading…</div>
             </div>
 
             <div class="tides-mini" aria-label="Tidal information">
@@ -115,80 +82,113 @@
                 </div>
             </div>
             {# Recent council actions omitted #}
+            </div> <!-- End ecd-header-utilities -->
         </section>
 
         <section class="panel panel--center">
-            <div class="center-grid">
-                <div class="center-grid__main">
-                    <h2 class="panel__title">This Week</h2>
-                    {% if week_events and week_events|length > 0 %}
-                    <div class="agenda agenda--vertical"
-                        aria-label="Agenda this week">
-                        {% for day in week_grid[:5] %}
-                        <div class="agenda-v__row">
-                            <div class="agenda-v__label">{{ day.label }}</div>
-                            <div class="agenda-v__items">
-                                {% for it in day['items'] %}
-                                <div class="agenda-v__item"
-                                    data-title="{{ it.title }}"
-                                    data-time="{{ it.time }}"
-                                    data-link="{{ it.link }}"
-                                    data-location="{{ it.location }}"
-                                    data-source="{{ it.source }}"
-                                    data-date="{{ it.date }}"
-                                    data-summary="{{ it.summary | e }}">
-                                    <span class="agenda-v__time">{{ it.time
-                                        }}</span>
-                                    <a class="agenda__link" href="{{ it.link }}"
-                                        target="_blank" rel="noopener">{{
-                                        it.title }}</a>
-                                </div>
-                                {% else %}
-                                <div
-                                    class="agenda-v__item agenda__item--empty">—</div>
-                                {% endfor %}
-                            </div>
+            <div class="this-week">
+                <header class="week-header desktop-only">
+                    <button id="js-week-prev" class="week-nav week-nav-prev" aria-label="Previous week">‹</button>
+                    <div id="js-week-label" class="week-label">Week of {{ week_start_date|default('this week') }}</div>
+                    <button id="js-week-next" class="week-nav week-nav-next" aria-label="Next week">›</button>
+                </header>
+
+                <div class="ecd-week-wrapper mobile-only">
+                     <button class="ecd-week-nav ecd-week-nav--prev" id="js-mobile-week-prev" aria-label="Previous week">‹</button>
+                     <div class="ecd-week-days-scroll" id="js-mobile-week-scroll">
+                         <!-- Populated by JS -->
+                     </div>
+                     <button class="ecd-week-nav ecd-week-nav--next" id="js-mobile-week-next" aria-label="Next week">›</button>
+                </div>
+
+                <div class="week-grid desktop-only" id="js-agenda-week">
+                    {% for day in week_grid %}
+                    <div class="week-day-column">
+                        <div class="week-day-header">{{ day.label }}</div>
+                        <div class="week-day-body">
+                            {% for it in day['items'] %}
+                            <button class="week-event-item" type="button"
+                                data-title="{{ it.title }}"
+                                data-time="{{ it.time }}"
+                                data-link="{{ it.link }}"
+                                data-location="{{ it.location }}"
+                                data-source="{{ it.source }}"
+                                data-date="{{ it.date }}"
+                                data-summary="{{ it.summary | e }}">
+                                <div class="week-event-time">{{ it.time }}</div>
+                                <div class="week-event-title">{{ it.title }}</div>
+                            </button>
+                            {% else %}
+                            <div class="week-day-empty">—</div>
+                            {% endfor %}
                         </div>
-                        {% endfor %}
                     </div>
-                    {% else %}
-                    <div class="list__item list__item--empty">No events this
-                        week.</div>
-                    {% endif %}
+                    {% endfor %}
                 </div>
-                <div class="center-grid__side">
-                    <h2 class="panel__title">Details</h2>
-                    <article class="feature detail" id="js-detail">
-                        <h3 class="detail__title" id="js-detail-title">Select an
-                            item from This Week.</h3>
-                        <div class="detail__grid">
-                            <div class="detail__row">
-                                <div class="detail__label">When</div>
-                                <div class="detail__value"
-                                    id="js-detail-when">—</div>
+
+                <div class="ecd-mobile-events mobile-only">
+                     <h2 class="ecd-section-heading">Today</h2>
+                     <div class="ecd-mobile-events-today" id="js-mobile-events-today">
+                         <!-- Populated by JS -->
+                     </div>
+                     
+                     <h2 class="ecd-section-heading">This Week</h2>
+                     <div class="ecd-mobile-events-week" id="js-mobile-events-week">
+                        {% for day in week_grid %}
+                            {% for it in day['items'] %}
+                            <article class="ecd-event-card" 
+                                data-date="{{ it.date }}"
+                                data-title="{{ it.title }}"
+                                data-time="{{ it.time }}"
+                                data-link="{{ it.link }}"
+                                data-location="{{ it.location }}"
+                                data-source="{{ it.source }}"
+                                data-summary="{{ it.summary | e }}">
+                                <div class="ecd-event-time">{{ it.time }}</div>
+                                <div class="ecd-event-title">{{ it.title }}</div>
+                                <div class="ecd-event-meta">
+                                    {% if it.location %}{{ it.location }}{% endif %}
+                                </div>
+                            </article>
+                            {% endfor %}
+                        {% endfor %}
+                     </div>
+                </div>
+
+                <aside class="week-details ecd-event-details" id="js-detail" aria-label="Event details">
+                    <button class="ecd-details-close mobile-only" id="js-details-close" aria-label="Close">×</button>
+                    <div class="week-details-card" data-empty="true">
+                        <div class="week-details-heading">Details</div>
+                        <h3 class="week-details-title" id="js-detail-title">Select an event</h3>
+                        
+                        <div class="week-details-meta">
+                            <div class="week-details-row">
+                                <span class="label">WHEN</span>
+                                <span class="value" id="js-detail-when">—</span>
                             </div>
-                            <div class="detail__row">
-                                <div class="detail__label">Where</div>
-                                <div class="detail__value"
-                                    id="js-detail-where">—</div>
+                            <div class="week-details-row">
+                                <span class="label">WHERE</span>
+                                <span class="value" id="js-detail-where">—</span>
                             </div>
-                            <div class="detail__row">
-                                <div class="detail__label">Source</div>
-                                <div class="detail__value"
-                                    id="js-detail-source">—</div>
+                            <div class="week-details-row">
+                                <span class="label">SOURCE</span>
+                                <span class="value" id="js-detail-source">—</span>
                             </div>
                         </div>
-                        <div class="detail__section">
-                            <div class="detail__label">About</div>
-                            <p class="detail__summary"
-                                id="js-detail-summary"></p>
+
+                        <hr class="week-details-separator">
+
+                        <div class="week-details-section">
+                            <span class="label">ABOUT</span>
+                            <div class="week-details-about" id="js-detail-summary"></div>
                         </div>
-                        <p class="feature__meta"><a id="js-detail-link"
-                                class="detail__link" href="#" target="_blank"
-                                rel="noopener" style="display:none;">Open
-                                link</a></p>
-                    </article>
-                </div>
+
+                        <a class="week-details-link" id="js-detail-link" href="#" target="_blank" rel="noopener" style="display:none;">
+                            ↗ Open link
+                        </a>
+                    </div>
+                </aside>
+                <input type="hidden" id="js-week-offset" value="0" />
             </div>
         </section>
 
@@ -211,6 +211,13 @@
                     {% endfor %}
                 </ul>
             </div>
+            
+            <button class="ecd-mobile-accordion-toggle ecd-city-map-toggle" id="js-map-toggle" type="button" aria-expanded="false" aria-controls="js-map-stats">
+                <span>City Map &amp; Stats</span>
+                <span class="ecd-mobile-chevron" aria-hidden="true">▾</span>
+            </button>
+
+            <div class="ecd-city-map-stats" id="js-map-stats">
             <div class="map-controls">
                 <label for="js-map-select" class="sr-only">Map Layer</label>
                 <select id="js-map-select" class="map-controls__select"
@@ -306,10 +313,11 @@
                 </li>
                 {% endfor %}
             </ul>
+            </div> <!-- End ecd-city-map-stats -->
         </aside>
     </main>
 
-    <section class="strip">
+    <section class="strip desktop-only">
         <div class="strip__inner">
             {% for item in bottom_strip_items %}
             {% if item.category == 'events' %}
@@ -344,9 +352,23 @@
             <a href="{{ url_for('about') }}">About</a>
             <a href="{{ url_for('feeds_view') }}">Feeds</a>
             <a href="{{ url_for('feeds_api') }}">API</a>
+            <span class="mobile-only">© Elm City Daily</span>
         </nav>
-        <div class="footer-mini__meta">{{ app_name }} · {{ date_str }} · {{
+        <div class="footer-mini__meta desktop-only">{{ app_name }} · {{ date_str }} · {{
             time_str }}</div>
     </footer>
 </div>
+<script>
+  // Make weather data available to JavaScript
+  window.WEATHER_DATA = {
+    current_temp: {% if weather and weather.current_temp is not none %}{{ weather.current_temp }}{% else %}null{% endif %},
+    high_temp: {% if weather and weather.high_temp is not none %}{{ weather.high_temp }}{% else %}null{% endif %},
+    low_temp: {% if weather and weather.low_temp is not none %}{{ weather.low_temp }}{% else %}null{% endif %},
+    weather_desc: {% if weather and weather.weather_desc %}{{ weather.weather_desc|tojson|safe }}{% else %}""{% endif %}
+  };
+  window.DAYPART_TEMPS = {{ daypart_temps|tojson|safe if daypart_temps else '{}' }};
+  window.TIME_STR = {{ time_str|tojson|safe if time_str else '""' }};
+  window.WEEK_GRID = {{ week_grid|tojson|safe if week_grid else '[]' }};
+  window.TODAY_DATE = "{{ today_date }}"; /* Ensure this variable exists in context or use JS date */
+</script>
 {% endblock %}

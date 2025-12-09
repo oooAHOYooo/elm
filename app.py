@@ -205,18 +205,35 @@ def create_app() -> Flask:
         except Exception:
             daypart_temps = {"morning": None, "afternoon": None, "evening": None, "night": None}
 
-        # This week's events (next 7 days)
-        def within_next_seven_days(iso_str: str) -> bool:
+        # This week's events (next 7 days) - expand to 4 weeks for navigation
+        def within_weeks(iso_str: str, weeks_ahead: int = 4) -> bool:
             try:
                 from datetime import datetime, timedelta
                 if not iso_str:
                     return False
                 dt = datetime.fromisoformat(iso_str.replace("Z", "+00:00")).astimezone(tz)
-                return today <= dt <= (today + timedelta(days=7))
+                end_date = today + timedelta(days=7 * weeks_ahead)
+                return today <= dt <= end_date
             except Exception:
                 return False
 
-        week_events = [e for e in unified_events if within_next_seven_days(e.get("date_iso") or "")]
+        # Get events for next 4 weeks (for week navigation)
+        all_week_events = [e for e in unified_events if within_weeks(e.get("date_iso") or "", weeks_ahead=4)]
+        
+        # Filter to current week for initial display
+        def within_current_week(iso_str: str) -> bool:
+            try:
+                from datetime import datetime, timedelta
+                if not iso_str:
+                    return False
+                dt = datetime.fromisoformat(iso_str.replace("Z", "+00:00")).astimezone(tz)
+                start_of_week = today - timedelta(days=today.weekday())
+                end_of_week = start_of_week + timedelta(days=7)
+                return start_of_week <= dt < end_of_week
+            except Exception:
+                return False
+
+        week_events = [e for e in all_week_events if within_current_week(e.get("date_iso") or "")]
         # sort ascending by date within the week
         def week_sort_key(i: Dict[str, Any]):
             try:
@@ -232,6 +249,19 @@ def create_app() -> Flask:
 
         # Fallback to stub events if no week events from feeds
         if not week_events:
+            # Use within_current_week function for fallback
+            def within_current_week_fallback(iso_str: str) -> bool:
+                try:
+                    from datetime import datetime, timedelta
+                    if not iso_str:
+                        return False
+                    dt = datetime.fromisoformat(iso_str.replace("Z", "+00:00")).astimezone(tz)
+                    start_of_week = today - timedelta(days=today.weekday())
+                    end_of_week = start_of_week + timedelta(days=7)
+                    return start_of_week <= dt < end_of_week
+                except Exception:
+                    return False
+            
             fallback = [
                 {
                     "title": e.title,
@@ -246,13 +276,14 @@ def create_app() -> Flask:
                     "date_iso": e.start.astimezone(ZoneInfo("UTC")).isoformat(),
                 }
                 for e in events_service.get_upcoming_events(tz=tz, max_events=8)
-                if within_next_seven_days(e.start.astimezone(ZoneInfo("UTC")).isoformat())
+                if within_current_week_fallback(e.start.astimezone(ZoneInfo("UTC")).isoformat())
             ]
             week_events = sorted(fallback, key=lambda i: i.get("date_iso", ""))
 
         # Build compact 7-day grid starting Monday
         from datetime import timedelta
         start_of_week = today - timedelta(days=today.weekday())
+        week_start_date = start_of_week.strftime("%b %d")
         week_grid = []
         for i in range(7):
             d = (start_of_week + timedelta(days=i)).date()
@@ -265,9 +296,11 @@ def create_app() -> Flask:
                 try:
                     dt_local = datetime.fromisoformat(iso.replace("Z", "+00:00")).astimezone(tz)
                     if dt_local.date() == d:
+                        # Format time, removing leading zero if present
+                        time_str = dt_local.strftime("%I:%M %p").lstrip("0") if hasattr(dt_local, "strftime") else ""
                         items_for_day.append(
                             {
-                                "time": dt_local.strftime("%-I:%M %p") if hasattr(dt_local, "strftime") else "",
+                                "time": time_str,
                                 "title": ev.get("title"),
                                 "link": ev.get("link"),
                                 "location": ev.get("location") or "",
@@ -414,6 +447,7 @@ def create_app() -> Flask:
             tax_info=tax_info,
             feed_history=feed_history,
             week_grid=week_grid,
+            week_start_date=week_start_date,
             time_str=time_str,
             boards_upcoming=boards_upcoming,
         )
@@ -458,6 +492,97 @@ def create_app() -> Flask:
         day = request.args.get("date", "today")
         data = tides_service.fetch_tides(station=station, day=day)
         return jsonify(data)
+
+    @app.route("/api/events/week")
+    def api_events_week():
+        """API endpoint for events in a specific week"""
+        tz = ZoneInfo("America/New_York")
+        today = datetime.now(tz)
+        week_offset = int(request.args.get("offset", 0))
+        
+        from datetime import timedelta
+        start_of_week = today - timedelta(days=today.weekday()) + timedelta(weeks=week_offset)
+        end_of_week = start_of_week + timedelta(days=7)
+        
+        # Get all events from aggregator
+        agg = aggregate_all()
+        agg_items = agg.get("items", [])
+        
+        unified_events = []
+        for it in agg_items:
+            category = it.get("category") or "news"
+            if category in {"events", "city_events", "city_calendar_items", "music_arts"}:
+                unified_events.append(it)
+        
+        # Filter events for this week
+        week_events = []
+        for ev in unified_events:
+            date_iso = ev.get("date")
+            if not date_iso:
+                continue
+            try:
+                dt = datetime.fromisoformat(date_iso.replace("Z", "+00:00")).astimezone(tz)
+                if start_of_week <= dt < end_of_week:
+                    week_events.append({
+                        "title": ev.get("title"),
+                        "link": ev.get("link"),
+                        "location": ev.get("location") or "",
+                        "source": (ev.get("source") or {}).get("name") or "Source",
+                        "date_iso": date_iso,
+                        "summary": ev.get("summary") or "",
+                    })
+            except Exception:
+                continue
+        
+        # Fallback to stub events if needed
+        if not week_events:
+            fallback_events = events_service.get_upcoming_events(tz=tz, max_events=20)
+            for e in fallback_events:
+                ev_dt = e.start
+                if start_of_week <= ev_dt < end_of_week:
+                    week_events.append({
+                        "title": e.title,
+                        "link": e.link or "",
+                        "location": e.location,
+                        "source": "Local Events",
+                        "date_iso": ev_dt.astimezone(ZoneInfo("UTC")).isoformat(),
+                        "summary": e.description,
+                    })
+        
+        # Sort by date
+        week_events.sort(key=lambda x: x.get("date_iso", ""))
+        
+        # Build week grid
+        week_grid = []
+        for i in range(7):
+            d = (start_of_week + timedelta(days=i)).date()
+            label = (start_of_week + timedelta(days=i)).strftime("%a")
+            items_for_day = []
+            for ev in week_events:
+                try:
+                    dt_local = datetime.fromisoformat(ev["date_iso"].replace("Z", "+00:00")).astimezone(tz)
+                    if dt_local.date() == d:
+                        # Format time, removing leading zero if present
+                        time_str = dt_local.strftime("%I:%M %p").lstrip("0")
+                        items_for_day.append({
+                            "time": time_str,
+                            "title": ev["title"],
+                            "link": ev["link"],
+                            "location": ev["location"],
+                            "source": ev["source"],
+                            "date": dt_local.strftime("%Y-%m-%d %I:%M %p"),
+                            "summary": ev["summary"],
+                        })
+                except Exception:
+                    continue
+            week_grid.append({"label": label, "items": items_for_day[:2]})
+        
+        week_start_date = start_of_week.strftime("%b %d")
+        return jsonify({
+            "week_grid": week_grid,
+            "week_start_date": week_start_date,
+            "week_offset": week_offset,
+        })
 
     return app
 

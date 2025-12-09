@@ -72,14 +72,17 @@ document.addEventListener("DOMContentLoaded", () => {
     fitContainer.style.transform = `scale(${scale})`;
     // Expand width so scaled content fills viewport width
     fitContainer.style.width = `${100 / scale}%`;
+    fitContainer.style.transform = ""; // DISABLED: User wants native scrolling on mobile now
+    fitContainer.style.width = ""; // Reset
+    document.body.classList.remove("mobile-compact");
   }
-  window.addEventListener("resize", fitToViewport);
-  // Delay to let mobile-nav initialize first
-  setTimeout(fitToViewport, 100);
-  fitToViewport();
-
+  // window.addEventListener("resize", fitToViewport);
+  // setTimeout(fitToViewport, 100);
+  // fitToViewport(); 
+  // DISABLED SCALING logic above per request for native scroll on mobile
+  
   // Agenda interactions: clicking an item populates the Details panel
-  const agenda = document.querySelector(".agenda");
+  const agenda = document.getElementById("js-agenda-week");
   const detail = document.getElementById("js-detail");
   const dTitle = document.getElementById("js-detail-title");
   const dSummary = document.getElementById("js-detail-summary");
@@ -90,13 +93,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function setDetailsFromEl(el) {
     if (!el || !detail) return;
+    
+    // Toggle active state
+    const allItems = document.querySelectorAll('.week-event-item, .ecd-event-card');
+    allItems.forEach(i => i.classList.remove('is-selected'));
+    el.classList.add('is-selected');
+
     const title = el.dataset.title || "Selected item";
     const summary = el.dataset.summary || "";
     const time = el.dataset.time || "";
-    const date = el.dataset.date || "";
+    const date = el.dataset.date || ""; // this might be display string or ISO
     const source = el.dataset.source || "";
     const location = el.dataset.location || "";
     const link = el.dataset.link || "";
+
     if (dTitle) dTitle.textContent = title;
     if (dSummary) dSummary.textContent = summary;
     if (dWhen) dWhen.textContent = [date, time].filter(Boolean).join(" · ") || "—";
@@ -110,22 +120,129 @@ document.addEventListener("DOMContentLoaded", () => {
         dLink.style.display = "none";
       }
     }
+    
+    // Mark details as not empty
+    const card = detail.querySelector('.week-details-card');
+    if (card) card.setAttribute('data-empty', 'false');
+
+    // Mobile: Open Bottom Sheet
+    if (window.innerWidth <= 768) {
+      detail.classList.add('is-open');
+    }
   }
 
   if (agenda) {
     agenda.addEventListener("click", (e) => {
       const target = e.target;
       if (!(target instanceof Element)) return;
-      // If a link inside, try to populate details and keep link default if cmd/ctrl
-      const item = target.closest(".agenda-v__item");
+      const item = target.closest(".week-event-item");
       if (item) {
-        // Populate and prevent navigation unless modifier used
         const isModified = e.metaKey || e.ctrlKey || e.shiftKey || e.altKey;
         setDetailsFromEl(item);
         if (!isModified) {
           e.preventDefault();
         }
       }
+    });
+  }
+
+  // Week navigation for events
+  const weekPrev = document.getElementById("js-week-prev");
+  const weekNext = document.getElementById("js-week-next");
+  const weekLabel = document.getElementById("js-week-label");
+  const weekOffsetInput = document.getElementById("js-week-offset");
+  
+  let currentWeekOffset = 0;
+  
+  async function fetchWeekEvents(offset) {
+    if (!agenda) return;
+    try {
+      const resp = await fetch(`/api/events/week?offset=${encodeURIComponent(offset)}`);
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const data = await resp.json();
+      
+      // Update week label
+      if (weekLabel) {
+        weekLabel.textContent = `Week of ${data.week_start_date}`;
+      }
+      
+      // Update agenda
+      agenda.innerHTML = "";
+      data.week_grid.forEach(day => {
+        const col = document.createElement("div");
+        col.className = "week-day-column";
+
+        const header = document.createElement("div");
+        header.className = "week-day-header";
+        header.textContent = day.label;
+        
+        const body = document.createElement("div");
+        body.className = "week-day-body";
+        
+        if (day.items && day.items.length > 0) {
+          day.items.forEach(it => {
+            const btn = document.createElement("button");
+            btn.className = "week-event-item";
+            btn.type = "button";
+            btn.setAttribute("data-title", it.title || "");
+            btn.setAttribute("data-time", it.time || "");
+            btn.setAttribute("data-link", it.link || "");
+            btn.setAttribute("data-location", it.location || "");
+            btn.setAttribute("data-source", it.source || "");
+            btn.setAttribute("data-date", it.date || "");
+            btn.setAttribute("data-summary", (it.summary || "").replace(/"/g, "&quot;"));
+            
+            const timeDiv = document.createElement("div");
+            timeDiv.className = "week-event-time";
+            timeDiv.textContent = it.time || "";
+            
+            const titleDiv = document.createElement("div");
+            titleDiv.className = "week-event-title";
+            titleDiv.textContent = it.title || "";
+            
+            btn.appendChild(timeDiv);
+            btn.appendChild(titleDiv);
+            body.appendChild(btn);
+          });
+        } else {
+            const empty = document.createElement("div");
+            empty.className = "week-day-empty";
+            empty.textContent = "—";
+            body.appendChild(empty);
+        }
+        
+        col.appendChild(header);
+        col.appendChild(body);
+        agenda.appendChild(col);
+      });
+      
+      const card = detail ? detail.querySelector('.week-details-card') : null;
+      if (card) {
+           if (dTitle) dTitle.textContent = "Select an event";
+           if (dSummary) dSummary.textContent = "";
+           if (dWhen) dWhen.textContent = "—";
+           if (dWhere) dWhere.textContent = "—";
+           if (dSource) dSource.textContent = "—";
+           if (dLink) dLink.style.display = "none";
+           card.setAttribute('data-empty', 'true');
+      }
+
+    } catch (err) {
+      console.error("Failed to fetch week events:", err);
+    }
+  }
+  
+  if (weekPrev && weekNext) {
+    weekPrev.addEventListener("click", () => {
+      currentWeekOffset = Math.max(-4, currentWeekOffset - 1);
+      if (weekOffsetInput) weekOffsetInput.value = currentWeekOffset;
+      fetchWeekEvents(currentWeekOffset);
+    });
+    
+    weekNext.addEventListener("click", () => {
+      currentWeekOffset = Math.min(4, currentWeekOffset + 1);
+      if (weekOffsetInput) weekOffsetInput.value = currentWeekOffset;
+      fetchWeekEvents(currentWeekOffset);
     });
   }
 
@@ -168,52 +285,226 @@ document.addEventListener("DOMContentLoaded", () => {
     fetchTides();
   }
 
-  // Temperature units switcher (F/C) for current, H/L, and dayparts
-  const unitsSelect = document.getElementById("js-units");
+  // Compressed weather widget (similar to tides)
+  const weatherOutput = document.getElementById("js-weather-output");
+  const weatherUnitsSelect = document.getElementById("js-units");
+  
   function toC(f) {
     return (f - 32) * 5 / 9;
   }
   function fmt(n) {
-    // Round to nearest integer
     return Math.round(n);
   }
-  function applyUnits() {
-    if (!unitsSelect) return;
-    const units = unitsSelect.value || "F";
-    // Current temp(s)
-    document.querySelectorAll("[data-temp-f]").forEach(el => {
-      const fStr = el.getAttribute("data-temp-f");
-      const fVal = fStr ? Number(fStr) : NaN;
-      if (!isFinite(fVal)) return;
-      const val = units === "F" ? fVal : toC(fVal);
-      el.textContent = `${fmt(val)}°`;
-    });
-    // High / Low
-    const hilo = document.getElementById("js-hilo");
-    if (hilo) {
-      const hiStr = hilo.getAttribute("data-high-f");
-      const loStr = hilo.getAttribute("data-low-f");
-      const hiF = hiStr ? Number(hiStr) : NaN;
-      const loF = loStr ? Number(loStr) : NaN;
-      const hi = isFinite(hiF) ? (units === "F" ? hiF : toC(hiF)) : null;
-      const lo = isFinite(loF) ? (units === "F" ? loF : toC(loF)) : null;
-      const hiTxt = hi == null ? "—" : `${fmt(hi)}°`;
-      const loTxt = lo == null ? "—" : `${fmt(lo)}°`;
-      hilo.textContent = `H ${hiTxt} · L ${loTxt}`;
+  
+  function updateWeatherDisplay() {
+    if (!weatherOutput) return;
+    const units = weatherUnitsSelect ? (weatherUnitsSelect.value || "F") : "F";
+    
+    // Get weather data from data attributes or window
+    const weatherData = window.WEATHER_DATA || {};
+    const daypartData = window.DAYPART_TEMPS || {};
+    const timeStr = window.TIME_STR || "";
+    const weatherDesc = weatherData.weather_desc || "";
+    
+    const currentTemp = weatherData.current_temp;
+    const highTemp = weatherData.high_temp;
+    const lowTemp = weatherData.low_temp;
+    
+    const parts = [];
+    
+    // Time and condition
+    if (timeStr && weatherDesc) {
+      parts.push(`${timeStr} · ${weatherDesc}`);
     }
-    // Persist preference
-    try { localStorage.setItem("units", units); } catch {}
+    
+    // Current temp
+    if (currentTemp != null && currentTemp !== null) {
+      const temp = units === "F" ? currentTemp : toC(currentTemp);
+      parts.push(`${fmt(temp)}°`);
+    }
+
+    // Update Mobile Header Status
+    const mobileStatus = document.getElementById('js-mobile-status-text');
+    if (mobileStatus) {
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+        const t = (currentTemp != null) ? `${fmt(units === "F" ? currentTemp : toC(currentTemp))}°` : '';
+        const d = weatherDesc ? weatherDesc : '';
+        mobileStatus.textContent = `${dateStr} · ${t} ${d}`;
+    }
+    
+    // High/Low
+    if (highTemp != null && highTemp !== null && lowTemp != null && lowTemp !== null) {
+      const hi = units === "F" ? highTemp : toC(highTemp);
+      const lo = units === "F" ? lowTemp : toC(lowTemp);
+      parts.push(`H ${fmt(hi)}° L ${fmt(lo)}°`);
+    }
+    
+    // Dayparts
+    const dayparts = [];
+    if (daypartData.morning != null && daypartData.morning !== null) {
+      const m = units === "F" ? daypartData.morning : toC(daypartData.morning);
+      dayparts.push(`Morning ${fmt(m)}°`);
+    }
+    if (daypartData.afternoon != null && daypartData.afternoon !== null) {
+      const a = units === "F" ? daypartData.afternoon : toC(daypartData.afternoon);
+      dayparts.push(`Afternoon ${fmt(a)}°`);
+    }
+    if (daypartData.evening != null && daypartData.evening !== null) {
+      const e = units === "F" ? daypartData.evening : toC(daypartData.evening);
+      dayparts.push(`Evening ${fmt(e)}°`);
+    }
+    if (daypartData.night != null && daypartData.night !== null) {
+      const n = units === "F" ? daypartData.night : toC(daypartData.night);
+      dayparts.push(`Night ${fmt(n)}°`);
+    }
+    
+    if (dayparts.length > 0) {
+      parts.push(dayparts.join(" "));
+    }
+    
+    weatherOutput.textContent = parts.length > 0 ? parts.join("  ·  ") : "Weather unavailable.";
   }
-  if (unitsSelect) {
+  
+  if (weatherUnitsSelect) {
     try {
       const saved = localStorage.getItem("units");
       if (saved && (saved === "F" || saved === "C")) {
-        unitsSelect.value = saved;
+        weatherUnitsSelect.value = saved;
       }
     } catch {}
-    unitsSelect.addEventListener("change", applyUnits);
-    applyUnits();
+    weatherUnitsSelect.addEventListener("change", updateWeatherDisplay);
+  }
+  
+  // Wait for window data to be available
+  if (window.WEATHER_DATA) {
+    updateWeatherDisplay();
+  } else {
+    // Retry after a short delay
+    setTimeout(updateWeatherDisplay, 100);
+  }
+
+  // --- MOBILE LOGIC ---
+
+  // 1. Accordion Toggles
+  const toggles = document.querySelectorAll('.ecd-mobile-accordion-toggle');
+  toggles.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetId = btn.getAttribute('aria-controls');
+      const target = document.getElementById(targetId);
+      if (target) {
+        const isExpanded = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', !isExpanded);
+        target.classList.toggle('is-open', !isExpanded);
+      }
+    });
+  });
+
+  // 2. Mobile Week Scroller & Events
+  const weekData = window.WEEK_GRID || [];
+  const mobileWeekScroll = document.getElementById('js-mobile-week-scroll');
+  const mobileEventsToday = document.getElementById('js-mobile-events-today');
+  
+  // Calculate today YYYY-MM-DD
+  const now = new Date();
+  const todayStr = now.toLocaleDateString('en-CA'); // YYYY-MM-DD in local time usually, or close enough
+  
+  if (mobileWeekScroll && weekData.length > 0) {
+    weekData.forEach((day, index) => {
+      const pill = document.createElement('button');
+      pill.className = 'ecd-day-pill';
+      pill.type = 'button';
+      pill.textContent = day.label; // "Mon", "Tue"
+      if (index === 0) pill.classList.add('is-selected'); // Default to first day? Or today?
+      
+      // Better: check if label matches today's day name, or passed date
+      // We don't have exact date in week_grid items easily accessible at top level, 
+      // but assuming week starts Monday or current week.
+      // Let's just default to first day or highlighting logic if we had dates.
+      
+      pill.addEventListener('click', () => {
+        // Highlight pill
+        document.querySelectorAll('.ecd-day-pill').forEach(p => p.classList.remove('is-selected'));
+        pill.classList.add('is-selected');
+        
+        // Filter events (Not implemented fully in Step 4, 
+        // prompt said "Show only that day’s events in the 'Today / Selected Day' events list")
+        // Implementation: Filter existing cards in 'This Week' or just rely on 'This Week' list?
+        // Step 4 says: "When a user taps... Show only that day’s events in the 'Today / Selected Day' events list"
+        
+        // Let's filter the "This Week" list to only show selected day? 
+        // OR update the "Today" section to become "Selected Day".
+        const sectionTitle = document.querySelector('.ecd-mobile-events .ecd-section-heading');
+        if (sectionTitle) sectionTitle.textContent = day.label;
+        
+        mobileEventsToday.innerHTML = '';
+        if (day.items && day.items.length > 0) {
+           day.items.forEach(it => {
+               const card = createEventCard(it);
+               mobileEventsToday.appendChild(card);
+           });
+        } else {
+            mobileEventsToday.innerHTML = '<div style="font-size:12px; color:var(--muted-ink); padding:8px;">No events.</div>';
+        }
+      });
+      
+      mobileWeekScroll.appendChild(pill);
+    });
+
+    // Initial populate of "Today" (using first day of week grid as default, or actual today if found)
+    // We already have "This Week" populated in template.
+    // Let's populate "Today" with actual today's events if possible.
+    // We can look at the rendered "This Week" cards and find today's date.
+    
+    const allMobileCards = document.querySelectorAll('.ecd-mobile-events-week .ecd-event-card');
+    let todayFound = false;
+    allMobileCards.forEach(card => {
+        // card.dataset.date is "YYYY-MM-DD ..." or similar
+        if (card.dataset.date && card.dataset.date.includes(todayStr)) {
+            const clone = card.cloneNode(true);
+            clone.addEventListener('click', (e) => handleMobileCardClick(e, clone));
+            mobileEventsToday.appendChild(clone);
+            todayFound = true;
+        }
+    });
+    if (!todayFound) {
+        mobileEventsToday.innerHTML = '<div style="font-size:12px; color:var(--muted-ink); padding:8px;">No events today.</div>';
+    }
+
+    // Attach click listeners to "This Week" cards too
+    allMobileCards.forEach(card => {
+        card.addEventListener('click', (e) => handleMobileCardClick(e, card));
+    });
+  }
+
+  function createEventCard(it) {
+      const art = document.createElement('article');
+      art.className = 'ecd-event-card';
+      art.dataset.title = it.title;
+      art.dataset.summary = it.summary;
+      art.dataset.time = it.time;
+      art.dataset.location = it.location;
+      art.dataset.source = it.source;
+      art.dataset.link = it.link;
+      
+      art.innerHTML = `
+        <div class="ecd-event-time">${it.time}</div>
+        <div class="ecd-event-title">${it.title}</div>
+        <div class="ecd-event-meta">${it.location || ''}</div>
+      `;
+      art.addEventListener('click', (e) => handleMobileCardClick(e, art));
+      return art;
+  }
+
+  function handleMobileCardClick(e, card) {
+      setDetailsFromEl(card);
+  }
+
+  // 3. Details Bottom Sheet Close
+  const closeDetails = document.getElementById('js-details-close');
+  if (closeDetails) {
+      closeDetails.addEventListener('click', () => {
+          detail.classList.remove('is-open');
+      });
   }
 });
-
-
