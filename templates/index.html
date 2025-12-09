@@ -256,14 +256,6 @@
                 {% endif %}
             </div>
 
-            <div class="live-cam-widget">
-                <h3 class="filters__title">Live Traffic — CAM 78</h3>
-                <div class="live-cam-widget__container">
-                    <canvas id="cam78Canvas" width="360" height="360"></canvas>
-                </div>
-                <p class="live-cam-widget__label">I-95 @ East St. Exit 48</p>
-            </div>
-
             <div class="filters">
                 <h3 class="filters__title">Filters</h3>
                 <label class="checkbox">
@@ -351,16 +343,10 @@
         <nav class="footer-mini__nav">
             <a href="{{ url_for('about') }}">About</a>
             <a href="{{ url_for('feeds_view') }}">Feeds</a>
-            <a href="{{ url_for('cams') }}">Traffic Cams</a>
             <a href="{{ url_for('feeds_api') }}">API</a>
         </nav>
         <div class="footer-mini__meta">{{ app_name }} · {{ date_str }} · {{
             time_str }}</div>
     </footer>
 </div>
-
-<link rel="stylesheet"
-    href="{{ url_for('static', filename='css/live_cam_78.css') }}">
-<script src="{{ url_for('static', filename='js/live_cam_78.js') }}"
-    defer></script>
 {% endblock %}

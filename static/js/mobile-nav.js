@@ -45,12 +45,6 @@
             contentSelector: '.mobile-tab-change'
         },
         {
-            id: 'cams',
-            label: 'Cams',
-            icon: '📹',
-            contentSelector: '.mobile-tab-cams'
-        },
-        {
             id: 'weather',
             label: 'Weather',
             icon: '🌤️',
@@ -197,13 +191,6 @@
         changeTab.setAttribute('role', 'tabpanel');
         changeTab.setAttribute('aria-labelledby', 'tab-change');
 
-        // Cams tab - traffic cameras
-        const camsTab = document.createElement('div');
-        camsTab.className = 'mobile-tab-content mobile-tab-cams';
-        camsTab.setAttribute('aria-hidden', 'true');
-        camsTab.setAttribute('role', 'tabpanel');
-        camsTab.setAttribute('aria-labelledby', 'tab-cams');
-
         // Weather tab - weather and alerts
         const weatherTab = document.createElement('div');
         weatherTab.className = 'mobile-tab-content mobile-tab-weather';
@@ -214,7 +201,6 @@
         // Find and move content to appropriate tabs
         const main = dashboard.querySelector('main.grid');
         const strip = dashboard.querySelector('section.strip');
-        const liveCam = dashboard.querySelector('#liveCam78');
         const footer = dashboard.querySelector('footer.footer-mini');
 
         if (main) {
@@ -277,12 +263,6 @@
                 }
             }
 
-            // Cams: Live camera
-            if (liveCam) {
-                const camClone = liveCam.cloneNode(true);
-                camsTab.appendChild(camClone);
-            }
-
             // Weather: Weather info from right panel
             if (rightPanel) {
                 const weatherSection = rightPanel.querySelector('.weather');
@@ -304,7 +284,6 @@
         tabContainer.appendChild(newsTab);
         tabContainer.appendChild(civicsTab);
         tabContainer.appendChild(changeTab);
-        tabContainer.appendChild(camsTab);
         tabContainer.appendChild(weatherTab);
 
         // Insert before footer
@@ -317,7 +296,6 @@
         // Hide original content on mobile
         if (main) main.style.display = 'none';
         if (strip) strip.style.display = 'none';
-        if (liveCam) liveCam.style.display = 'none';
     }
 
     /**
@@ -328,13 +306,11 @@
         const bottomNav = document.getElementById('mobile-bottom-nav');
         const main = document.querySelector('main.grid');
         const strip = document.querySelector('section.strip');
-        const liveCam = document.querySelector('#liveCam78');
 
         if (tabContainer) tabContainer.remove();
         if (bottomNav) bottomNav.remove();
         if (main) main.style.display = '';
         if (strip) strip.style.display = '';
-        if (liveCam) liveCam.style.display = '';
     }
 
     /**

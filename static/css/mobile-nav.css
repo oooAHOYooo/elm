@@ -358,18 +358,6 @@
         margin-bottom: 12px;
     }
 
-    /* Live camera in mobile */
-    .mobile-tab-content #liveCam78 {
-        margin: 0;
-        padding: 12px;
-        border-radius: 12px;
-    }
-
-    .mobile-tab-content #cam78Canvas {
-        max-width: 100%;
-        border-radius: 8px;
-    }
-
     /* Change New Haven in mobile - Premium button design */
     .mobile-tab-content .change-nh {
         background: rgba(255, 255, 255, 0.8);

@@ -19,7 +19,6 @@ from services.civics import (
 )
 from services import weather as weather_service
 from services import nws as nws_service
-from services import traffic_cams as traffic_cams_service
 from services import tides as tides_service
 from feeds.aggregator import aggregate_all, aggregate_filtered
 
@@ -439,30 +438,6 @@ def create_app() -> Flask:
     @app.route("/about")
     def about():
         return render_template("about.html", app_name=app.config["APP_NAME"])
-
-    @app.route("/cams")
-    def cams():
-        """Traffic camera gallery page"""
-        return render_template("cams.html", app_name=app.config["APP_NAME"])
-
-    @app.route("/api/cams")
-    def api_cams():
-        """API endpoint for traffic camera data"""
-        highway = request.args.get("highway")
-        location = request.args.get("location")
-        
-        if highway:
-            cameras = traffic_cams_service.get_cameras_by_highway(highway)
-        elif location:
-            cameras = traffic_cams_service.get_cameras_by_location(location)
-        else:
-            cameras = traffic_cams_service.get_all_cameras()
-        
-        metadata = traffic_cams_service.get_camera_metadata()
-        return jsonify({
-            "cameras": cameras,
-            "metadata": metadata,
-        })
 
     @app.route("/api/nws/alerts")
     def api_nws_alerts():
