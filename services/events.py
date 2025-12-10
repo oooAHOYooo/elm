@@ -82,3 +82,4 @@ def get_upcoming_events(tz: ZoneInfo, max_events: int = 6) -> List[Event]:
     return events[:max_events]
 
 
+

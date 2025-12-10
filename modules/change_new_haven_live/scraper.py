@@ -112,3 +112,4 @@ def get_live_data() -> List[Dict[str, Any]]:
     return scrape()
 
 
+
