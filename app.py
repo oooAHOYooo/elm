@@ -20,6 +20,8 @@ from services.civics import (
 from services import weather as weather_service
 from services import nws as nws_service
 from services import tides as tides_service
+from services import air_quality as aqi_service
+from services import context as context_service
 from feeds.aggregator import aggregate_all, aggregate_filtered
 
 
@@ -165,6 +167,21 @@ def create_app() -> Flask:
         nws_alerts = nws_service.fetch_nws_alerts(zone="ctz010")
         nws_fc = nws_service.fetch_nws_forecast(lat=lat, lon=lon)
         nws_periods = nws_fc.get("periods", [])[:2] if nws_fc else []
+
+        # Air Quality Index
+        airnow_key = app.config.get("AIRNOW_API_KEY", "")
+        air_quality = aqi_service.fetch_air_quality(
+            lat=lat, lon=lon, api_key=airnow_key if airnow_key else None
+        )
+
+        # Contextual intelligence (auto-generated insights)
+        today_summary = context_service.get_today_summary(
+            weather=weather,
+            events_count=len(week_events) if week_events else 0,
+            alerts_count=len(nws_alerts) if nws_alerts else 0,
+            air_quality=air_quality,
+        )
+        holiday_info = context_service.get_holiday_info()
 
         # Compute simple daypart temperatures from hourly forecast (local time)
         daypart_temps: Dict[str, Any] = {}
@@ -450,6 +467,9 @@ def create_app() -> Flask:
             week_start_date=week_start_date,
             time_str=time_str,
             boards_upcoming=boards_upcoming,
+            air_quality=air_quality,
+            today_summary=today_summary,
+            holiday_info=holiday_info,
         )
 
     @app.route("/feeds")

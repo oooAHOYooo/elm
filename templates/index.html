@@ -4,9 +4,16 @@
     <header class="masthead">
         <div class="masthead__title">
             <h1>{{ app_name or "Elm City Daily" }}</h1>
+            <span class="live-badge" title="Data updating in real-time">
+                <span class="live-badge__dot"></span>
+                Live
+            </span>
         </div>
         <p class="masthead__date">{{ date_str }}</p>
         <div class="masthead__lines" aria-hidden="true"></div>
+        <button class="dark-mode-toggle" id="js-dark-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
+            <span class="dark-mode-icon" aria-hidden="true">🌙</span>
+        </button>
     </header>
 
     <main class="grid">
@@ -45,27 +52,58 @@
                     loading…</div>
             </div>
 
+            <!-- Today at a Glance - Auto-generated contextual summary -->
+            <div class="today-glance" role="region" aria-label="Today at a Glance">
+                <div class="today-glance__header">
+                    <span class="today-glance__icon">{{ today_summary.time_context.icon }}</span>
+                    <span class="today-glance__greeting">{{ today_summary.time_context.greeting }}, New Haven</span>
+                    {% if holiday_info %}
+                    <span class="today-glance__holiday" title="{{ holiday_info.type|capitalize }} Holiday">
+                        {{ holiday_info.icon }} {{ holiday_info.name }}
+                    </span>
+                    {% endif %}
+                </div>
+                
+                <div class="today-glance__summary">
+                    {% for item in today_summary.summary_items %}
+                    <div class="summary-item summary-item--{{ item.type }}">{{ item.text }}</div>
+                    {% endfor %}
+                </div>
+                
+                {% if today_summary.tips %}
+                <div class="today-glance__tips">
+                    <div class="tips-label">Smart Tips</div>
+                    {% for tip in today_summary.tips %}
+                    <div class="tip-item tip-item--{{ tip.priority }}">
+                        <span class="tip-icon">{{ tip.icon }}</span>
+                        <span class="tip-text">{{ tip.tip }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
             {# History sections omitted for now #}
             <div class="change-nh" role="region"
                 aria-label="Change New Haven quick actions">
-                <div class="change-nh__title">Change New Haven</div>
+                <div class="change-nh__title">City Services</div>
                 <div class="change-nh__actions">
-                    <a class="change-nh__btn" href="tel:+12039465128"
-                        title="Zoning (Call)">
+                    <a class="change-nh__btn change-nh__btn--primary" 
+                        href="https://seeclickfix.com/new-haven" target="_blank"
+                        rel="noopener" title="Report an Issue">
+                        <span class="change-nh__icon">📢</span><span
+                            class="change-nh__label">Report Issue</span>
+                    </a>
+                    <a class="change-nh__btn" href="tel:+12039464800"
+                        title="City Hall (203-946-4800)">
                         <span class="change-nh__icon">☎️</span><span
-                            class="change-nh__label">Zoning</span>
+                            class="change-nh__label">311/City</span>
                     </a>
                     <a class="change-nh__btn"
                         href="https://newhavenct.legistar.com" target="_blank"
                         rel="noopener" title="Legistar">
                         <span class="change-nh__icon">📄</span><span
                             class="change-nh__label">Legistar</span>
-                    </a>
-                    <a class="change-nh__btn"
-                        href="https://cityofnewhaven.com/civicax/citycalendar/calendarjson"
-                        target="_blank" rel="noopener" title="Calendar JSON">
-                        <span class="change-nh__icon">🗓️</span><span
-                            class="change-nh__label">Calendar</span>
                     </a>
                     <a class="change-nh__btn"
                         href="https://www.newhavenct.gov/government/departments-divisions/city-plan"
@@ -78,6 +116,63 @@
                         rel="noopener" title="Maps">
                         <span class="change-nh__icon">🗺️</span><span
                             class="change-nh__label">Maps</span>
+                    </a>
+                </div>
+                <div class="change-nh__title" style="margin-top: 8px;">Resources</div>
+                <div class="change-nh__actions">
+                    <a class="change-nh__btn"
+                        href="https://www.newhavenct.gov/government/job-opportunities"
+                        target="_blank" rel="noopener" title="City Jobs">
+                        <span class="change-nh__icon">💼</span><span
+                            class="change-nh__label">City Jobs</span>
+                    </a>
+                    <a class="change-nh__btn"
+                        href="https://nhfpl.org" target="_blank"
+                        rel="noopener" title="Library">
+                        <span class="change-nh__icon">📚</span><span
+                            class="change-nh__label">Library</span>
+                    </a>
+                    <a class="change-nh__btn"
+                        href="https://www.newhavenct.gov/residents/parking"
+                        target="_blank" rel="noopener" title="Parking">
+                        <span class="change-nh__icon">🅿️</span><span
+                            class="change-nh__label">Parking</span>
+                    </a>
+                    <a class="change-nh__btn"
+                        href="https://www.newhavenct.gov/residents/trash-recycling"
+                        target="_blank" rel="noopener" title="Trash & Recycling">
+                        <span class="change-nh__icon">♻️</span><span
+                            class="change-nh__label">Recycling</span>
+                    </a>
+                    <a class="change-nh__btn"
+                        href="https://portal.ct.gov/dph" target="_blank"
+                        rel="noopener" title="CT Health Dept">
+                        <span class="change-nh__icon">🏥</span><span
+                            class="change-nh__label">Health</span>
+                    </a>
+                </div>
+                <div class="change-nh__title" style="margin-top: 8px;">Emergency</div>
+                <div class="change-nh__actions">
+                    <a class="change-nh__btn change-nh__btn--emergency" href="tel:911"
+                        title="Emergency 911">
+                        <span class="change-nh__icon">🚨</span><span
+                            class="change-nh__label">911</span>
+                    </a>
+                    <a class="change-nh__btn" href="tel:+12039466316"
+                        title="Police Non-Emergency">
+                        <span class="change-nh__icon">👮</span><span
+                            class="change-nh__label">Police</span>
+                    </a>
+                    <a class="change-nh__btn" href="tel:+12039466262"
+                        title="Fire Non-Emergency">
+                        <span class="change-nh__icon">🚒</span><span
+                            class="change-nh__label">Fire</span>
+                    </a>
+                    <a class="change-nh__btn"
+                        href="https://www.211ct.org/" target="_blank"
+                        rel="noopener" title="211 United Way">
+                        <span class="change-nh__icon">ℹ️</span><span
+                            class="change-nh__label">211</span>
                     </a>
                 </div>
             </div>
@@ -233,7 +328,12 @@
                     data-lat="{{ center_lat }}"
                     data-lon="{{ center_lon }}"></iframe>
             </div>
-            <h2 class="panel__title">City by the Numbers</h2>
+            <h2 class="panel__title">City by the Numbers
+                <span class="data-freshness" id="js-civics-freshness">
+                    <span class="freshness-dot"></span>
+                    <span class="freshness-text">Updated just now</span>
+                </span>
+            </h2>
             <div class="stats stats--compact">
                 <div class="stat">
                     <div class="stat__value">{{ civics_stats.introduced }}</div>
@@ -264,23 +364,113 @@
             </div>
 
             <div class="filters">
-                <h3 class="filters__title">Filters</h3>
-                <label class="checkbox">
-                    <input type="checkbox" class="js-filter"
-                        data-category="news" checked />
-                    <span>News</span>
-                </label>
-                <label class="checkbox">
-                    <input type="checkbox" class="js-filter"
-                        data-category="events" checked />
-                    <span>Events</span>
-                </label>
-                <label class="checkbox">
-                    <input type="checkbox" class="js-filter"
-                        data-category="weather" checked />
-                    <span>Weather</span>
-                </label>
+                <h3 class="filters__title">Content Filters</h3>
+                <div class="filters__grid">
+                    <label class="checkbox">
+                        <input type="checkbox" class="js-filter"
+                            data-category="news" checked />
+                        <span>📰 News</span>
+                    </label>
+                    <label class="checkbox">
+                        <input type="checkbox" class="js-filter"
+                            data-category="events" checked />
+                        <span>📅 Events</span>
+                    </label>
+                    <label class="checkbox">
+                        <input type="checkbox" class="js-filter"
+                            data-category="weather" checked />
+                        <span>🌤️ Weather</span>
+                    </label>
+                    <label class="checkbox">
+                        <input type="checkbox" class="js-filter"
+                            data-category="civic" checked />
+                        <span>🏛️ Civic</span>
+                    </label>
+                    <label class="checkbox">
+                        <input type="checkbox" class="js-filter"
+                            data-category="arts" checked />
+                        <span>🎭 Arts</span>
+                    </label>
+                    <label class="checkbox">
+                        <input type="checkbox" class="js-filter"
+                            data-category="community" checked />
+                        <span>🤝 Community</span>
+                    </label>
+                    <label class="checkbox">
+                        <input type="checkbox" class="js-filter"
+                            data-category="fire" checked />
+                        <span>🚒 Fire/Safety</span>
+                    </label>
+                    <label class="checkbox">
+                        <input type="checkbox" class="js-filter"
+                            data-category="food" checked />
+                        <span>🍽️ Food</span>
+                    </label>
+                </div>
+                <div class="filters__actions">
+                    <button type="button" class="filters__btn" id="js-filter-all">Select All</button>
+                    <button type="button" class="filters__btn" id="js-filter-none">Clear All</button>
+                </div>
             </div>
+
+            <div class="neighborhood-filter">
+                <h3 class="filters__title">Neighborhood Focus</h3>
+                <select id="js-neighborhood" class="neighborhood-select" aria-label="Filter by neighborhood">
+                    <option value="all">All New Haven</option>
+                    <optgroup label="Downtown & Central">
+                        <option value="downtown">Downtown</option>
+                        <option value="wooster-square">Wooster Square</option>
+                        <option value="hill">The Hill</option>
+                        <option value="dwight">Dwight</option>
+                    </optgroup>
+                    <optgroup label="East">
+                        <option value="east-rock">East Rock</option>
+                        <option value="fair-haven">Fair Haven</option>
+                        <option value="quinnipiac-meadows">Quinnipiac Meadows</option>
+                        <option value="annex">The Annex</option>
+                    </optgroup>
+                    <optgroup label="West">
+                        <option value="westville">Westville</option>
+                        <option value="west-rock">West Rock</option>
+                        <option value="amity">Amity</option>
+                        <option value="beaver-hills">Beaver Hills</option>
+                    </optgroup>
+                    <optgroup label="North">
+                        <option value="newhallville">Newhallville</option>
+                        <option value="prospect-hill">Prospect Hill</option>
+                        <option value="dixwell">Dixwell</option>
+                    </optgroup>
+                    <optgroup label="South">
+                        <option value="long-wharf">Long Wharf</option>
+                        <option value="city-point">City Point</option>
+                        <option value="east-shore">East Shore</option>
+                    </optgroup>
+                </select>
+                <p class="neighborhood-note">Focus events & news on your area</p>
+            </div>
+            <div class="air-quality" role="region" aria-label="Air Quality Index">
+                <h3 class="filters__title">Air Quality</h3>
+                <div class="aqi-display">
+                    {% if air_quality and air_quality.available %}
+                    <div class="aqi-badge" style="background-color: {{ air_quality.color }}; color: {% if air_quality.aqi > 100 %}#fff{% else %}#1c1b1a{% endif %};">
+                        <span class="aqi-value">{{ air_quality.aqi }}</span>
+                        <span class="aqi-label">AQI</span>
+                    </div>
+                    <div class="aqi-info">
+                        <div class="aqi-category">{{ air_quality.emoji }} {{ air_quality.category }}</div>
+                        <div class="aqi-pollutant">Primary: {{ air_quality.pollutant or 'N/A' }}</div>
+                        <div class="aqi-advice">{{ air_quality.advice }}</div>
+                    </div>
+                    {% else %}
+                    <div class="aqi-unavailable">
+                        <span class="aqi-emoji">⚪</span>
+                        <span>AQI data unavailable</span>
+                        <a href="https://www.airnow.gov/?city=New%20Haven&state=CT" target="_blank" rel="noopener" class="aqi-link">Check AirNow →</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
             <div class="alerts">
                 <h3 class="filters__title">NWS Alerts</h3>
                 <ul class="list list--rail">
@@ -352,10 +542,18 @@
             <a href="{{ url_for('about') }}">About</a>
             <a href="{{ url_for('feeds_view') }}">Feeds</a>
             <a href="{{ url_for('feeds_api') }}">API</a>
+            <button type="button" class="refresh-btn" id="js-refresh" title="Refresh data">
+                <span class="refresh-icon">↻</span>
+                <span class="refresh-text">Refresh</span>
+            </button>
             <span class="mobile-only">© Elm City Daily</span>
         </nav>
-        <div class="footer-mini__meta desktop-only">{{ app_name }} · {{ date_str }} · {{
-            time_str }}</div>
+        <div class="footer-mini__meta desktop-only">
+            {{ app_name }} · {{ date_str }} · {{ time_str }}
+            <span class="auto-refresh-status" id="js-auto-refresh-status">
+                · Auto-refresh: <button type="button" id="js-auto-refresh-toggle" class="auto-refresh-toggle">OFF</button>
+            </span>
+        </div>
     </footer>
 </div>
 <script>

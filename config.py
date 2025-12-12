@@ -34,6 +34,9 @@ class Config:
     CACHE_TTL_RSS_SECONDS: int = int(os.getenv("CACHE_TTL_RSS_SECONDS", "600"))
     CACHE_TTL_WEATHER_SECONDS: int = int(os.getenv("CACHE_TTL_WEATHER_SECONDS", "900"))
 
+    # Air Quality (AirNow API - free key from https://docs.airnowapi.org/)
+    AIRNOW_API_KEY: str = os.getenv("AIRNOW_API_KEY", "")
+
     # Flask
     DEBUG: bool = _get_bool("FLASK_DEBUG", False)
 

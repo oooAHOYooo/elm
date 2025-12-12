@@ -1,9 +1,48 @@
 document.addEventListener("DOMContentLoaded", () => {
+  // --- Dark Mode Toggle ---
+  const darkToggle = document.getElementById("js-dark-toggle");
+  const root = document.documentElement;
+  
+  function getPreferredTheme() {
+    const stored = localStorage.getItem("theme");
+    if (stored) return stored;
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  }
+  
+  function setTheme(theme) {
+    root.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+    // Update toggle icon
+    const icon = darkToggle ? darkToggle.querySelector(".dark-mode-icon") : null;
+    if (icon) {
+      icon.textContent = theme === "dark" ? "☀️" : "🌙";
+      icon.setAttribute("aria-label", theme === "dark" ? "Switch to light mode" : "Switch to dark mode");
+    }
+  }
+  
+  // Initialize theme
+  setTheme(getPreferredTheme());
+  
+  if (darkToggle) {
+    darkToggle.addEventListener("click", () => {
+      const current = root.getAttribute("data-theme") || "light";
+      setTheme(current === "dark" ? "light" : "dark");
+    });
+  }
+  
+  // Listen for system preference changes
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
+    if (!localStorage.getItem("theme")) {
+      setTheme(e.matches ? "dark" : "light");
+    }
+  });
+
   const checkboxes = Array.from(document.querySelectorAll(".js-filter"));
   const cards = Array.from(document.querySelectorAll(".card"));
   const mapSelect = document.getElementById("js-map-select");
   const mapFrame = document.getElementById("js-map-frame");
 
+  // --- Enhanced Category Filtering ---
   function applyFilters() {
     const allowed = new Set(
       checkboxes.filter(cb => cb.checked).map(cb => cb.getAttribute("data-category"))
@@ -12,10 +51,217 @@ document.addEventListener("DOMContentLoaded", () => {
       const cat = card.getAttribute("data-category") || "news";
       card.style.display = allowed.has(cat) ? "" : "none";
     });
+    
+    // Save filter preferences
+    try {
+      const prefs = {};
+      checkboxes.forEach(cb => {
+        prefs[cb.getAttribute("data-category")] = cb.checked;
+      });
+      localStorage.setItem("filterPrefs", JSON.stringify(prefs));
+    } catch (e) {}
   }
+
+  // Load saved filter preferences
+  try {
+    const savedPrefs = JSON.parse(localStorage.getItem("filterPrefs") || "{}");
+    if (Object.keys(savedPrefs).length > 0) {
+      checkboxes.forEach(cb => {
+        const cat = cb.getAttribute("data-category");
+        if (cat in savedPrefs) {
+          cb.checked = savedPrefs[cat];
+        }
+      });
+    }
+  } catch (e) {}
 
   checkboxes.forEach(cb => cb.addEventListener("change", applyFilters));
   applyFilters();
+
+  // Select All / Clear All buttons
+  const filterAllBtn = document.getElementById("js-filter-all");
+  const filterNoneBtn = document.getElementById("js-filter-none");
+  
+  if (filterAllBtn) {
+    filterAllBtn.addEventListener("click", () => {
+      checkboxes.forEach(cb => cb.checked = true);
+      applyFilters();
+    });
+  }
+  
+  if (filterNoneBtn) {
+    filterNoneBtn.addEventListener("click", () => {
+      checkboxes.forEach(cb => cb.checked = false);
+      applyFilters();
+    });
+  }
+
+  // --- Neighborhood Filter ---
+  const neighborhoodSelect = document.getElementById("js-neighborhood");
+  
+  if (neighborhoodSelect) {
+    // Load saved neighborhood
+    try {
+      const savedNeighborhood = localStorage.getItem("neighborhoodFilter");
+      if (savedNeighborhood) {
+        neighborhoodSelect.value = savedNeighborhood;
+      }
+    } catch (e) {}
+    
+    neighborhoodSelect.addEventListener("change", () => {
+      const neighborhood = neighborhoodSelect.value;
+      localStorage.setItem("neighborhoodFilter", neighborhood);
+      
+      // Visual feedback - flash the filter
+      neighborhoodSelect.style.borderColor = "var(--accent)";
+      setTimeout(() => {
+        neighborhoodSelect.style.borderColor = "";
+      }, 300);
+      
+      // In future: filter events/news by neighborhood
+      // For now, just store the preference
+      console.log("Neighborhood filter set to:", neighborhood);
+      
+      // Could trigger a re-fetch with neighborhood param
+      // fetchWeekEvents(currentWeekOffset, neighborhood);
+    });
+  }
+
+  // --- Data Freshness Tracking ---
+  const pageLoadTime = Date.now();
+  
+  function updateFreshnessIndicators() {
+    const elapsed = Math.floor((Date.now() - pageLoadTime) / 1000);
+    const minutes = Math.floor(elapsed / 60);
+    
+    const freshnessElements = document.querySelectorAll(".data-freshness");
+    freshnessElements.forEach(el => {
+      const dot = el.querySelector(".freshness-dot");
+      const text = el.querySelector(".freshness-text");
+      
+      if (minutes < 5) {
+        if (dot) {
+          dot.className = "freshness-dot";
+        }
+        if (text) {
+          text.textContent = elapsed < 60 ? "Updated just now" : `Updated ${minutes}m ago`;
+        }
+      } else if (minutes < 15) {
+        if (dot) {
+          dot.className = "freshness-dot freshness-dot--stale";
+        }
+        if (text) {
+          text.textContent = `Updated ${minutes}m ago`;
+        }
+      } else {
+        if (dot) {
+          dot.className = "freshness-dot freshness-dot--stale";
+        }
+        if (text) {
+          text.textContent = `Updated ${minutes}m ago · Refresh for latest`;
+        }
+      }
+    });
+  }
+  
+  // Update freshness every 30 seconds
+  setInterval(updateFreshnessIndicators, 30000);
+  updateFreshnessIndicators();
+
+  // --- Refresh Button ---
+  const refreshBtn = document.getElementById("js-refresh");
+  
+  if (refreshBtn) {
+    refreshBtn.addEventListener("click", () => {
+      refreshBtn.classList.add("is-refreshing");
+      // Reload the page after a brief animation
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    });
+  }
+
+  // --- Auto-Refresh Toggle ---
+  const autoRefreshToggle = document.getElementById("js-auto-refresh-toggle");
+  let autoRefreshInterval = null;
+  const AUTO_REFRESH_MS = 5 * 60 * 1000; // 5 minutes
+  
+  function setAutoRefresh(enabled) {
+    if (autoRefreshInterval) {
+      clearInterval(autoRefreshInterval);
+      autoRefreshInterval = null;
+    }
+    
+    if (enabled) {
+      autoRefreshInterval = setInterval(() => {
+        console.log("Auto-refreshing...");
+        window.location.reload();
+      }, AUTO_REFRESH_MS);
+      
+      if (autoRefreshToggle) {
+        autoRefreshToggle.textContent = "ON";
+        autoRefreshToggle.classList.add("is-active");
+      }
+    } else {
+      if (autoRefreshToggle) {
+        autoRefreshToggle.textContent = "OFF";
+        autoRefreshToggle.classList.remove("is-active");
+      }
+    }
+    
+    // Save preference
+    try {
+      localStorage.setItem("autoRefresh", enabled ? "on" : "off");
+    } catch (e) {}
+  }
+  
+  // Load saved auto-refresh preference
+  try {
+    const savedAutoRefresh = localStorage.getItem("autoRefresh");
+    if (savedAutoRefresh === "on") {
+      setAutoRefresh(true);
+    }
+  } catch (e) {}
+  
+  if (autoRefreshToggle) {
+    autoRefreshToggle.addEventListener("click", () => {
+      const isActive = autoRefreshToggle.classList.contains("is-active");
+      setAutoRefresh(!isActive);
+    });
+  }
+
+  // --- Keyboard Shortcuts ---
+  document.addEventListener("keydown", (e) => {
+    // Ctrl/Cmd + R is already handled by browser
+    // Add custom shortcuts
+    
+    // 'D' for dark mode toggle (when not in input)
+    if (e.key === "d" && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      const target = e.target;
+      if (target.tagName !== "INPUT" && target.tagName !== "TEXTAREA" && target.tagName !== "SELECT") {
+        if (darkToggle) {
+          darkToggle.click();
+        }
+      }
+    }
+    
+    // 'R' for refresh (when not in input)
+    if (e.key === "r" && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      const target = e.target;
+      if (target.tagName !== "INPUT" && target.tagName !== "TEXTAREA" && target.tagName !== "SELECT") {
+        if (refreshBtn) {
+          refreshBtn.click();
+        }
+      }
+    }
+    
+    // Escape to close mobile details panel
+    if (e.key === "Escape") {
+      if (detail && detail.classList.contains("is-open")) {
+        detail.classList.remove("is-open");
+      }
+    }
+  });
 
   // Maps: build OSM embed URL for selected layer
   function updateMap() {
