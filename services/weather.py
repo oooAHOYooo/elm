@@ -58,7 +58,7 @@ def fetch_weather(lat: float, lon: float, request_timeout: int = 5) -> Dict[str,
         "latitude": lat,
         "longitude": lon,
         "current_weather": "true",
-        "daily": "temperature_2m_max,temperature_2m_min,precipitation_probability_max",
+        "daily": "temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunrise,sunset",
         "temperature_unit": "fahrenheit",
         "timezone": "auto",
     }
@@ -76,10 +76,14 @@ def fetch_weather(lat: float, lon: float, request_timeout: int = 5) -> Dict[str,
         daily_max = None
         daily_min = None
         precip_prob = None
+        sunrise = None
+        sunset = None
         try:
             daily_max = daily.get("temperature_2m_max", [None])[0]
             daily_min = daily.get("temperature_2m_min", [None])[0]
             precip_prob = daily.get("precipitation_probability_max", [None])[0]
+            sunrise = daily.get("sunrise", [None])[0]
+            sunset = daily.get("sunset", [None])[0]
         except Exception:
             pass
 
@@ -93,6 +97,8 @@ def fetch_weather(lat: float, lon: float, request_timeout: int = 5) -> Dict[str,
             "high_temp": daily_max,
             "low_temp": daily_min,
             "precip_probability": precip_prob,
+            "sunrise": sunrise,
+            "sunset": sunset,
         }
 
         _WEATHER_CACHE["timestamp"] = now

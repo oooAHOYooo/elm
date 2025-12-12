@@ -1,0 +1,105 @@
+/* Feed History Dropdowns */
+.feed-history-container {
+    margin-top: 1rem;
+    padding: 0 1rem;
+}
+
+.feed-dropdown {
+    margin-bottom: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--surface-2);
+    overflow: hidden;
+}
+
+.feed-dropdown__summary {
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    user-select: none;
+    transition: background-color 0.2s;
+}
+
+.feed-dropdown__summary:hover {
+    background: var(--surface-hover);
+}
+
+.feed-dropdown__summary::-webkit-details-marker {
+    display: none;
+}
+
+.feed-cat-name {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.feed-count {
+    background: var(--surface-3);
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.feed-dropdown__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-height: 300px;
+    overflow-y: auto;
+    border-top: 1px solid var(--border-color);
+    background: var(--surface-1);
+}
+
+.feed-item {
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.feed-item:last-child {
+    border-bottom: none;
+}
+
+.feed-link {
+    display: block;
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    color: var(--text-main);
+    transition: background-color 0.2s;
+}
+
+.feed-link:hover {
+    background: var(--surface-hover);
+}
+
+.feed-title {
+    display: block;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin-bottom: 0.25rem;
+}
+
+.feed-meta {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+/* Scrollbar for dropdowns */
+.feed-dropdown__list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.feed-dropdown__list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.feed-dropdown__list::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 3px;
+}
+

@@ -90,6 +90,31 @@ def _fetch_lines_from_web(url: str, request_timeout: int = 8) -> List[str]:
 _cache = TTLCache(ttl_seconds=30 * 60)  # 30 minutes
 
 
+def _make_gcal_link(title: str, start: datetime, end: Optional[datetime], location: str) -> str:
+    """Generate a Google Calendar event link."""
+    # Dates must be YYYYMMDDTHHMMSSZ
+    fmt = "%Y%m%dT%H%M%S"
+    # Assuming start is aware; convert to UTC
+    t_start = start.astimezone(ZoneInfo("UTC")).strftime(fmt) + "Z"
+    if end:
+        t_end = end.astimezone(ZoneInfo("UTC")).strftime(fmt) + "Z"
+    else:
+        # Default to 1 hour
+        from datetime import timedelta
+        t_end = (start + timedelta(hours=1)).astimezone(ZoneInfo("UTC")).strftime(fmt) + "Z"
+    
+    import urllib.parse
+    base = "https://www.google.com/calendar/render?action=TEMPLATE"
+    params = {
+        "text": title,
+        "dates": f"{t_start}/{t_end}",
+        "location": location,
+        "sf": "true",
+        "output": "xml"
+    }
+    return base + "&" + urllib.parse.urlencode(params)
+
+
 def load_events(tz: ZoneInfo) -> List[Dict[str, Any]]:
     """
     Parse The New Haven List events into structured event dicts for the homepage.
@@ -180,6 +205,7 @@ def load_events(tz: ZoneInfo) -> List[Dict[str, Any]]:
                 dt_local_end = None
 
         # Normalize to expected fields
+        gcal_link = _make_gcal_link(title, dt_local_start, dt_local_end, location)
         events.append(
             {
                 "title": title,
@@ -187,7 +213,7 @@ def load_events(tz: ZoneInfo) -> List[Dict[str, Any]]:
                 "date_iso": dt_local_start.astimezone(ZoneInfo("UTC")).isoformat(),
                 "source": "The New Haven List",
                 "summary": "",
-                "link": None,
+                "link": gcal_link,  # Use Google Calendar link as the main link
                 "published_display": dt_local_start.strftime("%Y-%m-%d %I:%M %p"),
                 # Keep end for potential future use
                 "end_iso": dt_local_end.astimezone(ZoneInfo("UTC")).isoformat() if dt_local_end else None,

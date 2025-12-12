@@ -15,6 +15,8 @@
             href="{{ url_for('static', filename='css/main.css') }}" />
         <link rel="stylesheet"
             href="{{ url_for('static', filename='css/mobile-nav.css') }}" />
+        <link rel="stylesheet"
+            href="{{ url_for('static', filename='css/feeds.css') }}" />
     </head>
     <body>
         <div id="digital-clock" class="digital-clock" role="button" aria-label="Clock (click to change format)" title="Click to change format"></div>
@@ -23,6 +25,8 @@
         <script src="{{ url_for('static', filename='js/dashboard.js') }}"
             defer></script>
         <script src="{{ url_for('static', filename='js/mobile-nav.js') }}"
+            defer></script>
+        <script src="{{ url_for('static', filename='js/change_new_haven_live.js') }}"
             defer></script>
     </body>
 </html>

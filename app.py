@@ -38,7 +38,9 @@ def create_app() -> Flask:
         format="%(asctime)s %(levelname)s %(name)s %(message)s",
     )
     app.logger.setLevel(logging.INFO)
-    # Register blueprints (none currently)
+    # Register blueprints
+    from modules.change_new_haven_live.routes import bp as cnh_bp
+    app.register_blueprint(cnh_bp)
 
     @app.route("/")
     def index():
@@ -56,12 +58,8 @@ def create_app() -> Flask:
         # Policy: avoid third-party news; only primary sources.
         # If FEED_URLS is empty, skip entirely.
         if feeds:
-            articles = rss_service.fetch_rss_feeds(
-                feed_urls=feeds,
-                per_feed_limit=per_feed_limit,
-                overall_limit=overall_limit,
-                request_timeout=timeout,
-            )
+            # User requested to get rid of all news
+            articles = []
         else:
             articles = []
 
@@ -118,7 +116,8 @@ def create_app() -> Flask:
             if category in {"events", "city_events", "city_calendar_items", "music_arts"}:
                 unified_events.append(item)
             else:
-                unified_news.append(item)
+                # User requested to get rid of all news
+                pass
 
         # De-duplicate by link
         seen_links = set()
@@ -173,15 +172,6 @@ def create_app() -> Flask:
         air_quality = aqi_service.fetch_air_quality(
             lat=lat, lon=lon, api_key=airnow_key if airnow_key else None
         )
-
-        # Contextual intelligence (auto-generated insights)
-        today_summary = context_service.get_today_summary(
-            weather=weather,
-            events_count=len(week_events) if week_events else 0,
-            alerts_count=len(nws_alerts) if nws_alerts else 0,
-            air_quality=air_quality,
-        )
-        holiday_info = context_service.get_holiday_info()
 
         # Compute simple daypart temperatures from hourly forecast (local time)
         daypart_temps: Dict[str, Any] = {}
@@ -296,6 +286,15 @@ def create_app() -> Flask:
                 if within_current_week_fallback(e.start.astimezone(ZoneInfo("UTC")).isoformat())
             ]
             week_events = sorted(fallback, key=lambda i: i.get("date_iso", ""))
+
+        # Contextual intelligence (auto-generated insights)
+        today_summary = context_service.get_today_summary(
+            weather=weather,
+            events_count=len(week_events) if week_events else 0,
+            alerts_count=len(nws_alerts) if nws_alerts else 0,
+            air_quality=air_quality,
+        )
+        holiday_info = context_service.get_holiday_info()
 
         # Build compact 7-day grid starting Monday
         from datetime import timedelta

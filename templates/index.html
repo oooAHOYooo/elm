@@ -83,7 +83,65 @@
                 {% endif %}
             </div>
 
-            {# History sections omitted for now #}
+            <div class="feed-history-container">
+                <h2 class="panel__title">Local Happenings</h2>
+                
+                <!-- City Resources Dropdown (Populated by JS) -->
+                <details class="feed-dropdown">
+                    <summary class="feed-dropdown__summary">
+                        <span class="feed-cat-name">🏛️ City Resources</span>
+                        <span class="feed-count" id="js-city-resources-count">0</span>
+                    </summary>
+                    <ul class="feed-dropdown__list" id="js-city-resources-list">
+                        <li class="feed-item" style="padding:1rem;color:var(--text-muted)">Loading...</li>
+                    </ul>
+                </details>
+
+                {# Group events by source or type for dropdowns #}
+                {% set feed_cats = {} %}
+                {# Pre-process feeds into categories #}
+                {% for item in events %}
+                    {# Use source as category for New Haven List items #}
+                    {% set cat = item.source if item.source else 'Other' %}
+                    {% if cat not in feed_cats %}
+                        {% set _ = feed_cats.update({cat: []}) %}
+                    {% endif %}
+                    {% set _ = feed_cats[cat].append(item) %}
+                {% endfor %}
+
+                {# Add aggregated history categories #}
+                {% for category, items in feed_history.items() %}
+                     {% if category not in feed_cats %}
+                        {% set _ = feed_cats.update({category: []}) %}
+                    {% endif %}
+                    {% set _ = feed_cats[category].extend(items) %}
+                {% endfor %}
+
+                {% for category, items in feed_cats.items() %}
+                {% if items %}
+                <details class="feed-dropdown">
+                    <summary class="feed-dropdown__summary">
+                        <span class="feed-cat-name">{{ category|replace('_', ' ')|title }}</span>
+                        <span class="feed-count">{{ items|length }}</span>
+                    </summary>
+                    <ul class="feed-dropdown__list">
+                        {% for item in items[:50] %}
+                        <li class="feed-item">
+                            <a href="{{ item.link or '#' }}" target="_blank" rel="noopener" class="feed-link">
+                                <span class="feed-title">{{ item.title }}</span>
+                                <span class="feed-meta">
+                                    {% if item.location %}{{ item.location }} · {% endif %}
+                                    {{ item.date|default('')|truncate(10, True, '') }}
+                                </span>
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </details>
+                {% endif %}
+                {% endfor %}
+            </div>
+
             <div class="change-nh" role="region"
                 aria-label="Change New Haven quick actions">
                 <div class="change-nh__title">City Services</div>
@@ -288,24 +346,7 @@
         </section>
 
         <aside class="panel panel--right">
-            <div class="boards">
-                <h3 class="filters__title">Upcoming Boards & Commissions</h3>
-                <ul class="list">
-                    {% for b in boards_upcoming %}
-                    <li class="list__item">
-                        <a class="list__link" href="{{ b.link or '#' }}"
-                            target="_blank" rel="noopener">
-                            <span class="list__source">{{ b.source }} · {{
-                                b.date }}</span>
-                            <span class="list__title">{{ b.title }}</span>
-                        </a>
-                    </li>
-                    {% else %}
-                    <li class="list__item list__item--empty">No upcoming
-                        meetings.</li>
-                    {% endfor %}
-                </ul>
-            </div>
+            <!-- Boards removed -->
             
             <button class="ecd-mobile-accordion-toggle ecd-city-map-toggle" id="js-map-toggle" type="button" aria-expanded="false" aria-controls="js-map-stats">
                 <span>City Map &amp; Stats</span>
@@ -328,126 +369,11 @@
                     data-lat="{{ center_lat }}"
                     data-lon="{{ center_lon }}"></iframe>
             </div>
-            <h2 class="panel__title">City by the Numbers
-                <span class="data-freshness" id="js-civics-freshness">
-                    <span class="freshness-dot"></span>
-                    <span class="freshness-text">Updated just now</span>
-                </span>
-            </h2>
-            <div class="stats stats--compact">
-                <div class="stat">
-                    <div class="stat__value">{{ civics_stats.introduced }}</div>
-                    <div class="stat__label">Matters ({{ civics_stats.since[:10]
-                        if civics_stats.since }})</div>
-                </div>
-                <div class="stat">
-                    <div class="stat__value">{{ civics_stats.adopted }}</div>
-                    <div class="stat__label">Adopted</div>
-                </div>
-                <div class="stat">
-                    <div class="stat__value">{{ civics_stats.failed }}</div>
-                    <div class="stat__label">Failed</div>
-                </div>
-                <div class="stat">
-                    <div class="stat__value">{{ civics_stats.projects_open
-                        }}</div>
-                    <div class="stat__label">Projects</div>
-                </div>
-                {% if tax_info and tax_info.mill_rate %}
-                <div class="stat">
-                    <div class="stat__value">{{
-                        '%.2f'|format(tax_info.mill_rate) }}</div>
-                    <div class="stat__label">Mill (FY {{ tax_info.fiscal_year
-                        }})</div>
-                </div>
-                {% endif %}
-            </div>
+            <!-- City stats removed -->
 
-            <div class="filters">
-                <h3 class="filters__title">Content Filters</h3>
-                <div class="filters__grid">
-                    <label class="checkbox">
-                        <input type="checkbox" class="js-filter"
-                            data-category="news" checked />
-                        <span>📰 News</span>
-                    </label>
-                    <label class="checkbox">
-                        <input type="checkbox" class="js-filter"
-                            data-category="events" checked />
-                        <span>📅 Events</span>
-                    </label>
-                    <label class="checkbox">
-                        <input type="checkbox" class="js-filter"
-                            data-category="weather" checked />
-                        <span>🌤️ Weather</span>
-                    </label>
-                    <label class="checkbox">
-                        <input type="checkbox" class="js-filter"
-                            data-category="civic" checked />
-                        <span>🏛️ Civic</span>
-                    </label>
-                    <label class="checkbox">
-                        <input type="checkbox" class="js-filter"
-                            data-category="arts" checked />
-                        <span>🎭 Arts</span>
-                    </label>
-                    <label class="checkbox">
-                        <input type="checkbox" class="js-filter"
-                            data-category="community" checked />
-                        <span>🤝 Community</span>
-                    </label>
-                    <label class="checkbox">
-                        <input type="checkbox" class="js-filter"
-                            data-category="fire" checked />
-                        <span>🚒 Fire/Safety</span>
-                    </label>
-                    <label class="checkbox">
-                        <input type="checkbox" class="js-filter"
-                            data-category="food" checked />
-                        <span>🍽️ Food</span>
-                    </label>
-                </div>
-                <div class="filters__actions">
-                    <button type="button" class="filters__btn" id="js-filter-all">Select All</button>
-                    <button type="button" class="filters__btn" id="js-filter-none">Clear All</button>
-                </div>
-            </div>
+            <!-- Filters removed -->
 
-            <div class="neighborhood-filter">
-                <h3 class="filters__title">Neighborhood Focus</h3>
-                <select id="js-neighborhood" class="neighborhood-select" aria-label="Filter by neighborhood">
-                    <option value="all">All New Haven</option>
-                    <optgroup label="Downtown & Central">
-                        <option value="downtown">Downtown</option>
-                        <option value="wooster-square">Wooster Square</option>
-                        <option value="hill">The Hill</option>
-                        <option value="dwight">Dwight</option>
-                    </optgroup>
-                    <optgroup label="East">
-                        <option value="east-rock">East Rock</option>
-                        <option value="fair-haven">Fair Haven</option>
-                        <option value="quinnipiac-meadows">Quinnipiac Meadows</option>
-                        <option value="annex">The Annex</option>
-                    </optgroup>
-                    <optgroup label="West">
-                        <option value="westville">Westville</option>
-                        <option value="west-rock">West Rock</option>
-                        <option value="amity">Amity</option>
-                        <option value="beaver-hills">Beaver Hills</option>
-                    </optgroup>
-                    <optgroup label="North">
-                        <option value="newhallville">Newhallville</option>
-                        <option value="prospect-hill">Prospect Hill</option>
-                        <option value="dixwell">Dixwell</option>
-                    </optgroup>
-                    <optgroup label="South">
-                        <option value="long-wharf">Long Wharf</option>
-                        <option value="city-point">City Point</option>
-                        <option value="east-shore">East Shore</option>
-                    </optgroup>
-                </select>
-                <p class="neighborhood-note">Focus events & news on your area</p>
-            </div>
+            <!-- Neighborhood filter removed -->
             <div class="air-quality" role="region" aria-label="Air Quality Index">
                 <h3 class="filters__title">Air Quality</h3>
                 <div class="aqi-display">
@@ -492,17 +418,7 @@
                 </ul>
             </div>
 
-            <ul class="list list--rail">
-                {% for item in right_rail_items %}
-                <li class="list__item">
-                    <a class="list__link" href="{{ item.link }}" target="_blank"
-                        rel="noopener">
-                        <span class="list__source">{{ item.source }}</span>
-                        <span class="list__title">{{ item.title }}</span>
-                    </a>
-                </li>
-                {% endfor %}
-            </ul>
+            <!-- Right rail items removed -->
             </div> <!-- End ecd-city-map-stats -->
         </aside>
     </main>
@@ -526,13 +442,6 @@
                 <div class="card__title">{{ item.title }}</div>
                 <div class="card__meta">{{ item.summary }}</div>
             </div>
-            {% else %}
-            <a class="card" href="{{ item.link }}" target="_blank"
-                rel="noopener" data-category="news">
-                <div class="card__badge">News</div>
-                <div class="card__title">{{ item.title }}</div>
-                <div class="card__meta">{{ item.source }}</div>
-            </a>
             {% endif %}
             {% endfor %}
         </div>
@@ -562,7 +471,9 @@
     current_temp: {% if weather and weather.current_temp is not none %}{{ weather.current_temp }}{% else %}null{% endif %},
     high_temp: {% if weather and weather.high_temp is not none %}{{ weather.high_temp }}{% else %}null{% endif %},
     low_temp: {% if weather and weather.low_temp is not none %}{{ weather.low_temp }}{% else %}null{% endif %},
-    weather_desc: {% if weather and weather.weather_desc %}{{ weather.weather_desc|tojson|safe }}{% else %}""{% endif %}
+    weather_desc: {% if weather and weather.weather_desc %}{{ weather.weather_desc|tojson|safe }}{% else %}""{% endif %},
+    sunrise: {% if weather and weather.sunrise %}{{ weather.sunrise|tojson|safe }}{% else %}null{% endif %},
+    sunset: {% if weather and weather.sunset %}{{ weather.sunset|tojson|safe }}{% else %}null{% endif %}
   };
   window.DAYPART_TEMPS = {{ daypart_temps|tojson|safe if daypart_temps else '{}' }};
   window.TIME_STR = {{ time_str|tojson|safe if time_str else '""' }};

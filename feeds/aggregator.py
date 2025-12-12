@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Optional
 
 from .feed_parser import parse_rss, parse_ical
 from .iaff_scraper import fetch_iaff_headlines
+from .newhavenlist import load_events
 from .sources import RSS_SOURCES, ICAL_SOURCES, SOURCE_CREDIT
 from utils.cache import TTLCache
 
@@ -36,6 +37,18 @@ def aggregate_all(timeout_rss: int = 6, timeout_ical: int = 8) -> Dict[str, Any]
     # iCal sources
     for name, url in ICAL_SOURCES.items():
         items.extend(parse_ical(url, timeout=timeout_ical))
+
+    # The New Haven List (local events)
+    try:
+        from zoneinfo import ZoneInfo
+        tz = ZoneInfo("America/New_York")
+        nhl_events = load_events(tz=tz)
+        # Normalize category
+        for ev in nhl_events:
+            ev["category"] = "events"
+        items.extend(nhl_events)
+    except Exception as e:
+        _logger.error("New Haven List error: %s", e)
 
     # IAFF Headlines special scraper
     if "iaff_headlines" in RSS_SOURCES:
