@@ -26,6 +26,16 @@
 
 .feed-dropdown__summary:hover {
     background: var(--surface-hover);
+    color: var(--accent); /* subtle highlight on hover */
+}
+
+.feed-dropdown[open] .feed-dropdown__summary {
+    border-bottom: 1px solid var(--border-subtle);
+    background: var(--surface-hover);
+}
+
+.feed-dropdown[open] {
+    box-shadow: 0 4px 12px var(--shadow);
 }
 
 .feed-dropdown__summary::-webkit-details-marker {

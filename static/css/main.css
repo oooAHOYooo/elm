@@ -494,12 +494,11 @@ a {
     color: var(--muted-ink);
 }
 
-.weather__units select {
-    border: 1px solid var(--line);
-    background: rgba(255, 255, 255, 0.9);
-    padding: 2px 4px;
+.weather-sun {
     font-size: 11px;
-    font-family: inherit;
+    color: var(--muted-ink);
+    margin-top: 2px;
+    opacity: 0.8;
 }
 
 .dayparts {
@@ -577,12 +576,14 @@ a {
     margin-bottom: 4px;
 }
 
+/* Hide the original weather mini select to reduce clutter if desired, or keep it */
 .weather-mini select {
     border: 1px solid var(--line);
-    background: #fff;
+    background: var(--card-bg, #fff);
     padding: 2px 4px;
     font-size: 11px;
     font-family: inherit;
+    border-radius: 4px;
 }
 
 .weather-mini__output {
