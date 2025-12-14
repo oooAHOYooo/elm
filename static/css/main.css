@@ -186,10 +186,13 @@ a {
     flex-direction: column;
     min-height: 0;
     /* to allow overflow control within panel */
+    overflow: hidden; /* Keep hidden generally, but we override for left panel specifically */
 }
 
+/* Allow left panel to show flyouts */
 .panel--left {
     grid-area: left;
+    overflow: visible; /* Allow feed dropdowns to fly out */
 }
 
 .panel--center {
@@ -1303,6 +1306,7 @@ a {
         box-shadow: none;
         padding: 0;
         margin-bottom: 16px;
+        overflow: visible; /* reset for mobile */
     }
 
     /* Accordion Utilities */
