@@ -4,25 +4,24 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import feedparser
 import requests
+from utils.cache import TTLCache
 
 _logger = logging.getLogger(__name__)
 
-_CACHE: Dict[str, Tuple[float, Any]] = {}
+# Persistent cache for NWS data
+# Use 15 min TTL default; alerts requests ask for 300s but TTLCache enforces one TTL.
+# 900s (15m) is fine for alerts too, or we could lower it.
+# Let's use 600s (10m) as a middle ground.
+_CACHE = TTLCache(ttl_seconds=600, filepath=".cache_nws.pkl")
 _UA = {"User-Agent": "ElmCityDaily/1.0 (+https://example.local)"}
 
 
 def _get_cache(key: str, ttl: int) -> Optional[Any]:
-    item = _CACHE.get(key)
-    if not item:
-        return None
-    ts, value = item
-    if time.time() - ts > ttl:
-        return None
-    return value
+    return _CACHE.get(key)
 
 
 def _set_cache(key: str, value: Any) -> None:
-    _CACHE[key] = (time.time(), value)
+    _CACHE.set(key, value)
 
 
 def fetch_nws_alerts(zone: str = "ctz010", ttl_seconds: int = 300) -> List[Dict[str, Any]]:

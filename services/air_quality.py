@@ -11,24 +11,20 @@ import time
 from typing import Any, Dict, List, Optional, Tuple
 
 import requests
+from utils.cache import TTLCache
 
 _logger = logging.getLogger(__name__)
 
-_CACHE: Dict[str, Tuple[float, Any]] = {}
+# Persistent cache for AQI data
+_CACHE = TTLCache(ttl_seconds=1800, filepath=".cache_aqi.pkl")
 
 
 def _get_cache(key: str, ttl: int) -> Optional[Any]:
-    item = _CACHE.get(key)
-    if not item:
-        return None
-    ts, value = item
-    if time.time() - ts > ttl:
-        return None
-    return value
+    return _CACHE.get(key)
 
 
 def _set_cache(key: str, value: Any) -> None:
-    _CACHE[key] = (time.time(), value)
+    _CACHE.set(key, value)
 
 
 # AQI color and health categories per EPA standards

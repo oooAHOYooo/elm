@@ -3,13 +3,12 @@ import time
 from typing import Any, Dict, Optional
 
 import requests
+from utils.cache import TTLCache
 
 _logger = logging.getLogger(__name__)
 
-_WEATHER_CACHE: Dict[str, Any] = {
-    "timestamp": 0.0,
-    "data": None,
-}
+# Persistent cache for weather
+_WEATHER_CACHE = TTLCache(ttl_seconds=900, filepath=".cache_weather.pkl")
 
 # Mapping for Open-Meteo weather codes
 _WEATHER_CODE_MAP: Dict[int, Dict[str, str]] = {
@@ -48,10 +47,11 @@ def fetch_weather(lat: float, lon: float, request_timeout: int = 5) -> Dict[str,
     Fetch current weather and today's min/max for the given coordinates from Open-Meteo.
     Includes a simple cache to avoid excessive requests.
     """
-    now = time.time()
-    ttl_seconds = 900  # 15 minutes
-    if _WEATHER_CACHE["data"] and now - _WEATHER_CACHE["timestamp"] < ttl_seconds:
-        return _WEATHER_CACHE["data"]
+    # Use simple key for single location apps
+    cache_key = f"weather:{lat:.4f},{lon:.4f}"
+    cached = _WEATHER_CACHE.get(cache_key)
+    if cached:
+        return cached
 
     base = "https://api.open-meteo.com/v1/forecast"
     params = {
@@ -101,8 +101,7 @@ def fetch_weather(lat: float, lon: float, request_timeout: int = 5) -> Dict[str,
             "sunset": sunset,
         }
 
-        _WEATHER_CACHE["timestamp"] = now
-        _WEATHER_CACHE["data"] = result
+        _WEATHER_CACHE.set(cache_key, result)
         return result
     except Exception as err:
         _logger.error("Failed to fetch weather: %s", err)

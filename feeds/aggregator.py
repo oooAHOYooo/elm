@@ -9,7 +9,7 @@ from .sources import RSS_SOURCES, ICAL_SOURCES, SOURCE_CREDIT
 from utils.cache import TTLCache
 
 _logger = logging.getLogger(__name__)
-_cache = TTLCache(ttl_seconds=600)
+_cache = TTLCache(ttl_seconds=600, filepath=".cache_feeds.pkl")
 
 
 def _sort_key(item: Dict[str, Any]) -> float:

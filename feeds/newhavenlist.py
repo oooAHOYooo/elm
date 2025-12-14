@@ -87,7 +87,7 @@ def _fetch_lines_from_web(url: str, request_timeout: int = 8) -> List[str]:
     except Exception:
         return []
 
-_cache = TTLCache(ttl_seconds=30 * 60)  # 30 minutes
+_cache = TTLCache(ttl_seconds=30 * 60, filepath=".cache_nhl.pkl")  # 30 minutes
 
 
 def _make_gcal_link(title: str, start: datetime, end: Optional[datetime], location: str) -> str:
@@ -211,7 +211,7 @@ def load_events(tz: ZoneInfo) -> List[Dict[str, Any]]:
                 "title": title,
                 "location": location,
                 "date_iso": dt_local_start.astimezone(ZoneInfo("UTC")).isoformat(),
-                "source": "The New Haven List",
+                "source": {"name": "The New Haven List", "url": "https://newhavenlist.com"},
                 "summary": "",
                 "link": gcal_link,  # Use Google Calendar link as the main link
                 "published_display": dt_local_start.strftime("%Y-%m-%d %I:%M %p"),

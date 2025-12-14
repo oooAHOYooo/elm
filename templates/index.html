@@ -131,7 +131,7 @@
                                 <span class="feed-title">{{ item.title }}</span>
                                 <span class="feed-meta">
                                     {% if item.location %}{{ item.location }} · {% endif %}
-                                    {{ item.date|default('')|truncate(10, True, '') }}
+                                    {{ item.date|default('', true)|truncate(10, True, '') }}
                                 </span>
                             </a>
                         </li>
