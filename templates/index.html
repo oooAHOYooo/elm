@@ -1,483 +1,227 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="dashboard" id="js-fit">
+<div class="newspaper" id="js-fit">
+    <!-- Masthead -->
     <header class="masthead">
-        <div class="masthead__title">
-            <h1>{{ app_name or "Elm City Daily" }}</h1>
-            <span class="live-badge" title="Data updating in real-time">
-                <span class="live-badge__dot"></span>
-                Live
-            </span>
+        <div class="masthead__edition">New Haven, Connecticut</div>
+        <h1 class="masthead__title">Elm City Daily</h1>
+        <div class="masthead__meta">
+            <time class="masthead__date">{{ date_str }}</time>
+            <span class="masthead__separator">·</span>
+            <span class="masthead__tagline">Your Daily Civic Digest</span>
+            <button class="masthead__theme" id="js-dark-toggle" type="button" aria-label="Toggle theme">
+                <span id="js-theme-icon">☀</span>
+            </button>
         </div>
-        <p class="masthead__date">{{ date_str }}</p>
-        <div class="masthead__lines" aria-hidden="true"></div>
-        <button class="dark-mode-toggle" id="js-dark-toggle" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
-            <span class="dark-mode-icon" aria-hidden="true">🌙</span>
-        </button>
+        <div class="masthead__rule"></div>
     </header>
 
-    <main class="grid">
-        <section class="panel panel--left">
-            <!-- Mobile Utility Toggle -->
-            <button class="ecd-mobile-accordion-toggle" id="js-utils-toggle" type="button" aria-expanded="false" aria-controls="js-mobile-utils">
-                <span class="ecd-site-title">Elm City Daily</span>
-                <span class="ecd-mobile-status" id="js-mobile-status-text">
-                    <!-- Populated by JS -->
-                </span>
-                <span class="ecd-mobile-chevron" aria-hidden="true">▾</span>
-            </button>
-
-            <div id="js-mobile-utils" class="ecd-header-utilities">
-                <h2 class="panel__title">Local Time & Weather</h2>
-                <div class="weather-mini" aria-label="Weather information">
-                <div class="weather-mini__controls">
-                    <label for="js-units" class="sr-only">Units</label>
-                    <select id="js-units" aria-label="Units">
-                        <option value="F" selected>°F</option>
-                        <option value="C">°C</option>
-                    </select>
-                </div>
-                <div id="js-weather-output" class="weather-mini__output">Weather loading…</div>
-            </div>
-
-            <div class="tides-mini" aria-label="Tidal information">
-                <div class="tides-mini__controls">
-                    <label for="js-tide-date" class="sr-only">Date</label>
-                    <select id="js-tide-date" aria-label="Date">
-                        <option value="today">Today</option>
-                        <option value="tomorrow">Tomorrow</option>
-                    </select>
-                </div>
-                <div id="js-tide-output" class="tides-mini__output">Tides
-                    loading…</div>
-            </div>
-
-            <!-- Today at a Glance - Auto-generated contextual summary -->
-            <div class="today-glance" role="region" aria-label="Today at a Glance">
-                <div class="today-glance__header">
-                    <span class="today-glance__icon">{{ today_summary.time_context.icon }}</span>
-                    <span class="today-glance__greeting">{{ today_summary.time_context.greeting }}, New Haven</span>
-                    {% if holiday_info %}
-                    <span class="today-glance__holiday" title="{{ holiday_info.type|capitalize }} Holiday">
-                        {{ holiday_info.icon }} {{ holiday_info.name }}
-                    </span>
-                    {% endif %}
-                </div>
-                
-                <div class="today-glance__summary">
-                    {% for item in today_summary.summary_items %}
-                    <div class="summary-item summary-item--{{ item.type }}">{{ item.text }}</div>
-                    {% endfor %}
-                </div>
-                
-                {% if today_summary.tips %}
-                <div class="today-glance__tips">
-                    <div class="tips-label">Smart Tips</div>
-                    {% for tip in today_summary.tips %}
-                    <div class="tip-item tip-item--{{ tip.priority }}">
-                        <span class="tip-icon">{{ tip.icon }}</span>
-                        <span class="tip-text">{{ tip.tip }}</span>
+    <!-- Above the Fold -->
+    <main class="broadsheet">
+        <!-- Lead Column: Weather & Conditions -->
+        <section class="col col--lead" aria-label="Weather and Conditions">
+            <article class="weather-block">
+                <h2 class="section-head">Today's Conditions</h2>
+                <div class="weather-hero">
+                    <div class="weather-hero__temp" id="js-temp">
+                        {% if weather and weather.current_temp is not none %}
+                        {{ weather.current_temp|round|int }}°
+                        {% else %}--{% endif %}
                     </div>
-                    {% endfor %}
+                    <div class="weather-hero__desc">
+                        {{ weather.weather_desc if weather else 'Loading...' }}
+                    </div>
+                </div>
+                <div class="weather-details">
+                    <div class="weather-stat">
+                        <span class="weather-stat__label">High</span>
+                        <span class="weather-stat__value" id="js-high">{{ weather.high_temp|round|int if weather and weather.high_temp else '--' }}°</span>
+                    </div>
+                    <div class="weather-stat">
+                        <span class="weather-stat__label">Low</span>
+                        <span class="weather-stat__value" id="js-low">{{ weather.low_temp|round|int if weather and weather.low_temp else '--' }}°</span>
+                    </div>
+                    <div class="weather-stat">
+                        <span class="weather-stat__label">Sunrise</span>
+                        <span class="weather-stat__value">{{ weather.sunrise if weather and weather.sunrise else '--' }}</span>
+                    </div>
+                    <div class="weather-stat">
+                        <span class="weather-stat__label">Sunset</span>
+                        <span class="weather-stat__value">{{ weather.sunset if weather and weather.sunset else '--' }}</span>
+                    </div>
+                </div>
+                {% if air_quality and air_quality.available %}
+                <div class="aqi-inline">
+                    <span class="aqi-inline__badge" style="background:{{ air_quality.color }}">{{ air_quality.aqi }}</span>
+                    <span class="aqi-inline__text">{{ air_quality.category }} Air Quality</span>
                 </div>
                 {% endif %}
-            </div>
+            </article>
 
-            <div class="feed-history-container">
-                <h2 class="panel__title">Local Happenings</h2>
-                
-                <!-- City Resources Dropdown (Populated by JS) -->
-                <details class="feed-dropdown">
-                    <summary class="feed-dropdown__summary">
-                        <span class="feed-cat-name">🏛️ City Resources</span>
-                        <span class="feed-count" id="js-city-resources-count">0</span>
-                    </summary>
-                    <ul class="feed-dropdown__list" id="js-city-resources-list">
-                        <li class="feed-item" style="padding:1rem;color:var(--text-muted)">Loading...</li>
-                    </ul>
-                </details>
+            <article class="tides-block">
+                <h2 class="section-head">Harbor Tides</h2>
+                <div id="js-tide-output" class="tides-content">Loading tides...</div>
+            </article>
 
-                {# Group events by source or type for dropdowns #}
-                {% set feed_cats = {} %}
-                {# Pre-process feeds into categories #}
-                {% for item in events %}
-                    {# Use source as category for New Haven List items #}
-                    {% set cat = item.source if item.source else 'Other' %}
-                    {% if cat not in feed_cats %}
-                        {% set _ = feed_cats.update({cat: []}) %}
-                    {% endif %}
-                    {% set _ = feed_cats[cat].append(item) %}
+            {% if nws_alerts and nws_alerts|length > 0 %}
+            <article class="alerts-block">
+                <h2 class="section-head section-head--alert">⚠ Weather Alerts</h2>
+                {% for al in nws_alerts %}
+                <a href="{{ al.link }}" target="_blank" rel="noopener" class="alert-item">
+                    <strong>{{ al.event }}</strong>: {{ al.headline|truncate(80) if al.headline else al.title }}
+                </a>
                 {% endfor %}
-
-                {# Add aggregated history categories #}
-                {% for category, items in feed_history.items() %}
-                     {% if category not in feed_cats %}
-                        {% set _ = feed_cats.update({category: []}) %}
-                    {% endif %}
-                    {% set _ = feed_cats[category].extend(items) %}
-                {% endfor %}
-
-                {% for category, items in feed_cats.items() %}
-                {% if items %}
-                <details class="feed-dropdown">
-                    <summary class="feed-dropdown__summary">
-                        <span class="feed-cat-name">{{ category|replace('_', ' ')|title }}</span>
-                        <span class="feed-count">{{ items|length }}</span>
-                    </summary>
-                    <ul class="feed-dropdown__list">
-                        {% for item in items[:50] %}
-                        <li class="feed-item">
-                            <a href="{{ item.link or '#' }}" target="_blank" rel="noopener" class="feed-link">
-                                <span class="feed-title">{{ item.title }}</span>
-                                <span class="feed-meta">
-                                    {% if item.location %}{{ item.location }} · {% endif %}
-                                    {{ item.date|default('', true)|truncate(10, True, '') }}
-                                </span>
-                            </a>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                </details>
-                {% endif %}
-                {% endfor %}
-            </div>
-
-            <div class="change-nh" role="region"
-                aria-label="Change New Haven quick actions">
-                <div class="change-nh__title">City Services</div>
-                <div class="change-nh__actions">
-                    <a class="change-nh__btn change-nh__btn--primary" 
-                        href="https://seeclickfix.com/new-haven" target="_blank"
-                        rel="noopener" title="Report an Issue">
-                        <span class="change-nh__icon">📢</span><span
-                            class="change-nh__label">Report Issue</span>
-                    </a>
-                    <a class="change-nh__btn" href="tel:+12039464800"
-                        title="City Hall (203-946-4800)">
-                        <span class="change-nh__icon">☎️</span><span
-                            class="change-nh__label">311/City</span>
-                    </a>
-                    <a class="change-nh__btn"
-                        href="https://newhavenct.legistar.com" target="_blank"
-                        rel="noopener" title="Legistar">
-                        <span class="change-nh__icon">📄</span><span
-                            class="change-nh__label">Legistar</span>
-                    </a>
-                    <a class="change-nh__btn"
-                        href="https://www.newhavenct.gov/government/departments-divisions/city-plan"
-                        target="_blank" rel="noopener" title="City Plan Dept">
-                        <span class="change-nh__icon">🏛️</span><span
-                            class="change-nh__label">City Plan</span>
-                    </a>
-                    <a class="change-nh__btn"
-                        href="https://maps.newhavenct.gov/" target="_blank"
-                        rel="noopener" title="Maps">
-                        <span class="change-nh__icon">🗺️</span><span
-                            class="change-nh__label">Maps</span>
-                    </a>
-                </div>
-                <div class="change-nh__title" style="margin-top: 8px;">Resources</div>
-                <div class="change-nh__actions">
-                    <a class="change-nh__btn"
-                        href="https://www.newhavenct.gov/government/job-opportunities"
-                        target="_blank" rel="noopener" title="City Jobs">
-                        <span class="change-nh__icon">💼</span><span
-                            class="change-nh__label">City Jobs</span>
-                    </a>
-                    <a class="change-nh__btn"
-                        href="https://nhfpl.org" target="_blank"
-                        rel="noopener" title="Library">
-                        <span class="change-nh__icon">📚</span><span
-                            class="change-nh__label">Library</span>
-                    </a>
-                    <a class="change-nh__btn"
-                        href="https://www.newhavenct.gov/residents/parking"
-                        target="_blank" rel="noopener" title="Parking">
-                        <span class="change-nh__icon">🅿️</span><span
-                            class="change-nh__label">Parking</span>
-                    </a>
-                    <a class="change-nh__btn"
-                        href="https://www.newhavenct.gov/residents/trash-recycling"
-                        target="_blank" rel="noopener" title="Trash & Recycling">
-                        <span class="change-nh__icon">♻️</span><span
-                            class="change-nh__label">Recycling</span>
-                    </a>
-                    <a class="change-nh__btn"
-                        href="https://portal.ct.gov/dph" target="_blank"
-                        rel="noopener" title="CT Health Dept">
-                        <span class="change-nh__icon">🏥</span><span
-                            class="change-nh__label">Health</span>
-                    </a>
-                </div>
-                <div class="change-nh__title" style="margin-top: 8px;">Emergency</div>
-                <div class="change-nh__actions">
-                    <a class="change-nh__btn change-nh__btn--emergency" href="tel:911"
-                        title="Emergency 911">
-                        <span class="change-nh__icon">🚨</span><span
-                            class="change-nh__label">911</span>
-                    </a>
-                    <a class="change-nh__btn" href="tel:+12039466316"
-                        title="Police Non-Emergency">
-                        <span class="change-nh__icon">👮</span><span
-                            class="change-nh__label">Police</span>
-                    </a>
-                    <a class="change-nh__btn" href="tel:+12039466262"
-                        title="Fire Non-Emergency">
-                        <span class="change-nh__icon">🚒</span><span
-                            class="change-nh__label">Fire</span>
-                    </a>
-                    <a class="change-nh__btn"
-                        href="https://www.211ct.org/" target="_blank"
-                        rel="noopener" title="211 United Way">
-                        <span class="change-nh__icon">ℹ️</span><span
-                            class="change-nh__label">211</span>
-                    </a>
-                </div>
-            </div>
-            {# Recent council actions omitted #}
-            </div> <!-- End ecd-header-utilities -->
+            </article>
+            {% endif %}
         </section>
 
-        <section class="panel panel--center">
-            <div class="this-week">
-                <header class="week-header desktop-only">
-                    <button id="js-week-prev" class="week-nav week-nav-prev" aria-label="Previous week">‹</button>
-                    <div id="js-week-label" class="week-label">Week of {{ week_start_date|default('this week') }}</div>
-                    <button id="js-week-next" class="week-nav week-nav-next" aria-label="Next week">›</button>
-                </header>
-
-                <div class="ecd-week-wrapper mobile-only">
-                     <button class="ecd-week-nav ecd-week-nav--prev" id="js-mobile-week-prev" aria-label="Previous week">‹</button>
-                     <div class="ecd-week-days-scroll" id="js-mobile-week-scroll">
-                         <!-- Populated by JS -->
-                     </div>
-                     <button class="ecd-week-nav ecd-week-nav--next" id="js-mobile-week-next" aria-label="Next week">›</button>
-                </div>
-
-                <div class="week-grid desktop-only" id="js-agenda-week">
-                    {% for day in week_grid %}
-                    <div class="week-day-column">
-                        <div class="week-day-header">{{ day.label }}</div>
-                        <div class="week-day-body">
-                            {% for it in day['items'] %}
-                            <button class="week-event-item" type="button"
-                                data-title="{{ it.title }}"
-                                data-time="{{ it.time }}"
-                                data-link="{{ it.link }}"
-                                data-location="{{ it.location }}"
-                                data-source="{{ it.source }}"
-                                data-date="{{ it.date }}"
-                                data-summary="{{ it.summary | e }}">
-                                <div class="week-event-time">{{ it.time }}</div>
-                                <div class="week-event-title">{{ it.title }}</div>
-                            </button>
-                            {% else %}
-                            <div class="week-day-empty">—</div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-
-                <div class="ecd-mobile-events mobile-only">
-                     <h2 class="ecd-section-heading">Today</h2>
-                     <div class="ecd-mobile-events-today" id="js-mobile-events-today">
-                         <!-- Populated by JS -->
-                     </div>
-                     
-                     <h2 class="ecd-section-heading">This Week</h2>
-                     <div class="ecd-mobile-events-week" id="js-mobile-events-week">
-                        {% for day in week_grid %}
-                            {% for it in day['items'] %}
-                            <article class="ecd-event-card" 
-                                data-date="{{ it.date }}"
-                                data-title="{{ it.title }}"
-                                data-time="{{ it.time }}"
-                                data-link="{{ it.link }}"
-                                data-location="{{ it.location }}"
-                                data-source="{{ it.source }}"
-                                data-summary="{{ it.summary | e }}">
-                                <div class="ecd-event-time">{{ it.time }}</div>
-                                <div class="ecd-event-title">{{ it.title }}</div>
-                                <div class="ecd-event-meta">
-                                    {% if it.location %}{{ it.location }}{% endif %}
-                                </div>
-                            </article>
-                            {% endfor %}
-                        {% endfor %}
-                     </div>
-                </div>
-
-                <aside class="week-details ecd-event-details" id="js-detail" aria-label="Event details">
-                    <button class="ecd-details-close mobile-only" id="js-details-close" aria-label="Close">×</button>
-                    <div class="week-details-card" data-empty="true">
-                        <div class="week-details-heading">Details</div>
-                        <h3 class="week-details-title" id="js-detail-title">Select an event</h3>
-                        
-                        <div class="week-details-meta">
-                            <div class="week-details-row">
-                                <span class="label">WHEN</span>
-                                <span class="value" id="js-detail-when">—</span>
-                            </div>
-                            <div class="week-details-row">
-                                <span class="label">WHERE</span>
-                                <span class="value" id="js-detail-where">—</span>
-                            </div>
-                            <div class="week-details-row">
-                                <span class="label">SOURCE</span>
-                                <span class="value" id="js-detail-source">—</span>
-                            </div>
-                        </div>
-
-                        <hr class="week-details-separator">
-
-                        <div class="week-details-section">
-                            <span class="label">ABOUT</span>
-                            <div class="week-details-about" id="js-detail-summary"></div>
-                        </div>
-
-                        <a class="week-details-link" id="js-detail-link" href="#" target="_blank" rel="noopener" style="display:none;">
-                            ↗ Open link
-                        </a>
-                    </div>
-                </aside>
-                <input type="hidden" id="js-week-offset" value="0" />
+        <!-- Center Column: Events Calendar -->
+        <section class="col col--center" aria-label="This Week's Events">
+            <h2 class="section-head section-head--large">This Week in New Haven</h2>
+            <div class="week-nav">
+                <button id="js-week-prev" class="week-nav__btn" aria-label="Previous week">‹ Prev</button>
+                <span id="js-week-label" class="week-nav__label">Week of {{ week_start_date|default('Today') }}</span>
+                <button id="js-week-next" class="week-nav__btn" aria-label="Next week">Next ›</button>
             </div>
-        </section>
-
-        <aside class="panel panel--right">
-            <!-- Boards removed -->
             
-            <button class="ecd-mobile-accordion-toggle ecd-city-map-toggle" id="js-map-toggle" type="button" aria-expanded="false" aria-controls="js-map-stats">
-                <span>City Map &amp; Stats</span>
-                <span class="ecd-mobile-chevron" aria-hidden="true">▾</span>
-            </button>
-
-            <div class="ecd-city-map-stats" id="js-map-stats">
-            <div class="map-controls">
-                <label for="js-map-select" class="sr-only">Map Layer</label>
-                <select id="js-map-select" class="map-controls__select"
-                    aria-label="Select map type">
-                    <option value="mapnik">General Map</option>
-                    <option value="opentopomap">Topographic</option>
-                    <option value="cyclemap">Cycle Routes</option>
-                    <option value="transportmap">Public Transport</option>
-                </select>
-            </div>
-            <div class="mapbox" role="region" aria-label="Map of New Haven">
-                <iframe id="js-map-frame" title="New Haven Map" loading="lazy"
-                    data-lat="{{ center_lat }}"
-                    data-lon="{{ center_lon }}"></iframe>
-            </div>
-            <!-- City stats removed -->
-
-            <!-- Filters removed -->
-
-            <!-- Neighborhood filter removed -->
-            <div class="air-quality" role="region" aria-label="Air Quality Index">
-                <h3 class="filters__title">Air Quality</h3>
-                <div class="aqi-display">
-                    {% if air_quality and air_quality.available %}
-                    <div class="aqi-badge" style="background-color: {{ air_quality.color }}; color: {% if air_quality.aqi > 100 %}#fff{% else %}#1c1b1a{% endif %};">
-                        <span class="aqi-value">{{ air_quality.aqi }}</span>
-                        <span class="aqi-label">AQI</span>
+            <div class="calendar-grid" id="js-agenda-week">
+                {% for day in week_grid %}
+                <div class="calendar-day">
+                    <div class="calendar-day__header">{{ day.label }}</div>
+                    <div class="calendar-day__events">
+                        {% for it in day['items'] %}
+                        <button class="event-chip" type="button"
+                            data-title="{{ it.title }}"
+                            data-time="{{ it.time }}"
+                            data-link="{{ it.link }}"
+                            data-location="{{ it.location }}"
+                            data-source="{{ it.source }}"
+                            data-date="{{ it.date }}"
+                            data-summary="{{ it.summary | e }}">
+                            <span class="event-chip__time">{{ it.time }}</span>
+                            <span class="event-chip__title">{{ it.title|truncate(35) }}</span>
+                        </button>
+                        {% else %}
+                        <span class="calendar-day__empty">—</span>
+                        {% endfor %}
                     </div>
-                    <div class="aqi-info">
-                        <div class="aqi-category">{{ air_quality.emoji }} {{ air_quality.category }}</div>
-                        <div class="aqi-pollutant">Primary: {{ air_quality.pollutant or 'N/A' }}</div>
-                        <div class="aqi-advice">{{ air_quality.advice }}</div>
-                    </div>
-                    {% else %}
-                    <div class="aqi-unavailable">
-                        <span class="aqi-emoji">⚪</span>
-                        <span>AQI data unavailable</span>
-                        <a href="https://www.airnow.gov/?city=New%20Haven&state=CT" target="_blank" rel="noopener" class="aqi-link">Check AirNow →</a>
-                    </div>
-                    {% endif %}
                 </div>
+                {% endfor %}
             </div>
 
-            <div class="alerts">
-                <h3 class="filters__title">NWS Alerts</h3>
-                <ul class="list list--rail">
-                    {% if nws_alerts and nws_alerts|length > 0 %}
-                    {% for al in nws_alerts %}
-                    <li class="list__item">
-                        <a class="list__link" href="{{ al.link }}"
-                            target="_blank"
-                            rel="noopener">
-                            <span class="list__source">{{ al.event }}</span>
-                            <span class="list__title">{{ al.title }}</span>
+            <!-- Event Detail Panel -->
+            <aside class="event-detail" id="js-detail" aria-label="Event details">
+                <div class="event-detail__card" data-empty="true">
+                    <h3 class="event-detail__title" id="js-detail-title">Select an event</h3>
+                    <div class="event-detail__meta">
+                        <div><strong>When:</strong> <span id="js-detail-when">—</span></div>
+                        <div><strong>Where:</strong> <span id="js-detail-where">—</span></div>
+                        <div><strong>Source:</strong> <span id="js-detail-source">—</span></div>
+                    </div>
+                    <p class="event-detail__summary" id="js-detail-summary"></p>
+                    <a class="event-detail__link" id="js-detail-link" href="#" target="_blank" rel="noopener" style="display:none;">
+                        Read more →
+                    </a>
+                </div>
+            </aside>
+            <input type="hidden" id="js-week-offset" value="0" />
+        </section>
+
+        <!-- Right Column: City Info & Quick Links -->
+        <section class="col col--sidebar" aria-label="City Information">
+            <!-- Mill Rate & Fiscal Info -->
+            {% if tax_info %}
+            <article class="infobox">
+                <h2 class="section-head">City Finance</h2>
+                <div class="stat-row">
+                    <span class="stat-row__label">Mill Rate</span>
+                    <span class="stat-row__value">{{ tax_info.mill_rate }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-row__label">Fiscal Year</span>
+                    <span class="stat-row__value">{{ tax_info.fiscal_year }}</span>
+                </div>
+            </article>
+            {% endif %}
+
+            <!-- Upcoming Meetings -->
+            {% if boards_upcoming %}
+            <article class="infobox">
+                <h2 class="section-head">Upcoming Meetings</h2>
+                <ul class="meeting-list">
+                    {% for m in boards_upcoming[:5] %}
+                    <li class="meeting-item">
+                        <a href="{{ m.link or '#' }}" target="_blank" rel="noopener">
+                            <span class="meeting-item__title">{{ m.title|truncate(40) }}</span>
+                            <span class="meeting-item__date">{{ m.date }}</span>
                         </a>
                     </li>
                     {% endfor %}
-                    {% else %}
-                    <li class="list__item list__item--empty">No active
-                        alerts.</li>
-                    {% endif %}
                 </ul>
-            </div>
+            </article>
+            {% endif %}
 
-            <!-- Right rail items removed -->
-            </div> <!-- End ecd-city-map-stats -->
-        </aside>
+            <!-- Quick Links -->
+            <article class="infobox infobox--links">
+                <h2 class="section-head">Quick Links</h2>
+                <div class="quick-links">
+                    <a href="https://seeclickfix.com/new-haven" target="_blank" rel="noopener">📢 Report Issue</a>
+                    <a href="tel:+12039464800">☎️ City Hall</a>
+                    <a href="https://nhfpl.org" target="_blank" rel="noopener">📚 Library</a>
+                    <a href="https://www.newhavenct.gov/residents/trash-recycling" target="_blank" rel="noopener">♻️ Recycling</a>
+                    <a href="https://www.newhavenct.gov/residents/parking" target="_blank" rel="noopener">🅿️ Parking</a>
+                    <a href="https://maps.newhavenct.gov/" target="_blank" rel="noopener">🗺️ City Maps</a>
+                </div>
+            </article>
+
+            <!-- Map -->
+            <article class="infobox infobox--map">
+                <h2 class="section-head">New Haven</h2>
+                <div class="map-embed">
+                    <iframe id="js-map-frame" title="New Haven Map" loading="lazy"
+                        data-lat="{{ center_lat }}"
+                        data-lon="{{ center_lon }}"></iframe>
+                </div>
+            </article>
+
+            <!-- Sponsors -->
+            <article class="infobox infobox--sponsors">
+                <h2 class="section-head">New Haven Hangouts</h2>
+                <a href="https://ahoyindiemedia.com" target="_blank" rel="noopener sponsored" class="sponsor">
+                    <span class="sponsor__icon">⚓</span>
+                    <span class="sponsor__name">Ahoy Indie Media</span>
+                </a>
+                <div class="sponsor sponsor--placeholder">
+                    <span class="sponsor__icon">📍</span>
+                    <span class="sponsor__name">Your Business Here</span>
+                </div>
+            </article>
+        </section>
     </main>
 
-    <section class="strip desktop-only">
-        <div class="strip__inner">
-            {% for item in bottom_strip_items %}
-            {% if item.category == 'events' %}
-            <div class="card" data-category="events">
-                <div class="card__badge">Event</div>
-                <div class="card__title">{{ item.title }}</div>
-                <div class="card__meta">
-                    {% if item.location %}{{ item.location }} · {% endif %}
-                    {% if item.published_display %}{{ item.published_display
-                    }}{% endif %}
-                </div>
-            </div>
-            {% elif item.category == 'weather' %}
-            <div class="card" data-category="weather">
-                <div class="card__badge">Weather</div>
-                <div class="card__title">{{ item.title }}</div>
-                <div class="card__meta">{{ item.summary }}</div>
-            </div>
-            {% endif %}
-            {% endfor %}
-        </div>
-    </section>
-    <footer class="footer-mini">
-        <nav class="footer-mini__nav">
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer__rule"></div>
+        <nav class="footer__nav">
             <a href="{{ url_for('about') }}">About</a>
-            <a href="{{ url_for('feeds_view') }}">Feeds</a>
             <a href="{{ url_for('feeds_api') }}">API</a>
-            <button type="button" class="refresh-btn" id="js-refresh" title="Refresh data">
-                <span class="refresh-icon">↻</span>
-                <span class="refresh-text">Refresh</span>
-            </button>
-            <span class="mobile-only">© Elm City Daily</span>
+            <button type="button" id="js-refresh" class="footer__refresh">↻ Refresh</button>
         </nav>
-        <div class="footer-mini__meta desktop-only">
-            {{ app_name }} · {{ date_str }} · {{ time_str }}
-            <span class="auto-refresh-status" id="js-auto-refresh-status">
-                · Auto-refresh: <button type="button" id="js-auto-refresh-toggle" class="auto-refresh-toggle">OFF</button>
-            </span>
+        <div class="footer__copy">
+            © {{ date_str.split(',')[-1].strip() }} Elm City Daily · New Haven, CT
         </div>
     </footer>
 </div>
+
 <script>
-  // Make weather data available to JavaScript
-  window.WEATHER_DATA = {
+window.WEATHER_DATA = {
     current_temp: {% if weather and weather.current_temp is not none %}{{ weather.current_temp }}{% else %}null{% endif %},
     high_temp: {% if weather and weather.high_temp is not none %}{{ weather.high_temp }}{% else %}null{% endif %},
     low_temp: {% if weather and weather.low_temp is not none %}{{ weather.low_temp }}{% else %}null{% endif %},
     weather_desc: {% if weather and weather.weather_desc %}{{ weather.weather_desc|tojson|safe }}{% else %}""{% endif %},
     sunrise: {% if weather and weather.sunrise %}{{ weather.sunrise|tojson|safe }}{% else %}null{% endif %},
     sunset: {% if weather and weather.sunset %}{{ weather.sunset|tojson|safe }}{% else %}null{% endif %}
-  };
-  window.DAYPART_TEMPS = {{ daypart_temps|tojson|safe if daypart_temps else '{}' }};
-  window.TIME_STR = {{ time_str|tojson|safe if time_str else '""' }};
-  window.WEEK_GRID = {{ week_grid|tojson|safe if week_grid else '[]' }};
-  window.TODAY_DATE = "{{ today_date }}"; /* Ensure this variable exists in context or use JS date */
+};
+window.WEEK_GRID = {{ week_grid|tojson|safe if week_grid else '[]' }};
 </script>
 {% endblock %}
