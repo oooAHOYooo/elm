@@ -62,4 +62,5 @@ htmlcov/
 .dmypy.json
 dmypy.json
 
-
+# Cache files
+.cache_*.pkl

@@ -3,10 +3,14 @@ RSS_SOURCES = {
     "who_knew": "https://www.infonewhaven.com/category/who-knew-blog/feed/",
     "food_drink": "https://www.infonewhaven.com/food-drink/feed/",
     "music_arts": "https://www.infonewhaven.com/arts-entertainment/music/feed/",
-    # City of New Haven feeds are currently disabled due to 403 responses.
-    # "city_news": "https://www.newhavenct.gov/Home/Components/News/RSS",
-    # "city_events": "https://www.newhavenct.gov/Home/Components/Calendar/Event/RSS",
-    # "city_calendar_items": "https://www.newhavenct.gov/Home/Components/Calendar/Item/RSS",
+    # Yale Daily News
+    "yale_daily_news": "https://yaledailynews.com/feed/",
+    # New Haven Independent
+    "nh_independent": "https://www.newhavenindependent.org/feed",
+    # CT Mirror - New Haven coverage
+    "ct_mirror": "https://ctmirror.org/category/cities/new-haven/feed/",
+    # NHPR (Connecticut Public Radio)
+    "ct_public": "https://www.ctpublic.org/rss.xml",
     # IAFF Local 825 (scraped, not RSS)
     "iaff_headlines": "https://newhavenfire.org/index.cfm?zone=/unionactive/iaff_headline_view.cfm",
 }
@@ -25,10 +29,18 @@ SOURCE_CREDIT = {
 
 SOURCE_META = {
     # InfoNewHaven
-    "who_knew": {"name": "InfoNewHaven.com", "url": "https://www.infonewhaven.com"},
-    "food_drink": {"name": "InfoNewHaven.com", "url": "https://www.infonewhaven.com"},
-    "music_arts": {"name": "InfoNewHaven.com", "url": "https://www.infonewhaven.com"},
-    "events_calendar": {"name": "InfoNewHaven.com", "url": "https://www.infonewhaven.com"},
+    "who_knew": {"name": "InfoNewHaven", "url": "https://www.infonewhaven.com"},
+    "food_drink": {"name": "InfoNewHaven", "url": "https://www.infonewhaven.com"},
+    "music_arts": {"name": "InfoNewHaven", "url": "https://www.infonewhaven.com"},
+    "events_calendar": {"name": "InfoNewHaven", "url": "https://www.infonewhaven.com"},
+    # Yale Daily News
+    "yale_daily_news": {"name": "Yale Daily News", "url": "https://yaledailynews.com"},
+    # New Haven Independent
+    "nh_independent": {"name": "NH Independent", "url": "https://www.newhavenindependent.org"},
+    # CT Mirror
+    "ct_mirror": {"name": "CT Mirror", "url": "https://ctmirror.org"},
+    # CT Public Radio
+    "ct_public": {"name": "CT Public", "url": "https://www.ctpublic.org"},
     # City of New Haven
     "city_news": {"name": "City of New Haven", "url": "https://www.newhavenct.gov"},
     "city_events": {"name": "City of New Haven", "url": "https://www.newhavenct.gov"},

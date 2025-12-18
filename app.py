@@ -3,6 +3,7 @@ Elm City Daily — MVP Newspaper Dashboard
 A simplified civic dashboard for New Haven, CT
 """
 import logging
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 from typing import Any, Dict, List
@@ -20,6 +21,9 @@ from services import air_quality as aqi_service
 from feeds.aggregator import aggregate_all
 
 load_dotenv()
+
+# Thread pool for parallel API calls
+_executor = ThreadPoolExecutor(max_workers=6)
 
 
 def create_app() -> Flask:
@@ -41,26 +45,34 @@ def create_app() -> Flask:
         lat = float(app.config["WEATHER_LAT"])
         lon = float(app.config["WEATHER_LON"])
 
-        # Weather
-        weather: Dict[str, Any] = weather_service.fetch_weather(
-            lat=lat, lon=lon, request_timeout=timeout
-        )
-        
-        # NWS Alerts
-        nws_alerts = nws_service.fetch_nws_alerts(zone="ctz010")
-        
-        # Air Quality
+        # Parallel API fetching for speed
         airnow_key = app.config.get("AIRNOW_API_KEY", "")
-        air_quality = aqi_service.fetch_air_quality(
-            lat=lat, lon=lon, api_key=airnow_key if airnow_key else None
-        )
-
-        # Tax/Mill Rate (kept)
-        tax_info = fetch_tax_rate(municipality="New Haven")
-
-        # City Calendar + Legistar Events (kept for meetings)
-        cal_upcoming = fetch_city_calendar(limit=6)
-        legis_upcoming = fetch_legistar_events(city_slug="newhaven", limit=6)
+        
+        futures = {
+            _executor.submit(weather_service.fetch_weather, lat, lon, timeout): "weather",
+            _executor.submit(nws_service.fetch_nws_alerts, "ctz010"): "nws_alerts",
+            _executor.submit(aqi_service.fetch_air_quality, lat, lon, airnow_key or None): "air_quality",
+            _executor.submit(fetch_tax_rate, "New Haven"): "tax_info",
+            _executor.submit(fetch_city_calendar, 6): "cal_upcoming",
+            _executor.submit(fetch_legistar_events, "newhaven", 6): "legis_upcoming",
+            _executor.submit(aggregate_all): "agg",
+        }
+        
+        results = {}
+        for future in as_completed(futures, timeout=10):
+            key = futures[future]
+            try:
+                results[key] = future.result()
+            except Exception as e:
+                app.logger.warning(f"Failed to fetch {key}: {e}")
+                results[key] = {} if key in ("weather", "air_quality", "tax_info", "agg") else []
+        
+        weather = results.get("weather", {})
+        nws_alerts = results.get("nws_alerts", [])
+        air_quality = results.get("air_quality", {})
+        tax_info = results.get("tax_info", {})
+        cal_upcoming = results.get("cal_upcoming", [])
+        legis_upcoming = results.get("legis_upcoming", [])
         
         boards_upcoming = []
         boards_upcoming.extend([
@@ -87,8 +99,8 @@ def create_app() -> Flask:
             pass
         boards_upcoming = boards_upcoming[:8]
 
-        # Events from aggregator
-        agg = aggregate_all()
+        # Events from aggregator (already fetched in parallel)
+        agg = results.get("agg", {})
         agg_items = agg.get("items", [])
         
         unified_events: List[Dict[str, Any]] = []

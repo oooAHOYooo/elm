@@ -5,12 +5,44 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>{{ app_name or "Elm City Daily" }}</title>
         <meta name="description" content="Elm City Daily — a civic dashboard for New Haven, CT" />
+        <!-- Critical CSS for loading bar -->
+        <style>
+            .page-loader{position:fixed;top:0;left:0;right:0;height:3px;z-index:9999;background:#f0f0f0}
+            .page-loader__bar{height:100%;width:0;background:linear-gradient(90deg,#8b4513,#d4a574);transition:width .3s ease}
+            .page-loader--done .page-loader__bar{width:100%}
+            .page-loader--hide{opacity:0;transition:opacity .3s ease}
+            body.loading{overflow:hidden}
+        </style>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&family=Source+Serif+Pro:wght@400;600&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Old+Standard+TT:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
     </head>
-    <body>
+    <body class="loading">
+        <!-- Loading Progress Bar -->
+        <div class="page-loader" id="page-loader">
+            <div class="page-loader__bar" id="loader-bar"></div>
+        </div>
+        <script>
+            // Immediate progress simulation
+            (function(){
+                var bar = document.getElementById('loader-bar');
+                var progress = 0;
+                var interval = setInterval(function(){
+                    progress += Math.random() * 15;
+                    if(progress > 90) progress = 90;
+                    bar.style.width = progress + '%';
+                }, 100);
+                window.addEventListener('load', function(){
+                    clearInterval(interval);
+                    bar.style.width = '100%';
+                    document.body.classList.remove('loading');
+                    setTimeout(function(){
+                        document.getElementById('page-loader').classList.add('page-loader--hide');
+                    }, 200);
+                });
+            })();
+        </script>
         {% block content %}{% endblock %}
         <script src="{{ url_for('static', filename='js/dashboard.js') }}" defer></script>
     </body>

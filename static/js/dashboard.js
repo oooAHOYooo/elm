@@ -234,9 +234,53 @@
     }
 
     // ==========================================================================
+    // POPUP PANELS
+    // ==========================================================================
+    const overlay = document.getElementById('popup-overlay');
+    const popupPanels = document.querySelectorAll('.popup-panel');
+    const quickLinks = document.querySelectorAll('.quick-link');
+    
+    function openPopup(popupId) {
+        const panel = document.getElementById(`popup-${popupId}`);
+        if (!panel) return;
+        
+        overlay?.classList.add('active');
+        panel.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeAllPopups() {
+        overlay?.classList.remove('active');
+        popupPanels.forEach(p => p.classList.remove('active'));
+        document.body.style.overflow = '';
+    }
+    
+    // Quick link click handlers
+    quickLinks.forEach(link => {
+        link.addEventListener('click', () => {
+            const popupId = link.dataset.popup;
+            if (popupId) openPopup(popupId);
+        });
+    });
+    
+    // Close button handlers
+    document.querySelectorAll('.popup-close').forEach(btn => {
+        btn.addEventListener('click', closeAllPopups);
+    });
+    
+    // Overlay click to close
+    overlay?.addEventListener('click', closeAllPopups);
+    
+    // ==========================================================================
     // KEYBOARD SHORTCUTS
     // ==========================================================================
     document.addEventListener('keydown', (e) => {
+        // Escape closes popups
+        if (e.key === 'Escape') {
+            closeAllPopups();
+            return;
+        }
+        
         // Ignore if typing in input
         if (e.target.matches('input, textarea, select')) return;
         

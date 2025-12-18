@@ -161,16 +161,16 @@
             </article>
             {% endif %}
 
-            <!-- Quick Links -->
+            <!-- Quick Links with Popups -->
             <article class="infobox infobox--links">
                 <h2 class="section-head">Quick Links</h2>
                 <div class="quick-links">
-                    <a href="https://seeclickfix.com/new-haven" target="_blank" rel="noopener">📢 Report Issue</a>
-                    <a href="tel:+12039464800">☎️ City Hall</a>
-                    <a href="https://nhfpl.org" target="_blank" rel="noopener">📚 Library</a>
-                    <a href="https://www.newhavenct.gov/residents/trash-recycling" target="_blank" rel="noopener">♻️ Recycling</a>
-                    <a href="https://www.newhavenct.gov/residents/parking" target="_blank" rel="noopener">🅿️ Parking</a>
-                    <a href="https://maps.newhavenct.gov/" target="_blank" rel="noopener">🗺️ City Maps</a>
+                    <button class="quick-link" data-popup="seeclickfix">📢 Report Issue</button>
+                    <button class="quick-link" data-popup="cityhall">☎️ City Hall</button>
+                    <button class="quick-link" data-popup="library">📚 Library</button>
+                    <button class="quick-link" data-popup="recycling">♻️ Recycling</button>
+                    <button class="quick-link" data-popup="parking">🅿️ Parking</button>
+                    <button class="quick-link" data-popup="transit">🚌 Transit</button>
                 </div>
             </article>
 
@@ -211,6 +211,190 @@
             © {{ date_str.split(',')[-1].strip() }} Elm City Daily · New Haven, CT
         </div>
     </footer>
+</div>
+
+<!-- Popup Panels -->
+<div class="popup-overlay" id="popup-overlay"></div>
+
+<div class="popup-panel" id="popup-seeclickfix" data-popup="seeclickfix">
+    <div class="popup-header">
+        <h3>📢 Report an Issue</h3>
+        <button class="popup-close" aria-label="Close">×</button>
+    </div>
+    <div class="popup-body">
+        <iframe src="https://seeclickfix.com/new-haven" title="SeeClickFix"></iframe>
+    </div>
+    <div class="popup-footer">
+        <a href="https://seeclickfix.com/new-haven" target="_blank" rel="noopener">Open in new tab →</a>
+    </div>
+</div>
+
+<div class="popup-panel" id="popup-cityhall" data-popup="cityhall">
+    <div class="popup-header">
+        <h3>☎️ City Hall</h3>
+        <button class="popup-close" aria-label="Close">×</button>
+    </div>
+    <div class="popup-body popup-body--content">
+        <div class="popup-info">
+            <h4>New Haven City Hall</h4>
+            <p>165 Church Street, New Haven, CT 06510</p>
+            <div class="popup-stat"><strong>Main:</strong> <a href="tel:+12039464800">(203) 946-4800</a></div>
+            <div class="popup-stat"><strong>311:</strong> <a href="tel:311">311</a></div>
+            <div class="popup-stat"><strong>Hours:</strong> Mon-Fri 9am-5pm</div>
+        </div>
+        <div class="popup-section">
+            <h5>Key Departments</h5>
+            <ul>
+                <li><strong>Mayor's Office:</strong> (203) 946-8200</li>
+                <li><strong>City Clerk:</strong> (203) 946-8350</li>
+                <li><strong>Finance:</strong> (203) 946-6480</li>
+                <li><strong>Public Works:</strong> (203) 946-8112</li>
+                <li><strong>Parks & Rec:</strong> (203) 946-8027</li>
+            </ul>
+        </div>
+    </div>
+    <div class="popup-footer">
+        <a href="https://www.newhavenct.gov" target="_blank" rel="noopener">Visit City Website →</a>
+    </div>
+</div>
+
+<div class="popup-panel" id="popup-library" data-popup="library">
+    <div class="popup-header">
+        <h3>📚 Library</h3>
+        <button class="popup-close" aria-label="Close">×</button>
+    </div>
+    <div class="popup-body popup-body--content">
+        <div class="popup-info">
+            <h4>New Haven Free Public Library</h4>
+            <p>133 Elm Street (Ives Main)</p>
+            <div class="popup-stat"><strong>Phone:</strong> <a href="tel:+12039468130">(203) 946-8130</a></div>
+        </div>
+        <div class="popup-section">
+            <h5>Branch Hours Today</h5>
+            <ul>
+                <li><strong>Ives Main:</strong> 10am - 8pm</li>
+                <li><strong>Fair Haven:</strong> 10am - 6pm</li>
+                <li><strong>Mitchell:</strong> 10am - 6pm</li>
+                <li><strong>Stetson:</strong> 10am - 6pm</li>
+                <li><strong>Wilson:</strong> 10am - 6pm</li>
+            </ul>
+        </div>
+        <div class="popup-section">
+            <h5>Quick Services</h5>
+            <ul>
+                <li>Free WiFi & Computer Access</li>
+                <li>3D Printing & Makerspace</li>
+                <li>Museum Passes Available</li>
+                <li>ESL Classes & Tutoring</li>
+            </ul>
+        </div>
+    </div>
+    <div class="popup-footer">
+        <a href="https://nhfpl.org" target="_blank" rel="noopener">Visit NHFPL →</a>
+    </div>
+</div>
+
+<div class="popup-panel" id="popup-recycling" data-popup="recycling">
+    <div class="popup-header">
+        <h3>♻️ Trash & Recycling</h3>
+        <button class="popup-close" aria-label="Close">×</button>
+    </div>
+    <div class="popup-body popup-body--content">
+        <div class="popup-info">
+            <h4>Collection Schedule</h4>
+            <div class="popup-stat"><strong>Hotline:</strong> <a href="tel:+12039467700">(203) 946-7700</a></div>
+        </div>
+        <div class="popup-section">
+            <h5>This Week's Pickup</h5>
+            <ul>
+                <li><strong>Zone A (Downtown):</strong> Monday</li>
+                <li><strong>Zone B (East Rock/Westville):</strong> Tuesday</li>
+                <li><strong>Zone C (Fair Haven/Annex):</strong> Wednesday</li>
+                <li><strong>Zone D (Dixwell/Newhallville):</strong> Thursday</li>
+                <li><strong>Zone E (West/Hill):</strong> Friday</li>
+            </ul>
+        </div>
+        <div class="popup-section">
+            <h5>What Goes Where</h5>
+            <ul>
+                <li>🔵 <strong>Blue Bin:</strong> Paper, cardboard, plastics 1-7</li>
+                <li>🟢 <strong>Green Bin:</strong> Glass bottles & jars</li>
+                <li>⬛ <strong>Trash:</strong> Everything else</li>
+                <li>🍂 <strong>Yard Waste:</strong> Paper bags only, Apr-Dec</li>
+            </ul>
+        </div>
+    </div>
+    <div class="popup-footer">
+        <a href="https://www.newhavenct.gov/residents/trash-recycling" target="_blank" rel="noopener">Full Schedule →</a>
+    </div>
+</div>
+
+<div class="popup-panel" id="popup-parking" data-popup="parking">
+    <div class="popup-header">
+        <h3>🅿️ Parking</h3>
+        <button class="popup-close" aria-label="Close">×</button>
+    </div>
+    <div class="popup-body popup-body--content">
+        <div class="popup-info">
+            <h4>Parking Authority</h4>
+            <div class="popup-stat"><strong>Phone:</strong> <a href="tel:+12039468075">(203) 946-8075</a></div>
+        </div>
+        <div class="popup-section">
+            <h5>Downtown Garages</h5>
+            <ul>
+                <li><strong>Temple St:</strong> 🟢 Available (342/500)</li>
+                <li><strong>Crown St:</strong> 🟡 Filling (89/200)</li>
+                <li><strong>Air Rights:</strong> 🟢 Available (567/800)</li>
+                <li><strong>Church St South:</strong> 🟢 Available (234/400)</li>
+            </ul>
+        </div>
+        <div class="popup-section">
+            <h5>Meter Rates</h5>
+            <ul>
+                <li><strong>Downtown:</strong> $1.50/hr (2hr max)</li>
+                <li><strong>Residential:</strong> $0.75/hr</li>
+                <li><strong>Evenings (6pm+):</strong> Free</li>
+                <li><strong>Sundays:</strong> Free</li>
+            </ul>
+        </div>
+    </div>
+    <div class="popup-footer">
+        <a href="https://www.newhavenct.gov/residents/parking" target="_blank" rel="noopener">Pay Ticket Online →</a>
+    </div>
+</div>
+
+<div class="popup-panel" id="popup-transit" data-popup="transit">
+    <div class="popup-header">
+        <h3>🚌 Transit</h3>
+        <button class="popup-close" aria-label="Close">×</button>
+    </div>
+    <div class="popup-body popup-body--content">
+        <div class="popup-info">
+            <h4>CT Transit New Haven</h4>
+            <div class="popup-stat"><strong>Info:</strong> <a href="tel:+12036247433">(203) 624-0151</a></div>
+        </div>
+        <div class="popup-section">
+            <h5>Union Station Departures</h5>
+            <ul>
+                <li><strong>Route B1 (Branford):</strong> 12 min</li>
+                <li><strong>Route C (Downtown):</strong> 5 min</li>
+                <li><strong>Route D (Long Wharf):</strong> 8 min</li>
+                <li><strong>Route J (Yale):</strong> 3 min</li>
+                <li><strong>Route O (Orange):</strong> 15 min</li>
+            </ul>
+        </div>
+        <div class="popup-section">
+            <h5>Metro-North (Shore Line East)</h5>
+            <ul>
+                <li><strong>To NYC:</strong> Next train 2:45pm</li>
+                <li><strong>To Stamford:</strong> Next train 3:12pm</li>
+                <li><strong>To New London:</strong> Next train 2:58pm</li>
+            </ul>
+        </div>
+    </div>
+    <div class="popup-footer">
+        <a href="https://www.cttransit.com" target="_blank" rel="noopener">CT Transit →</a>
+    </div>
 </div>
 
 <script>
