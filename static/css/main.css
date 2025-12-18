@@ -1019,3 +1019,91 @@ img {
     color: white;
     border-color: var(--accent-primary);
 }
+
+/* Footer freshness timestamp */
+.footer__freshness {
+    font-family: var(--font-sans);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: var(--space-xs);
+}
+
+/* ==========================================================================
+   PRINT STYLESHEET — "Fridge Card" for weekly events
+   ========================================================================== */
+@media print {
+    /* Hide non-essential elements */
+    .popup-overlay, .popup-panel,
+    .masthead__theme, #js-refresh,
+    .footer__nav, .map-embed,
+    .infobox--map, .infobox--sponsors,
+    .week-nav, .event-detail,
+    .alerts-block {
+        display: none !important;
+    }
+    
+    /* Reset backgrounds */
+    body, .newspaper, .broadsheet {
+        background: white !important;
+        color: black !important;
+    }
+    
+    /* Single column layout */
+    .broadsheet {
+        display: block !important;
+    }
+    
+    .col {
+        width: 100% !important;
+        margin-bottom: 1rem;
+    }
+    
+    /* Compact header */
+    .masthead {
+        padding: 0.5rem 0;
+        border-bottom: 2px solid black;
+    }
+    
+    .masthead__title {
+        font-size: 1.5rem;
+    }
+    
+    /* Calendar grid optimized for print */
+    .calendar-grid {
+        display: grid !important;
+        grid-template-columns: repeat(7, 1fr) !important;
+        gap: 0.25rem;
+        page-break-inside: avoid;
+    }
+    
+    .calendar-day {
+        border: 1px solid #ccc;
+        padding: 0.25rem;
+        font-size: 0.7rem;
+    }
+    
+    .calendar-day__header {
+        font-weight: bold;
+        border-bottom: 1px solid #ccc;
+        margin-bottom: 0.25rem;
+    }
+    
+    .event-chip {
+        display: block;
+        padding: 0.125rem 0;
+        font-size: 0.6rem;
+        background: none !important;
+        border: none !important;
+    }
+    
+    /* Quick links as simple list */
+    .quick-links {
+        display: none !important;
+    }
+    
+    /* Page setup */
+    @page {
+        size: letter landscape;
+        margin: 0.5in;
+    }
+}

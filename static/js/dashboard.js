@@ -294,4 +294,24 @@
         }
     });
 
+    // ==========================================================================
+    // LAST UPDATED TIMESTAMP
+    // ==========================================================================
+    const lastUpdatedEl = document.getElementById('js-last-updated');
+    const pageLoadTime = Date.now();
+    
+    function updateFreshness() {
+        if (!lastUpdatedEl) return;
+        const mins = Math.floor((Date.now() - pageLoadTime) / 60000);
+        if (mins < 1) {
+            lastUpdatedEl.textContent = 'Updated just now';
+        } else if (mins === 1) {
+            lastUpdatedEl.textContent = 'Updated 1 minute ago';
+        } else {
+            lastUpdatedEl.textContent = `Updated ${mins} minutes ago`;
+        }
+    }
+    
+    setInterval(updateFreshness, 60000);
+
 })();

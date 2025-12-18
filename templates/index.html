@@ -205,8 +205,12 @@
         <nav class="footer__nav">
             <a href="{{ url_for('about') }}">About</a>
             <a href="{{ url_for('feeds_api') }}">API</a>
+            <a href="{{ url_for('feeds_rss') }}" title="RSS Feed">📰 RSS</a>
             <button type="button" id="js-refresh" class="footer__refresh">↻ Refresh</button>
         </nav>
+        <div class="footer__freshness">
+            <span id="js-last-updated">Updated just now</span>
+        </div>
         <div class="footer__copy">
             © {{ date_str.split(',')[-1].strip() }} Elm City Daily · New Haven, CT
         </div>

@@ -9,7 +9,7 @@ from zoneinfo import ZoneInfo
 from typing import Any, Dict, List
 
 from dotenv import load_dotenv
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, Response
 
 from config import Config
 from services import events as events_service
@@ -217,6 +217,40 @@ def create_app() -> Flask:
         day = request.args.get("date", "today")
         data = tides_service.fetch_tides(station=station, day=day)
         return jsonify(data)
+
+    @app.route("/feeds.rss")
+    def feeds_rss():
+        """RSS feed output for feed readers"""
+        data = aggregate_all()
+        items = data.get("items", [])[:20]
+        
+        rss_items = []
+        for it in items:
+            pub_date = it.get("date", "")
+            try:
+                dt = datetime.fromisoformat(pub_date.replace("Z", "+00:00"))
+                pub_date = dt.strftime("%a, %d %b %Y %H:%M:%S +0000")
+            except Exception:
+                pub_date = ""
+            
+            rss_items.append(f"""    <item>
+      <title><![CDATA[{it.get('title', '')}]]></title>
+      <link>{it.get('link', '')}</link>
+      <description><![CDATA[{it.get('summary', '')}]]></description>
+      <pubDate>{pub_date}</pubDate>
+    </item>""")
+        
+        rss = f"""<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Elm City Daily</title>
+    <link>https://elmcitydaily.com</link>
+    <description>Your Daily Civic Digest for New Haven, CT</description>
+    <lastBuildDate>{datetime.now(ZoneInfo("UTC")).strftime("%a, %d %b %Y %H:%M:%S +0000")}</lastBuildDate>
+{chr(10).join(rss_items)}
+  </channel>
+</rss>"""
+        return Response(rss, mimetype="application/rss+xml")
 
     @app.route("/api/events/week")
     def api_events_week():
