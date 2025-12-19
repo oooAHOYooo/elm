@@ -233,21 +233,27 @@ def create_app() -> Flask:
             except Exception:
                 pub_date = ""
             
+            title = str(it.get('title', '')).replace(']]>', ']]&gt;')
+            link = str(it.get('link', ''))
+            summary = str(it.get('summary', '')).replace(']]>', ']]&gt;')
+            
             rss_items.append(f"""    <item>
-      <title><![CDATA[{it.get('title', '')}]]></title>
-      <link>{it.get('link', '')}</link>
-      <description><![CDATA[{it.get('summary', '')}]]></description>
+      <title><![CDATA[{title}]]></title>
+      <link>{link}</link>
+      <description><![CDATA[{summary}]]></description>
       <pubDate>{pub_date}</pubDate>
     </item>""")
         
+        build_date = datetime.now(ZoneInfo("UTC")).strftime("%a, %d %b %Y %H:%M:%S +0000")
+        items_xml = "\n".join(rss_items)
         rss = f"""<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
   <channel>
     <title>Elm City Daily</title>
     <link>https://elmcitydaily.com</link>
     <description>Your Daily Civic Digest for New Haven, CT</description>
-    <lastBuildDate>{datetime.now(ZoneInfo("UTC")).strftime("%a, %d %b %Y %H:%M:%S +0000")}</lastBuildDate>
-{chr(10).join(rss_items)}
+    <lastBuildDate>{build_date}</lastBuildDate>
+{items_xml}
   </channel>
 </rss>"""
         return Response(rss, mimetype="application/rss+xml")
