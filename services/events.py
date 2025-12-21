@@ -25,6 +25,24 @@ def get_upcoming_events(tz: ZoneInfo, max_events: int = 6) -> List[Event]:
     base_date = now.replace(hour=18, minute=0, second=0, microsecond=0)
     events: List[Event] = [
         Event(
+            title="New Haven Civilian Review Board",
+            start=datetime(2025, 12, 22, 18, 0, 0, tzinfo=tz),
+            end=datetime(2025, 12, 22, 20, 0, 0, tzinfo=tz),
+            location="Virtual (Zoom) - (203) 623-3027",
+            category="Civics",
+            description="New Haven Civilian Review Board meeting. To attend virtually: Join Zoom Meeting at 6pm. Meeting ID: 875 1566 5183",
+            link=None,
+        ),
+        Event(
+            title="Owl Pellets and Prowl",
+            start=datetime(2026, 1, 25, 15, 0, 0, tzinfo=tz),
+            end=datetime(2026, 1, 25, 18, 0, 0, tzinfo=tz),
+            location="West Rock Nature Center, 1080 Wintergreen Ave. Hamden",
+            category="Outdoors",
+            description="Dissect a real owl pellet and search for local owls! Note: Dress warmly, wear your hiking shoes and bring a flashlight! This program is free and open to all. Children must be accompanied by an adult. No pre-registration required. Just show up!",
+            link=None,
+        ),
+        Event(
             title="City Hall Public Hearing: Zoning Updates",
             start=base_date + timedelta(days=1),
             end=None,

@@ -59,13 +59,29 @@ def create_app() -> Flask:
         }
         
         results = {}
-        for future in as_completed(futures, timeout=10):
-            key = futures[future]
-            try:
-                results[key] = future.result()
-            except Exception as e:
-                app.logger.warning(f"Failed to fetch {key}: {e}")
-                results[key] = {} if key in ("weather", "air_quality", "tax_info", "agg") else []
+        try:
+            for future in as_completed(futures, timeout=timeout):
+                key = futures[future]
+                try:
+                    results[key] = future.result()
+                except Exception as e:
+                    app.logger.warning(f"Failed to fetch {key}: {e}")
+                    results[key] = {} if key in ("weather", "air_quality", "tax_info", "agg") else []
+        except TimeoutError:
+            # Some futures didn't complete in time - process what we have
+            app.logger.warning(f"Timeout waiting for futures - processing completed results")
+            for future, key in futures.items():
+                if key not in results:
+                    try:
+                        if future.done():
+                            results[key] = future.result()
+                        else:
+                            # Future didn't complete - set default
+                            app.logger.warning(f"Future {key} did not complete in time")
+                            results[key] = {} if key in ("weather", "air_quality", "tax_info", "agg") else []
+                    except Exception as e:
+                        app.logger.warning(f"Failed to fetch {key}: {e}")
+                        results[key] = {} if key in ("weather", "air_quality", "tax_info", "agg") else []
         
         weather = results.get("weather", {})
         nws_alerts = results.get("nws_alerts", [])

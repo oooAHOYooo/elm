@@ -27,7 +27,7 @@
     --accent-link: #1a5f7a;
     --alert-bg: #fff3cd;
     --alert-text: #856404;
-    
+
     /* Spacing - 10% more compact */
     --space-xs: 3px;
     --space-sm: 6px;
@@ -35,7 +35,7 @@
     --space-lg: 18px;
     --space-xl: 24px;
     --space-2xl: 36px;
-    
+
     /* Layout */
     --max-width: 1140px;
     --column-gap: 18px;
@@ -79,7 +79,9 @@
 /* --------------------------------------------------------------------------
    RESET & BASE
    -------------------------------------------------------------------------- */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
@@ -275,6 +277,7 @@ img {
     font-size: 0.75rem;
     text-align: center;
     letter-spacing: 0.25em;
+    margin-bottom: var(--space-xs);
 }
 
 .section-head--alert {
@@ -401,8 +404,8 @@ img {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: var(--space-md);
-    margin-bottom: var(--space-lg);
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
 }
 
 .week-nav__btn {
@@ -428,127 +431,304 @@ img {
     color: var(--text-headline);
 }
 
-/* Calendar Grid */
-.calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 1px;
-    background: var(--border-light);
-    border: 1px solid var(--border-light);
+/* Events Meta */
+.events-meta {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-bottom: var(--space-sm);
+    font-style: italic;
+}
+
+/* Events List */
+.events-list {
     margin-bottom: var(--space-lg);
 }
 
-.calendar-day {
-    background: var(--bg-card);
-    min-height: 100px;
+.events-list.loading {
+    opacity: 0.6;
+    pointer-events: none;
 }
 
-.calendar-day__header {
+.events-day-group {
+    margin-bottom: var(--space-md);
+}
+
+.events-day-group:last-child {
+    margin-bottom: 0;
+}
+
+.events-day-group__header {
     font-family: var(--font-sans);
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    text-align: center;
-    padding: var(--space-sm);
-    background: var(--bg-hover);
+    font-size: 0.75rem;
+    font-weight: 600;
     color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-xs);
+    padding-bottom: 2px;
     border-bottom: 1px solid var(--border-light);
 }
 
-.calendar-day__events {
-    padding: var(--space-xs);
-    display: flex;
-    flex-direction: column;
+.events-day-group__cards {
+    display: grid;
+    grid-template-columns: 1fr;
     gap: var(--space-xs);
 }
 
-.calendar-day__empty {
+.events-day-group__empty {
     color: var(--text-caption);
-    text-align: center;
-    padding: var(--space-md);
-    font-size: 0.875rem;
+    font-size: 0.8rem;
+    font-style: italic;
+    padding: var(--space-xs) 0;
 }
 
-/* Event Chips */
-.event-chip {
-    display: block;
-    width: 100%;
+/* Event Cards */
+.event-card {
+    display: flex;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-xs);
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-left: 2px solid var(--accent-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
     text-align: left;
-    padding: var(--space-xs) var(--space-sm);
+}
+
+.event-card:hover,
+.event-card:focus {
     background: var(--bg-hover);
+    border-left-color: var(--accent-primary);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    outline: none;
+}
+
+.event-card:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+}
+
+.event-card__time {
+    flex-shrink: 0;
+    width: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+}
+
+.event-card__time-value {
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--accent-primary);
+    line-height: 1.1;
+}
+
+.event-card__day-label {
+    font-family: var(--font-sans);
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.event-card__content {
+    flex: 1;
+    min-width: 0;
+}
+
+.event-card__title {
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-headline);
+    margin: 0 0 2px 0;
+    line-height: 1.25;
+}
+
+.event-card__location {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin: 0 0 2px 0;
+    line-height: 1.3;
+}
+
+.event-card__description {
+    font-size: 0.8rem;
+    color: var(--text-body);
+    margin: 0 0 var(--space-xs) 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.event-card__more {
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    color: var(--accent-primary);
+    background: none;
+    border: none;
+    padding: 0;
+    margin-top: 2px;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.event-card__more:hover {
+    color: var(--accent-link);
+}
+
+/* Event Detail Drawer */
+.event-drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.event-drawer[aria-hidden="true"] {
+    display: none;
+}
+
+.event-drawer.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.event-drawer__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+}
+
+.event-drawer__panel {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.event-drawer__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-lg);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.event-drawer__title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-headline);
+    margin: 0;
+}
+
+.event-drawer__close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: var(--space-xs);
+    line-height: 1;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border-radius: 3px;
-    border-left: 3px solid var(--accent-primary);
     transition: all 0.15s ease;
 }
 
-.event-chip:hover {
-    background: var(--accent-primary);
-    color: white;
-}
-
-.event-chip:hover .event-chip__time,
-.event-chip:hover .event-chip__title {
-    color: white;
-}
-
-.event-chip__time {
-    font-family: var(--font-sans);
-    font-size: 0.65rem;
-    font-weight: 600;
-    color: var(--accent-primary);
-    display: block;
-}
-
-.event-chip__title {
-    font-size: 0.75rem;
-    color: var(--text-body);
-    line-height: 1.3;
-    display: block;
-}
-
-/* Event Detail Panel */
-.event-detail {
-    background: var(--bg-card);
-    border: 1px solid var(--border-light);
-    padding: var(--space-md);
-}
-
-.event-detail__card[data-empty="true"] {
-    opacity: 0.6;
-}
-
-.event-detail__title {
-    font-family: var(--font-display);
-    font-size: 1.1rem;
-    font-weight: 600;
+.event-drawer__close:hover,
+.event-drawer__close:focus {
+    background: var(--bg-hover);
     color: var(--text-headline);
-    margin-bottom: var(--space-xs);
-    letter-spacing: 0.02em;
+    outline: none;
 }
 
-.event-detail__meta {
+.event-drawer__body {
+    padding: var(--space-lg);
+    overflow-y: auto;
+    flex: 1;
+}
+
+.event-drawer__meta {
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-lg);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.event-drawer__meta-item {
     font-size: 0.875rem;
-    color: var(--text-muted);
-    margin-bottom: var(--space-md);
+    margin-bottom: var(--space-sm);
+    line-height: 1.5;
 }
 
-.event-detail__meta div {
-    margin-bottom: var(--space-xs);
+.event-drawer__meta-item strong {
+    color: var(--text-headline);
+    margin-right: var(--space-sm);
 }
 
-.event-detail__summary {
+.event-drawer__meta-item span {
+    color: var(--text-body);
+}
+
+.event-drawer__description {
     font-size: 0.9rem;
     line-height: 1.6;
     color: var(--text-body);
-    margin-bottom: var(--space-md);
+    margin-bottom: var(--space-lg);
 }
 
-.event-detail__link {
-    font-family: var(--font-sans);
-    font-size: 0.8rem;
-    font-weight: 500;
+.event-drawer__footer {
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--border-light);
 }
+
+.event-drawer__link {
+    font-family: var(--font-sans);
+    font-size: 0.875rem;
+    color: var(--accent-primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.event-drawer__link:hover {
+    color: var(--accent-link);
+}
+
+.events-error {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    padding: var(--space-lg);
+    text-align: center;
+}
+
+/* Parts list styles removed - replaced with event cards */
 
 /* --------------------------------------------------------------------------
    SIDEBAR INFOBOXES
@@ -726,15 +906,15 @@ img {
     .broadsheet {
         grid-template-columns: 1fr 1fr;
     }
-    
+
     .col--lead {
         grid-column: 1 / 2;
     }
-    
+
     .col--center {
         grid-column: 2 / 3;
     }
-    
+
     .col--sidebar {
         grid-column: 1 / -1;
         border-left: none;
@@ -745,13 +925,15 @@ img {
         grid-template-columns: repeat(3, 1fr);
         gap: var(--space-lg);
     }
-    
-    .calendar-grid {
-        grid-template-columns: repeat(4, 1fr);
+
+    .events-day-group__cards {
+        grid-template-columns: repeat(2, 1fr);
     }
-    
-    .calendar-day:nth-child(n+5) {
-        display: none;
+}
+
+@media (min-width: 900px) {
+    .events-day-group__cards {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
@@ -759,15 +941,15 @@ img {
     .newspaper {
         padding: var(--space-sm);
     }
-    
+
     .masthead__title {
         font-size: 2rem;
     }
-    
+
     .broadsheet {
         grid-template-columns: 1fr;
     }
-    
+
     .col--lead,
     .col--center,
     .col--sidebar {
@@ -775,33 +957,38 @@ img {
         padding: 0;
         grid-column: 1;
     }
-    
+
     .col--lead {
         border-bottom: 1px solid var(--border-light);
         padding-bottom: var(--space-lg);
         margin-bottom: var(--space-lg);
     }
-    
+
     .col--sidebar {
         display: block;
     }
-    
-    .calendar-grid {
-        grid-template-columns: 1fr;
+
+    .event-drawer__panel {
+        width: 95%;
+        max-height: 90vh;
     }
-    
-    .calendar-day {
-        min-height: auto;
+
+    .event-card {
+        flex-direction: column;
+        gap: var(--space-sm);
     }
-    
-    .calendar-day__header {
-        text-align: left;
+
+    .event-card__time {
+        width: 100%;
+        flex-direction: row;
+        align-items: center;
+        gap: var(--space-sm);
     }
-    
+
     .quick-links {
         grid-template-columns: 1fr;
     }
-    
+
     .weather-hero__temp {
         font-size: 3rem;
     }
@@ -1032,42 +1219,50 @@ img {
    PRINT STYLESHEET — "Fridge Card" for weekly events
    ========================================================================== */
 @media print {
+
     /* Hide non-essential elements */
-    .popup-overlay, .popup-panel,
-    .masthead__theme, #js-refresh,
-    .footer__nav, .map-embed,
-    .infobox--map, .infobox--sponsors,
-    .week-nav, .event-detail,
+    .popup-overlay,
+    .popup-panel,
+    .masthead__theme,
+    #js-refresh,
+    .footer__nav,
+    .map-embed,
+    .infobox--map,
+    .infobox--sponsors,
+    .week-nav,
+    .event-detail,
     .alerts-block {
         display: none !important;
     }
-    
+
     /* Reset backgrounds */
-    body, .newspaper, .broadsheet {
+    body,
+    .newspaper,
+    .broadsheet {
         background: white !important;
         color: black !important;
     }
-    
+
     /* Single column layout */
     .broadsheet {
         display: block !important;
     }
-    
+
     .col {
         width: 100% !important;
         margin-bottom: 1rem;
     }
-    
+
     /* Compact header */
     .masthead {
         padding: 0.5rem 0;
         border-bottom: 2px solid black;
     }
-    
+
     .masthead__title {
         font-size: 1.5rem;
     }
-    
+
     /* Calendar grid optimized for print */
     .calendar-grid {
         display: grid !important;
@@ -1075,32 +1270,29 @@ img {
         gap: 0.25rem;
         page-break-inside: avoid;
     }
-    
+
     .calendar-day {
         border: 1px solid #ccc;
         padding: 0.25rem;
         font-size: 0.7rem;
     }
-    
+
     .calendar-day__header {
         font-weight: bold;
         border-bottom: 1px solid #ccc;
         margin-bottom: 0.25rem;
     }
-    
-    .event-chip {
-        display: block;
-        padding: 0.125rem 0;
-        font-size: 0.6rem;
-        background: none !important;
-        border: none !important;
+
+    .event-card {
+        break-inside: avoid;
+        page-break-inside: avoid;
     }
-    
+
     /* Quick links as simple list */
     .quick-links {
         display: none !important;
     }
-    
+
     /* Page setup */
     @page {
         size: letter landscape;

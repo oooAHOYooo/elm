@@ -79,50 +79,152 @@
     loadTides();
 
     // ==========================================================================
-    // EVENT DETAIL PANEL
+    // EVENT DETAIL DRAWER
     // ==========================================================================
-    const detailTitle = document.getElementById('js-detail-title');
-    const detailWhen = document.getElementById('js-detail-when');
-    const detailWhere = document.getElementById('js-detail-where');
-    const detailSource = document.getElementById('js-detail-source');
-    const detailSummary = document.getElementById('js-detail-summary');
-    const detailLink = document.getElementById('js-detail-link');
-    const detailCard = document.querySelector('.event-detail__card');
+    const eventDrawer = document.getElementById('js-event-drawer');
+    const drawerOverlay = document.getElementById('js-drawer-overlay');
+    const drawerClose = document.getElementById('js-drawer-close');
+    const drawerTitle = document.getElementById('js-drawer-title');
+    const drawerTime = document.getElementById('js-drawer-time');
+    const drawerLocation = document.getElementById('js-drawer-location');
+    const drawerSource = document.getElementById('js-drawer-source');
+    const drawerDescription = document.getElementById('js-drawer-description');
+    const drawerFooter = document.getElementById('js-drawer-footer');
+    const drawerLink = document.getElementById('js-drawer-link');
     
-    function showEventDetail(data) {
-        if (!detailTitle) return;
+    function openEventDrawer(data) {
+        if (!eventDrawer) return;
         
-        detailTitle.textContent = data.title || 'Event';
-        detailWhen.textContent = data.date || data.time || '—';
-        detailWhere.textContent = data.location || '—';
-        detailSource.textContent = data.source || '—';
-        detailSummary.textContent = data.summary || '';
-        
-        if (data.link && data.link !== '#') {
-            detailLink.href = data.link;
-            detailLink.style.display = 'inline';
-        } else {
-            detailLink.style.display = 'none';
+        // Update drawer content with sentence case
+        if (drawerTitle) {
+            drawerTitle.textContent = toSentenceCasePreserveAcronyms(data.title || 'Event');
         }
         
-        if (detailCard) {
-            detailCard.dataset.empty = 'false';
+        if (drawerTime) {
+            const timeSpan = drawerTime.querySelector('span');
+            if (timeSpan) {
+                const timeValue = formatTime(data.time || data.date || '');
+                timeSpan.textContent = timeValue || '—';
+            }
+        }
+        
+        if (drawerLocation) {
+            const locationSpan = drawerLocation.querySelector('span');
+            if (locationSpan && data.location) {
+                locationSpan.textContent = toSentenceCasePreserveAcronyms(data.location);
+                drawerLocation.style.display = 'block';
+            } else {
+                drawerLocation.style.display = 'none';
+            }
+        }
+        
+        if (drawerSource) {
+            const sourceSpan = drawerSource.querySelector('span');
+            if (sourceSpan && data.source) {
+                sourceSpan.textContent = toSentenceCasePreserveAcronyms(data.source);
+                drawerSource.style.display = 'block';
+            } else {
+                drawerSource.style.display = 'none';
+            }
+        }
+        
+        if (drawerDescription) {
+            const descText = data.summary || '';
+            drawerDescription.textContent = descText ? toSentenceCasePreserveAcronyms(descText) : 'No description available.';
+            drawerDescription.style.display = descText ? 'block' : 'none';
+        }
+        
+        // Show/hide link
+        if (data.link && data.link !== '#' && data.link !== '') {
+            if (drawerLink) {
+                drawerLink.href = data.link;
+            }
+            if (drawerFooter) {
+                drawerFooter.style.display = 'block';
+            }
+        } else {
+            if (drawerFooter) {
+                drawerFooter.style.display = 'none';
+            }
+        }
+        
+        // Show drawer
+        eventDrawer.setAttribute('aria-hidden', 'false');
+        eventDrawer.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        
+        // Focus management
+        if (drawerClose) {
+            drawerClose.focus();
         }
     }
     
-    // Event chip click handlers
-    document.querySelectorAll('.event-chip').forEach(chip => {
-        chip.addEventListener('click', () => {
-            showEventDetail({
-                title: chip.dataset.title,
-                time: chip.dataset.time,
-                date: chip.dataset.date,
-                location: chip.dataset.location,
-                source: chip.dataset.source,
-                summary: chip.dataset.summary,
-                link: chip.dataset.link,
-            });
+    function closeEventDrawer() {
+        if (!eventDrawer) return;
+        eventDrawer.setAttribute('aria-hidden', 'true');
+        eventDrawer.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+    
+    // Close drawer handlers
+    if (drawerOverlay) {
+        drawerOverlay.addEventListener('click', closeEventDrawer);
+    }
+    
+    if (drawerClose) {
+        drawerClose.addEventListener('click', closeEventDrawer);
+    }
+    
+    // Keyboard: Escape closes drawer (handled in main keyboard handler below)
+    
+    // Convert initial page load events to sentence case
+    function convertInitialEvents() {
+        document.querySelectorAll('.event-card').forEach(card => {
+            const titleEl = card.querySelector('.event-card__title');
+            const locationEl = card.querySelector('.event-card__location');
+            const descEl = card.querySelector('.event-card__description');
+            
+            if (titleEl && titleEl.textContent) {
+                titleEl.textContent = toSentenceCasePreserveAcronyms(titleEl.textContent);
+            }
+            if (locationEl && locationEl.textContent) {
+                locationEl.textContent = toSentenceCasePreserveAcronyms(locationEl.textContent);
+            }
+            if (descEl && descEl.textContent) {
+                descEl.textContent = toSentenceCasePreserveAcronyms(descEl.textContent);
+            }
         });
+    }
+    
+    // Run on page load
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', convertInitialEvents);
+    } else {
+        convertInitialEvents();
+    }
+    
+    // Event card click handlers (delegated)
+    document.addEventListener('click', (e) => {
+        const eventCard = e.target.closest('.event-card');
+        if (eventCard) {
+            openEventDrawer({
+                title: eventCard.dataset.title || '',
+                time: eventCard.dataset.time || '',
+                date: eventCard.dataset.date || '',
+                location: eventCard.dataset.location || '',
+                source: eventCard.dataset.source || '',
+                summary: eventCard.dataset.summary || '',
+                link: eventCard.dataset.link || '',
+            });
+        }
+    });
+    
+    // Keyboard: Enter/Space on event card
+    document.addEventListener('keydown', (e) => {
+        if (e.target.classList.contains('event-card') && (e.key === 'Enter' || e.key === ' ')) {
+            e.preventDefault();
+            e.target.click();
+        }
     });
 
     // ==========================================================================
@@ -132,12 +234,12 @@
     const weekNext = document.getElementById('js-week-next');
     const weekLabel = document.getElementById('js-week-label');
     const weekOffsetInput = document.getElementById('js-week-offset');
-    const calendarGrid = document.getElementById('js-agenda-week');
+    const eventsList = document.getElementById('js-agenda-week');
     
     async function loadWeek(offset) {
-        if (!calendarGrid) return;
+        if (!eventsList) return;
         
-        calendarGrid.classList.add('loading');
+        eventsList.classList.add('loading');
         
         try {
             const res = await fetch(`/api/events/week?offset=${offset}`);
@@ -151,46 +253,53 @@
                 weekOffsetInput.value = data.week_offset;
             }
             
-            // Rebuild calendar grid
-            calendarGrid.innerHTML = data.week_grid.map(day => `
-                <div class="calendar-day">
-                    <div class="calendar-day__header">${day.label}</div>
-                    <div class="calendar-day__events">
-                        ${day.items.length > 0 ? day.items.map(it => `
-                            <button class="event-chip" type="button"
-                                data-title="${escapeHtml(it.title)}"
-                                data-time="${escapeHtml(it.time)}"
-                                data-link="${escapeHtml(it.link)}"
-                                data-location="${escapeHtml(it.location)}"
-                                data-source="${escapeHtml(it.source)}"
-                                data-date="${escapeHtml(it.date)}"
-                                data-summary="${escapeHtml(it.summary)}">
-                                <span class="event-chip__time">${escapeHtml(it.time)}</span>
-                                <span class="event-chip__title">${escapeHtml(truncate(it.title, 35))}</span>
-                            </button>
-                        `).join('') : '<span class="calendar-day__empty">—</span>'}
+            // Rebuild events list with cards
+            eventsList.innerHTML = data.week_grid.map(day => {
+                const dayLabel = day.label || '';
+                const hasEvents = day.items && day.items.length > 0;
+                
+                return `
+                    <div class="events-day-group">
+                        <h3 class="events-day-group__header">${escapeHtml(dayLabel)}</h3>
+                        <div class="events-day-group__cards">
+                            ${hasEvents ? day.items.map(it => {
+                                const title = toSentenceCasePreserveAcronyms(it.title || 'Event');
+                                const time = formatTime(it.time || '');
+                                const location = it.location ? toSentenceCasePreserveAcronyms(it.location) : '';
+                                const summary = it.summary ? toSentenceCasePreserveAcronyms(it.summary) : '';
+                                
+                                return `
+                                    <article class="event-card" tabindex="0" role="button"
+                                        aria-label="Event: ${escapeHtml(title)}"
+                                        data-title="${escapeHtml(it.title || '')}"
+                                        data-time="${escapeHtml(it.time || '')}"
+                                        data-link="${escapeHtml(it.link || '')}"
+                                        data-location="${escapeHtml(it.location || '')}"
+                                        data-source="${escapeHtml(it.source || '')}"
+                                        data-date="${escapeHtml(it.date || '')}"
+                                        data-summary="${escapeHtml(it.summary || '')}">
+                                        <div class="event-card__time">
+                                            <span class="event-card__time-value">${escapeHtml(time)}</span>
+                                            <span class="event-card__day-label">${escapeHtml(dayLabel)}</span>
+                                        </div>
+                                        <div class="event-card__content">
+                                            <h4 class="event-card__title">${escapeHtml(title)}</h4>
+                                            ${location ? `<p class="event-card__location">${escapeHtml(location)}</p>` : ''}
+                                            ${summary ? `<p class="event-card__description">${escapeHtml(truncate(summary, 80))}</p>` : ''}
+                                            <button class="event-card__more" aria-label="View more details">More details →</button>
+                                        </div>
+                                    </article>
+                                `;
+                            }).join('') : '<p class="events-day-group__empty">— No public events listed</p>'}
+                        </div>
                     </div>
-                </div>
-            `).join('');
-            
-            // Re-bind click handlers
-            calendarGrid.querySelectorAll('.event-chip').forEach(chip => {
-                chip.addEventListener('click', () => {
-                    showEventDetail({
-                        title: chip.dataset.title,
-                        time: chip.dataset.time,
-                        date: chip.dataset.date,
-                        location: chip.dataset.location,
-                        source: chip.dataset.source,
-                        summary: chip.dataset.summary,
-                        link: chip.dataset.link,
-                    });
-                });
-            });
+                `;
+            }).join('');
         } catch (e) {
             console.error('Failed to load week:', e);
+            eventsList.innerHTML = '<p class="events-error">Unable to load events. Please try again later.</p>';
         } finally {
-            calendarGrid.classList.remove('loading');
+            eventsList.classList.remove('loading');
         }
     }
     
@@ -231,6 +340,61 @@
     function truncate(str, len) {
         if (!str) return '';
         return str.length > len ? str.slice(0, len) + '…' : str;
+    }
+
+    /**
+     * Convert string to sentence case while preserving acronyms
+     * Examples: "CONCERT ON THE GREEN" -> "Concert on the green"
+     *           "CT TRANSIT" -> "CT Transit"
+     *           "NWS ALERTS" -> "NWS Alerts"
+     */
+    function toSentenceCasePreserveAcronyms(str) {
+        if (!str) return '';
+        
+        // Split by spaces and process each word
+        return str.split(/\s+/).map((word, index) => {
+            // If word is all caps and 2-4 chars, likely an acronym
+            if (word.length >= 2 && word.length <= 4 && /^[A-Z0-9]+$/.test(word)) {
+                return word; // Keep acronym as-is
+            }
+            
+            // First word: capitalize first letter, lowercase rest
+            // Other words: lowercase unless it's an acronym
+            if (index === 0) {
+                return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+            } else {
+                return word.toLowerCase();
+            }
+        }).join(' ');
+    }
+
+    /**
+     * Format time string to human-friendly format
+     * Handles various input formats: "7:00 PM", "19:00", "2025-12-25 07:00 PM"
+     */
+    function formatTime(timeStr) {
+        if (!timeStr) return '';
+        
+        // If already in "7:00 PM" format, return as-is
+        if (/^\d{1,2}:\d{2}\s*(AM|PM)$/i.test(timeStr.trim())) {
+            return timeStr.trim();
+        }
+        
+        // Try to parse ISO datetime or other formats
+        try {
+            const date = new Date(timeStr);
+            if (!isNaN(date.getTime())) {
+                return date.toLocaleTimeString('en-US', { 
+                    hour: 'numeric', 
+                    minute: '2-digit',
+                    hour12: true 
+                });
+            }
+        } catch (e) {
+            // Fall through to return original
+        }
+        
+        return timeStr;
     }
 
     // ==========================================================================
@@ -275,9 +439,13 @@
     // KEYBOARD SHORTCUTS
     // ==========================================================================
     document.addEventListener('keydown', (e) => {
-        // Escape closes popups
+        // Escape closes popups and event drawer
         if (e.key === 'Escape') {
-            closeAllPopups();
+            if (eventDrawer && eventDrawer.classList.contains('active')) {
+                closeEventDrawer();
+            } else {
+                closeAllPopups();
+            }
             return;
         }
         
