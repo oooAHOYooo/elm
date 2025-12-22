@@ -1,0 +1,86 @@
+:root {
+    /* =========================================
+       1. Primitive Colors (The Palette)
+       ========================================= */
+    --color-cream: #f5efe6;
+    --color-cream-dark: #f5f1e6;
+    --color-charcoal: #1c1b1a;
+    --color-charcoal-light: #5a524b;
+    --color-coral: #d65b47;
+    --color-teal: #79a7ac;
+    --color-mustard: #f0cd83;
+    
+    --color-white: #ffffff;
+    --color-white-translucent: rgba(255, 255, 255, 0.6);
+    --color-black-translucent: rgba(28, 27, 26, 0.08);
+
+    /* =========================================
+       2. Semantic Theme Variables
+       ========================================= */
+    /* Backgrounds */
+    --bg-body: var(--color-cream);
+    --bg-card: var(--color-white-translucent);
+    --bg-panel: rgba(245, 239, 230, 0.8);
+    --bg-surface: #ffffff;
+    --bg-surface-alt: var(--color-cream-dark);
+    --bg-hover: rgba(0, 0, 0, 0.05);
+    
+    /* Text */
+    --text-main: var(--color-charcoal);
+    --text-muted: var(--color-charcoal-light);
+    --text-inverse: #ffffff;
+    
+    /* Borders & Lines */
+    --border-color: rgba(28, 27, 26, 0.14);
+    --border-subtle: rgba(28, 27, 26, 0.08);
+    --shadow-color: var(--color-black-translucent);
+    
+    /* Accents */
+    --accent-primary: var(--color-coral);
+    --accent-secondary: var(--color-teal);
+    --accent-highlight: var(--color-mustard);
+    
+    /* Status */
+    --status-success: #22c55e;
+    --status-warning: #eab308;
+    --status-error: #ef4444;
+}
+
+/* Dark Mode Overrides */
+[data-theme="dark"] {
+    --bg-body: #1a1d21;
+    --bg-card: rgba(40, 44, 52, 0.8);
+    --bg-panel: rgba(26, 29, 33, 0.9);
+    --bg-surface: #252830;
+    --bg-hover: rgba(255, 255, 255, 0.05);
+    
+    --text-main: #e8e4df;
+    --text-muted: #9a958e;
+    
+    --border-color: rgba(232, 228, 223, 0.12);
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    
+    --accent-primary: #ff7b6b;
+    --accent-secondary: #8ec4c9;
+    --accent-highlight: #d4a84b;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --bg-body: #1a1d21;
+        --bg-card: rgba(40, 44, 52, 0.8);
+        --bg-panel: rgba(26, 29, 33, 0.9);
+        --bg-surface: #252830;
+        --bg-hover: rgba(255, 255, 255, 0.05);
+        
+        --text-main: #e8e4df;
+        --text-muted: #9a958e;
+        
+        --border-color: rgba(232, 228, 223, 0.12);
+        --shadow-color: rgba(0, 0, 0, 0.3);
+        
+        --accent-primary: #ff7b6b;
+        --accent-secondary: #8ec4c9;
+        --accent-highlight: #d4a84b;
+    }
+}

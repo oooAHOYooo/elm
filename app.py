@@ -78,30 +78,36 @@ def create_app() -> Flask:
         }
         
         results = {}
+        completed_count = 0
         try:
             for future in as_completed(futures, timeout=timeout):
                 key = futures[future]
                 try:
                     results[key] = future.result()
+                    completed_count += 1
                 except Exception as e:
                     app.logger.warning(f"Failed to fetch {key}: {e}")
                     results[key] = {} if key in ("weather", "air_quality", "tax_info", "agg") else []
+                    completed_count += 1
         except TimeoutError:
             # Some futures didn't complete in time - process what we have
-            app.logger.warning(f"Timeout waiting for futures - processing completed results")
-            for future, key in futures.items():
-                if key not in results:
-                    try:
-                        if future.done():
-                            results[key] = future.result()
-                        else:
-                            # Future didn't complete - set default
-                            app.logger.warning(f"Future {key} did not complete in time")
-                            results[key] = {} if key in ("weather", "air_quality", "tax_info", "agg") else []
-                    except Exception as e:
-                        app.logger.warning(f"Failed to fetch {key}: {e}")
-                        results[key] = {} if key in ("weather", "air_quality", "tax_info", "agg") else []
+            app.logger.warning(f"Timeout waiting for futures ({completed_count}/{len(futures)} completed) - processing completed results")
         
+        # Process any remaining futures that completed but weren't processed yet
+        for future, key in futures.items():
+            if key not in results:
+                try:
+                    if future.done():
+                        results[key] = future.result()
+                    else:
+                        # Future didn't complete - set default
+                        app.logger.warning(f"Future {key} did not complete in time - using default")
+                        results[key] = {} if key in ("weather", "air_quality", "tax_info", "agg") else []
+                except Exception as e:
+                    app.logger.warning(f"Failed to fetch {key}: {e}")
+                    results[key] = {} if key in ("weather", "air_quality", "tax_info", "agg") else []
+        
+        # Ensure all expected keys have defaults
         weather = results.get("weather", {})
         nws_alerts = results.get("nws_alerts", [])
         air_quality = results.get("air_quality", {})
