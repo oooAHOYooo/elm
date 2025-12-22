@@ -77,18 +77,21 @@
 
     function updateMoonPhases() {
         const today = new Date();
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
         const day3 = new Date(today);
-        day3.setDate(day3.getDate() + 2);
+        day3.setDate(day3.getDate() + 3);
+        const day7 = new Date(today);
+        day7.setDate(day7.getDate() + 7);
+        const day14 = new Date(today);
+        day14.setDate(day14.getDate() + 14);
 
         const phases = [
             { date: today, iconEl: document.getElementById('js-moon-today'), nameEl: document.getElementById('js-moon-name-today') },
-            { date: tomorrow, iconEl: document.getElementById('js-moon-tomorrow'), nameEl: document.getElementById('js-moon-name-tomorrow') },
-            { date: day3, iconEl: document.getElementById('js-moon-day3'), nameEl: document.getElementById('js-moon-name-day3') }
+            { date: day3, iconEl: document.getElementById('js-moon-day3'), nameEl: document.getElementById('js-moon-name-day3'), labelEl: document.getElementById('js-moon-label-day3') },
+            { date: day7, iconEl: document.getElementById('js-moon-day7'), nameEl: document.getElementById('js-moon-name-day7'), labelEl: document.getElementById('js-moon-label-day7') },
+            { date: day14, iconEl: document.getElementById('js-moon-day14'), nameEl: document.getElementById('js-moon-name-day14'), labelEl: document.getElementById('js-moon-label-day14') }
         ];
 
-        phases.forEach(({ date, iconEl, nameEl }) => {
+        phases.forEach(({ date, iconEl, nameEl, labelEl }) => {
             if (!iconEl || !nameEl) return;
             
             const phase = calculateMoonPhase(date);
@@ -97,17 +100,182 @@
             
             iconEl.className = 'moon-phase__icon ' + iconClass;
             nameEl.textContent = phaseName;
+            
+            // Update label with day name if it's not today
+            if (labelEl) {
+                const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+                const dayName = dayNames[date.getDay()];
+                const daysDiff = Math.floor((date - today) / (1000 * 60 * 60 * 24));
+                labelEl.textContent = daysDiff === 3 ? '+3 days' : daysDiff === 7 ? '+7 days' : daysDiff === 14 ? '+14 days' : `${dayName} (+${daysDiff}d)`;
+            }
+        });
+    }
+
+    updateMoonPhases();
+
+    // ==========================================================================
+    // SUN PHASES
+    // ==========================================================================
+    function getSunPhase(date) {
+        const hour = date.getHours();
+        const minute = date.getMinutes();
+        const timeOfDay = hour + minute / 60;
+        
+        // Determine sun phase based on time of day
+        if (timeOfDay >= 6 && timeOfDay < 8) {
+            return { phase: 'sunrise', name: 'Sunrise', angle: (timeOfDay - 6) * 90 / 2 }; // 0-90 degrees
+        } else if (timeOfDay >= 8 && timeOfDay < 16) {
+            return { phase: 'day', name: 'Day', angle: 90 + (timeOfDay - 8) * 90 / 8 }; // 90-180 degrees
+        } else if (timeOfDay >= 16 && timeOfDay < 20) {
+            return { phase: 'sunset', name: 'Sunset', angle: 180 + (timeOfDay - 16) * 90 / 4 }; // 180-270 degrees
+        } else {
+            return { phase: 'night', name: 'Night', angle: 270 }; // Night
+        }
+    }
+
+    function createSunVisualization(container, phaseData) {
+        if (!container || typeof THREE === 'undefined') return;
+        
+        const width = container.clientWidth || 80;
+        const height = container.clientHeight || 80;
+        
+        // Clear existing canvas
+        container.innerHTML = '';
+        
+        // Create scene
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+        renderer.setSize(width, height);
+        renderer.setClearColor(0x000000, 0);
+        container.appendChild(renderer.domElement);
+        
+        // Create sun
+        const sunGeometry = new THREE.SphereGeometry(1, 32, 32);
+        const sunMaterial = new THREE.MeshBasicMaterial({ 
+            color: phaseData.phase === 'night' ? 0x444444 : 0xffaa00,
+            emissive: phaseData.phase === 'night' ? 0x000000 : 0xff6600,
+            emissiveIntensity: phaseData.phase === 'night' ? 0 : 0.5
+        });
+        const sun = new THREE.Mesh(sunGeometry, sunMaterial);
+        scene.add(sun);
+        
+        // Add glow effect for day phases
+        if (phaseData.phase !== 'night') {
+            const glowGeometry = new THREE.SphereGeometry(1.2, 32, 32);
+            const glowMaterial = new THREE.MeshBasicMaterial({
+                color: 0xffaa00,
+                transparent: true,
+                opacity: 0.3
+            });
+            const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+            scene.add(glow);
+        }
+        
+        // Position sun based on phase angle
+        const angle = (phaseData.angle * Math.PI) / 180;
+        const radius = 2.5;
+        sun.position.x = Math.cos(angle) * radius;
+        sun.position.y = Math.sin(angle) * radius;
+        if (phaseData.phase === 'night') {
+            sun.position.y = -3; // Below horizon
+        }
+        
+        if (phaseData.phase !== 'night') {
+            const glow = scene.children.find(child => child !== sun);
+            if (glow) {
+                glow.position.x = sun.position.x;
+                glow.position.y = sun.position.y;
+            }
+        }
+        
+        // Add horizon line
+        const horizonGeometry = new THREE.PlaneGeometry(10, 0.1);
+        const horizonMaterial = new THREE.MeshBasicMaterial({ 
+            color: 0x666666,
+            transparent: true,
+            opacity: 0.5
+        });
+        const horizon = new THREE.Mesh(horizonGeometry, horizonMaterial);
+        horizon.position.y = -2.5;
+        horizon.rotation.x = Math.PI / 2;
+        scene.add(horizon);
+        
+        // Position camera
+        camera.position.z = 5;
+        camera.lookAt(0, 0, 0);
+        
+        // Animate
+        let animationId;
+        function animate() {
+            animationId = requestAnimationFrame(animate);
+            sun.rotation.y += 0.01;
+            if (glow) {
+                glow.rotation.y = sun.rotation.y;
+            }
+            renderer.render(scene, camera);
+        }
+        animate();
+        
+        // Store animation ID and scene for cleanup
+        container._animationId = animationId;
+        container._scene = scene;
+        container._renderer = renderer;
+    }
+
+    function updateSunPhases() {
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const day3 = new Date(today);
+        day3.setDate(day3.getDate() + 2);
+
+        const phases = [
+            { date: today, canvasEl: document.getElementById('js-sun-today'), nameEl: document.getElementById('js-sun-name-today') },
+            { date: tomorrow, canvasEl: document.getElementById('js-sun-tomorrow'), nameEl: document.getElementById('js-sun-name-tomorrow') },
+            { date: day3, canvasEl: document.getElementById('js-sun-day3'), nameEl: document.getElementById('js-sun-name-day3') }
+        ];
+
+        phases.forEach(({ date, canvasEl, nameEl }) => {
+            if (!canvasEl || !nameEl) return;
+            
+            // Clean up previous animation if exists
+            if (canvasEl._animationId) {
+                cancelAnimationFrame(canvasEl._animationId);
+            }
+            
+            const phaseData = getSunPhase(date);
+            nameEl.textContent = phaseData.name;
+            
+            // Wait for Three.js to be available
+            if (typeof THREE !== 'undefined') {
+                createSunVisualization(canvasEl, phaseData);
+            } else {
+                // Retry after a short delay if Three.js isn't loaded yet
+                setTimeout(() => {
+                    if (typeof THREE !== 'undefined') {
+                        createSunVisualization(canvasEl, phaseData);
+                    }
+                }, 100);
+            }
         });
 
         // Update day 3 label
-        const day3Label = document.getElementById('js-moon-label-day3');
+        const day3Label = document.getElementById('js-sun-label-day3');
         if (day3Label) {
             const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
             day3Label.textContent = dayNames[day3.getDay()];
         }
     }
 
-    updateMoonPhases();
+    // Wait for DOM and Three.js to be ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(updateSunPhases, 200);
+        });
+    } else {
+        setTimeout(updateSunPhases, 200);
+    }
 
     // ==========================================================================
     // DARK MODE
@@ -407,17 +575,26 @@
                 // Tide chart
                 const chartHtml = createTideChart(data.predictions);
                 
-                // Tide list
-                const tidesHtml = data.predictions.slice(0, 4).map(p => {
+                // Tide list with navigation
+                const tidePredictions = data.predictions.slice(0, 4);
+                const tidesHtml = tidePredictions.map((p, index) => {
                     const time = p.t ? p.t.split(' ')[1] : '';
                     const height = parseFloat(p.v).toFixed(1);
                     const type = p.type === 'H' ? 'High' : 'Low';
+                    const isFirst = index === 0;
+                    const isLast = index === tidePredictions.length - 1;
                     return `
-                        <div class="tide-item tide-item--${type.toLowerCase()}">
+                        <div class="tide-item tide-item--${type.toLowerCase()}" data-tide-index="${index}" tabindex="0" role="button" aria-label="${type} tide at ${time}, ${height} feet">
+                            <button class="tide-item__nav tide-item__nav--up" ${isFirst ? 'disabled aria-disabled="true"' : ''} aria-label="Previous tide" title="Previous tide">
+                                <span class="tide-item__nav-icon">▲</span>
+                            </button>
                             <span class="tide-item__icon tide-item__icon--${type.toLowerCase()}"></span>
                             <span class="tide-item__type">${type}</span>
                             <span class="tide-item__time">${time}</span>
                             <span class="tide-item__height">${height} ft</span>
+                            <button class="tide-item__nav tide-item__nav--down" ${isLast ? 'disabled aria-disabled="true"' : ''} aria-label="Next tide" title="Next tide">
+                                <span class="tide-item__nav-icon">▼</span>
+                            </button>
                         </div>
                     `;
                 }).join('');
@@ -468,6 +645,46 @@
                     </div>
                     ${boatsHtml}
                 `;
+                
+                // Add navigation handlers for tide items
+                const tideItems = output.querySelectorAll('.tide-item');
+                tideItems.forEach((item, index) => {
+                    const upBtn = item.querySelector('.tide-item__nav--up');
+                    const downBtn = item.querySelector('.tide-item__nav--down');
+                    
+                    if (upBtn && !upBtn.disabled) {
+                        upBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            if (index > 0) {
+                                tideItems[index - 1].focus();
+                                tideItems[index - 1].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                            }
+                        });
+                    }
+                    
+                    if (downBtn && !downBtn.disabled) {
+                        downBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            if (index < tideItems.length - 1) {
+                                tideItems[index + 1].focus();
+                                tideItems[index + 1].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                            }
+                        });
+                    }
+                    
+                    // Keyboard navigation
+                    item.addEventListener('keydown', (e) => {
+                        if (e.key === 'ArrowUp' && index > 0) {
+                            e.preventDefault();
+                            tideItems[index - 1].focus();
+                            tideItems[index - 1].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        } else if (e.key === 'ArrowDown' && index < tideItems.length - 1) {
+                            e.preventDefault();
+                            tideItems[index + 1].focus();
+                            tideItems[index + 1].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        }
+                    });
+                });
             } else {
                 output.textContent = 'No tide data available';
             }
