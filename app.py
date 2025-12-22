@@ -22,8 +22,8 @@ from feeds.aggregator import aggregate_all
 
 load_dotenv()
 
-# Thread pool for parallel API calls
-_executor = ThreadPoolExecutor(max_workers=6)
+# Thread pool for parallel API calls - increased workers for faster loading
+_executor = ThreadPoolExecutor(max_workers=8)
 
 
 def create_app() -> Flask:
@@ -41,6 +41,25 @@ def create_app() -> Flask:
         tz = ZoneInfo("America/New_York")
         today = datetime.now(tz)
         date_str = today.strftime("%A, %B %d, %Y")
+        
+        # Format sunrise/sunset times in EST with 12-hour format
+        def format_sun_time(iso_time_str: str) -> str:
+            """Convert ISO time string to EST 12-hour format (e.g., '7:23 AM')"""
+            if not iso_time_str:
+                return '--'
+            try:
+                # Parse ISO format (e.g., "2024-01-15T07:23:00")
+                dt = datetime.fromisoformat(iso_time_str.replace('Z', '+00:00'))
+                # Convert to EST timezone
+                dt_est = dt.astimezone(tz)
+                # Format as 12-hour with AM/PM, remove leading zero from hour
+                time_str = dt_est.strftime("%I:%M %p")
+                # Remove leading zero from hour (e.g., "07:23 AM" -> "7:23 AM")
+                if time_str.startswith("0"):
+                    time_str = time_str[1:]
+                return time_str
+            except Exception:
+                return iso_time_str if iso_time_str else '--'
         timeout: int = int(app.config["REQUEST_TIMEOUT"])
         lat = float(app.config["WEATHER_LAT"])
         lon = float(app.config["WEATHER_LON"])
@@ -133,13 +152,14 @@ def create_app() -> Flask:
                     "location": it.get("location"),
                 })
 
-        # Filter to current week
+        # Filter to current week (starting on Sunday)
         def within_current_week(iso_str: str) -> bool:
             try:
                 if not iso_str:
                     return False
                 dt = datetime.fromisoformat(iso_str.replace("Z", "+00:00")).astimezone(tz)
-                start_of_week = today - timedelta(days=today.weekday())
+                days_to_sunday = (today.weekday() + 1) % 7
+                start_of_week = today - timedelta(days=days_to_sunday)
                 end_of_week = start_of_week + timedelta(days=7)
                 return start_of_week <= dt < end_of_week
             except Exception:
@@ -165,8 +185,9 @@ def create_app() -> Flask:
             ]
             week_events = sorted(fallback, key=lambda i: i.get("date_iso", ""))
 
-        # Build 7-day grid
-        start_of_week = today - timedelta(days=today.weekday())
+        # Build 7-day grid (starting on Sunday)
+        days_to_sunday = (today.weekday() + 1) % 7
+        start_of_week = today - timedelta(days=days_to_sunday)
         week_start_date = start_of_week.strftime("%b %d")
         week_grid = []
         
@@ -197,6 +218,14 @@ def create_app() -> Flask:
             
             week_grid.append({"label": label, "items": items_for_day[:3]})
 
+        # Format sunrise/sunset times
+        if weather:
+            weather = weather.copy()  # Don't modify the original
+            if weather.get("sunrise"):
+                weather["sunrise"] = format_sun_time(weather["sunrise"])
+            if weather.get("sunset"):
+                weather["sunset"] = format_sun_time(weather["sunset"])
+        
         return render_template(
             "index.html",
             app_name=app.config["APP_NAME"],
@@ -276,12 +305,13 @@ def create_app() -> Flask:
 
     @app.route("/api/events/week")
     def api_events_week():
-        """API endpoint for events in a specific week"""
+        """API endpoint for events in a specific week (starting on Sunday)"""
         tz = ZoneInfo("America/New_York")
         today = datetime.now(tz)
         week_offset = int(request.args.get("offset", 0))
         
-        start_of_week = today - timedelta(days=today.weekday()) + timedelta(weeks=week_offset)
+        days_to_sunday = (today.weekday() + 1) % 7
+        start_of_week = today - timedelta(days=days_to_sunday) + timedelta(weeks=week_offset)
         end_of_week = start_of_week + timedelta(days=7)
         
         agg = aggregate_all()

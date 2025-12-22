@@ -44,6 +44,7 @@ def fetch_tides(
     units: str = "english",
     datum: str = "MLLW",
     ttl_seconds: int = 600,
+    timeout: int = 4,
 ) -> Dict[str, Any]:
     """
     Fetch today's or tomorrow's high/low tide predictions for a NOAA station.
@@ -69,7 +70,7 @@ def fetch_tides(
         "format": "json",
     }
     try:
-        resp = requests.get(base, params=params, timeout=6)
+        resp = requests.get(base, params=params, timeout=timeout)
         resp.raise_for_status()
         data = resp.json()
         preds: List[Dict[str, Any]] = data.get("predictions", []) or []

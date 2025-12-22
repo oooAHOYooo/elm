@@ -5,13 +5,102 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>{{ app_name or "Elm City Daily" }}</title>
         <meta name="description" content="Elm City Daily — a civic dashboard for New Haven, CT" />
-        <!-- Critical CSS for loading bar -->
+        <!-- Critical CSS for loading screen -->
         <style>
-            .page-loader{position:fixed;top:0;left:0;right:0;height:3px;z-index:9999;background:#f0f0f0}
-            .page-loader__bar{height:100%;width:0;background:linear-gradient(90deg,#8b4513,#d4a574);transition:width .3s ease}
-            .page-loader--done .page-loader__bar{width:100%}
-            .page-loader--hide{opacity:0;transition:opacity .3s ease}
-            body.loading{overflow:hidden}
+            .loading-splash {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: #faf8f5;
+                z-index: 99999;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                font-family: 'Old Standard TT', 'Bodoni Moda', serif;
+                transition: opacity 0.5s ease, visibility 0.5s ease;
+            }
+            .loading-splash--hidden {
+                opacity: 0;
+                visibility: hidden;
+            }
+            .loading-splash__title {
+                font-size: clamp(3rem, 10vw, 6rem);
+                font-weight: 700;
+                letter-spacing: 0.1em;
+                text-transform: uppercase;
+                color: #1a1a1a;
+                margin-bottom: 1rem;
+                text-shadow: 2px 2px 0 rgba(0,0,0,0.1);
+            }
+            .loading-splash__subtitle {
+                font-size: clamp(0.9rem, 2vw, 1.2rem);
+                color: #6b6b6b;
+                margin-bottom: 3rem;
+                font-family: 'IBM Plex Sans', sans-serif;
+                text-transform: uppercase;
+                letter-spacing: 0.15em;
+            }
+            .loading-splash__progress {
+                width: 90%;
+                max-width: 600px;
+                margin-bottom: 2rem;
+            }
+            .loading-splash__progress-bar {
+                width: 100%;
+                height: 8px;
+                background: #e0dcd5;
+                border-radius: 4px;
+                overflow: hidden;
+                position: relative;
+            }
+            .loading-splash__progress-fill {
+                height: 100%;
+                width: 0%;
+                background: linear-gradient(90deg, #8b4513, #d4a574);
+                transition: width 0.3s ease;
+                box-shadow: 0 2px 8px rgba(139, 69, 19, 0.3);
+            }
+            .loading-splash__percentage {
+                font-size: clamp(2rem, 6vw, 4rem);
+                font-weight: 700;
+                color: #8b4513;
+                margin-bottom: 1rem;
+                font-family: 'IBM Plex Sans', monospace;
+            }
+            .loading-splash__message {
+                font-size: clamp(0.85rem, 1.5vw, 1rem);
+                color: #2d2d2d;
+                text-align: center;
+                min-height: 1.5em;
+                font-family: 'Crimson Pro', serif;
+                font-style: italic;
+                max-width: 500px;
+                padding: 0 1rem;
+            }
+            [data-theme="dark"] .loading-splash {
+                background: #0a0a0a;
+            }
+            [data-theme="dark"] .loading-splash__title {
+                color: #f0ece4;
+            }
+            [data-theme="dark"] .loading-splash__subtitle {
+                color: #9a9590;
+            }
+            [data-theme="dark"] .loading-splash__percentage {
+                color: #d4a574;
+            }
+            [data-theme="dark"] .loading-splash__message {
+                color: #d4d0c8;
+            }
+            [data-theme="dark"] .loading-splash__progress-bar {
+                background: #2a2825;
+            }
+            body.loading {
+                overflow: hidden;
+            }
         </style>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,28 +108,117 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
     </head>
     <body class="loading">
-        <!-- Loading Progress Bar -->
-        <div class="page-loader" id="page-loader">
-            <div class="page-loader__bar" id="loader-bar"></div>
+        <!-- Loading Splash Screen -->
+        <div class="loading-splash" id="loading-splash">
+            <div class="loading-splash__title">ELM CITY DAILY</div>
+            <div class="loading-splash__subtitle">Your Daily Civic Digest</div>
+            <div class="loading-splash__percentage" id="loading-percentage">0%</div>
+            <div class="loading-splash__progress">
+                <div class="loading-splash__progress-bar">
+                    <div class="loading-splash__progress-fill" id="loading-progress"></div>
+                </div>
+            </div>
+            <div class="loading-splash__message" id="loading-message">Initializing...</div>
         </div>
         <script>
-            // Immediate progress simulation
             (function(){
-                var bar = document.getElementById('loader-bar');
-                var progress = 0;
-                var interval = setInterval(function(){
-                    progress += Math.random() * 15;
-                    if(progress > 90) progress = 90;
-                    bar.style.width = progress + '%';
-                }, 100);
-                window.addEventListener('load', function(){
-                    clearInterval(interval);
-                    bar.style.width = '100%';
-                    document.body.classList.remove('loading');
-                    setTimeout(function(){
-                        document.getElementById('page-loader').classList.add('page-loader--hide');
+                var splash = document.getElementById('loading-splash');
+                var progressBar = document.getElementById('loading-progress');
+                var percentage = document.getElementById('loading-percentage');
+                var message = document.getElementById('loading-message');
+                
+                var currentProgress = 0;
+                var targetProgress = 0;
+                
+                // Loading messages with progress targets
+                var loadingSteps = [
+                    { progress: 5, message: "Connecting to civic data sources..." },
+                    { progress: 15, message: "Fetching weather conditions..." },
+                    { progress: 30, message: "Gathering air quality data..." },
+                    { progress: 45, message: "Loading tide predictions..." },
+                    { progress: 60, message: "Collecting city events..." },
+                    { progress: 75, message: "Aggregating news feeds..." },
+                    { progress: 85, message: "Preparing your dashboard..." },
+                    { progress: 95, message: "Finalizing layout..." },
+                    { progress: 100, message: "Ready!" }
+                ];
+                
+                var currentStep = 0;
+                var animationFrame;
+                
+                function updateProgress() {
+                    if (currentProgress < targetProgress) {
+                        currentProgress += Math.max(1, (targetProgress - currentProgress) * 0.1);
+                        if (currentProgress > targetProgress) currentProgress = targetProgress;
+                        
+                        var percent = Math.floor(currentProgress);
+                        progressBar.style.width = currentProgress + '%';
+                        percentage.textContent = percent + '%';
+                        
+                        // Update message based on progress
+                        var step = loadingSteps.find(function(s) { return percent >= s.progress; });
+                        if (step && step.message !== message.textContent) {
+                            message.textContent = step.message;
+                        }
+                        
+                        animationFrame = requestAnimationFrame(updateProgress);
+                    } else if (currentStep < loadingSteps.length - 1) {
+                        currentStep++;
+                        targetProgress = loadingSteps[currentStep].progress;
+                        animationFrame = requestAnimationFrame(updateProgress);
+                    }
+                }
+                
+                // Start progress animation
+                function startLoading() {
+                    currentStep = 0;
+                    targetProgress = loadingSteps[0].progress;
+                    updateProgress();
+                }
+                
+                // Simulate initial loading steps quickly
+                var stepInterval = setInterval(function() {
+                    if (currentStep < loadingSteps.length - 1) {
+                        currentStep++;
+                        targetProgress = loadingSteps[currentStep].progress;
+                    } else {
+                        clearInterval(stepInterval);
+                    }
+                }, 150);
+                
+                startLoading();
+                
+                // Complete on page load
+                window.addEventListener('load', function() {
+                    clearInterval(stepInterval);
+                    targetProgress = 100;
+                    
+                    setTimeout(function() {
+                        currentProgress = 100;
+                        progressBar.style.width = '100%';
+                        percentage.textContent = '100%';
+                        message.textContent = 'Ready!';
+                        
+                        setTimeout(function() {
+                            splash.classList.add('loading-splash--hidden');
+                            document.body.classList.remove('loading');
+                            setTimeout(function() {
+                                splash.style.display = 'none';
+                            }, 500);
+                        }, 300);
                     }, 200);
                 });
+                
+                // Fallback: complete after max time
+                setTimeout(function() {
+                    if (currentProgress < 100) {
+                        targetProgress = 100;
+                        setTimeout(function() {
+                            splash.classList.add('loading-splash--hidden');
+                            document.body.classList.remove('loading');
+                        }, 500);
+                    }
+                }, 5000);
             })();
         </script>
         {% block content %}{% endblock %}

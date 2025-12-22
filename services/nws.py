@@ -66,12 +66,12 @@ def fetch_nws_forecast(lat: float, lon: float, ttl_seconds: int = 900) -> Dict[s
         return cached
     try:
         points_url = f"https://api.weather.gov/points/{lat:.4f},{lon:.4f}"
-        points = requests.get(points_url, headers=_UA, timeout=6).json()
+        points = requests.get(points_url, headers=_UA, timeout=4).json()
         forecast_url = points["properties"]["forecast"]
         hourly_url = points["properties"]["forecastHourly"]
 
-        forecast = requests.get(forecast_url, headers=_UA, timeout=6).json()
-        hourly = requests.get(hourly_url, headers=_UA, timeout=6).json()
+        forecast = requests.get(forecast_url, headers=_UA, timeout=4).json()
+        hourly = requests.get(hourly_url, headers=_UA, timeout=4).json()
         periods = forecast.get("properties", {}).get("periods", []) or []
         hourly_periods = hourly.get("properties", {}).get("periods", []) or []
 

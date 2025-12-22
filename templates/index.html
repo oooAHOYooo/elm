@@ -11,7 +11,7 @@
             <span class="masthead__tagline">Your Daily Civic Digest</span>
             <button class="masthead__theme" id="js-dark-toggle" type="button"
                 aria-label="Toggle theme">
-                <span id="js-theme-icon">☀</span>
+                <span id="js-theme-icon" class="theme-icon"></span>
             </button>
         </div>
         <div class="masthead__rule"></div>
@@ -24,10 +24,14 @@
             <article class="weather-block">
                 <h2 class="section-head">Today's Conditions</h2>
                 <div class="weather-hero">
-                    <div class="weather-hero__temp" id="js-temp">
-                        {% if weather and weather.current_temp is not none %}
-                        {{ weather.current_temp|round|int }}°
-                        {% else %}--{% endif %}
+                    <div class="weather-ticker">
+                        <div class="weather-ticker__label">New Haven</div>
+                        <div class="weather-ticker__temp" id="js-temp">
+                            {% if weather and weather.current_temp is not none %}
+                            {{ weather.current_temp|round|int }}°
+                            {% else %}--{% endif %}
+                        </div>
+                        <div class="weather-ticker__clock" id="js-clock">--:--:--</div>
                     </div>
                     <div class="weather-hero__desc">
                         {{ weather.weather_desc if weather else 'Loading...' }}
@@ -209,6 +213,28 @@
             </article>
             {% endif %}
 
+            <!-- Moon Phases -->
+            <article class="infobox infobox--moon">
+                <h2 class="section-head">Moon Phases</h2>
+                <div class="moon-phases" id="js-moon-phases">
+                    <div class="moon-phase">
+                        <div class="moon-phase__icon" id="js-moon-today"></div>
+                        <div class="moon-phase__label">Today</div>
+                        <div class="moon-phase__name" id="js-moon-name-today">--</div>
+                    </div>
+                    <div class="moon-phase">
+                        <div class="moon-phase__icon" id="js-moon-tomorrow"></div>
+                        <div class="moon-phase__label">Tomorrow</div>
+                        <div class="moon-phase__name" id="js-moon-name-tomorrow">--</div>
+                    </div>
+                    <div class="moon-phase">
+                        <div class="moon-phase__icon" id="js-moon-day3"></div>
+                        <div class="moon-phase__label" id="js-moon-label-day3">Day 3</div>
+                        <div class="moon-phase__name" id="js-moon-name-day3">--</div>
+                    </div>
+                </div>
+            </article>
+
             <!-- Upcoming Meetings -->
             {% if boards_upcoming %}
             <article class="infobox">
@@ -232,17 +258,23 @@
             <article class="infobox infobox--links">
                 <h2 class="section-head">Quick Links</h2>
                 <div class="quick-links">
-                    <button class="quick-link" data-popup="seeclickfix">📢
+                    <button class="quick-link" data-popup="seeclickfix">
+                        <span class="quick-link__icon quick-link__icon--report"></span>
                         Report Issue</button>
-                    <button class="quick-link" data-popup="cityhall">☎️ City
-                        Hall</button>
-                    <button class="quick-link" data-popup="library">📚
+                    <button class="quick-link" data-popup="cityhall">
+                        <span class="quick-link__icon quick-link__icon--phone"></span>
+                        City Hall</button>
+                    <button class="quick-link" data-popup="library">
+                        <span class="quick-link__icon quick-link__icon--library"></span>
                         Library</button>
-                    <button class="quick-link" data-popup="recycling">♻️
+                    <button class="quick-link" data-popup="recycling">
+                        <span class="quick-link__icon quick-link__icon--recycle"></span>
                         Recycling</button>
-                    <button class="quick-link" data-popup="parking">🅿️
+                    <button class="quick-link" data-popup="parking">
+                        <span class="quick-link__icon quick-link__icon--parking"></span>
                         Parking</button>
-                    <button class="quick-link" data-popup="transit">🚌
+                    <button class="quick-link" data-popup="transit">
+                        <span class="quick-link__icon quick-link__icon--transit"></span>
                         Transit</button>
                 </div>
             </article>
@@ -261,13 +293,13 @@
             <!-- Sponsors -->
             <article class="infobox infobox--sponsors">
                 <h2 class="section-head">New Haven Hangouts</h2>
-                <a href="https://ahoyindiemedia.com" target="_blank"
+                <a href="https://app.ahoy.ooo" target="_blank"
                     rel="noopener sponsored" class="sponsor">
-                    <span class="sponsor__icon">⚓</span>
+                    <span class="sponsor__icon sponsor__icon--anchor"></span>
                     <span class="sponsor__name">Ahoy Indie Media</span>
                 </a>
                 <div class="sponsor sponsor--placeholder">
-                    <span class="sponsor__icon">📍</span>
+                    <span class="sponsor__icon sponsor__icon--pin"></span>
                     <span class="sponsor__name">Your Business Here</span>
                 </div>
             </article>
@@ -299,7 +331,7 @@
 
 <div class="popup-panel" id="popup-seeclickfix" data-popup="seeclickfix">
     <div class="popup-header">
-        <h3>📢 Report an Issue</h3>
+        <h3><span class="popup-header__icon popup-header__icon--report"></span> Report an Issue</h3>
         <button class="popup-close" aria-label="Close">×</button>
     </div>
     <div class="popup-body">
@@ -314,7 +346,7 @@
 
 <div class="popup-panel" id="popup-cityhall" data-popup="cityhall">
     <div class="popup-header">
-        <h3>☎️ City Hall</h3>
+        <h3><span class="popup-header__icon popup-header__icon--phone"></span> City Hall</h3>
         <button class="popup-close" aria-label="Close">×</button>
     </div>
     <div class="popup-body popup-body--content">
@@ -347,7 +379,7 @@
 
 <div class="popup-panel" id="popup-library" data-popup="library">
     <div class="popup-header">
-        <h3>📚 Library</h3>
+        <h3><span class="popup-header__icon popup-header__icon--library"></span> Library</h3>
         <button class="popup-close" aria-label="Close">×</button>
     </div>
     <div class="popup-body popup-body--content">
@@ -385,7 +417,7 @@
 
 <div class="popup-panel" id="popup-recycling" data-popup="recycling">
     <div class="popup-header">
-        <h3>♻️ Trash & Recycling</h3>
+        <h3><span class="popup-header__icon popup-header__icon--recycle"></span> Trash & Recycling</h3>
         <button class="popup-close" aria-label="Close">×</button>
     </div>
     <div class="popup-body popup-body--content">
@@ -425,7 +457,7 @@
 
 <div class="popup-panel" id="popup-parking" data-popup="parking">
     <div class="popup-header">
-        <h3>🅿️ Parking</h3>
+        <h3><span class="popup-header__icon popup-header__icon--parking"></span> Parking</h3>
         <button class="popup-close" aria-label="Close">×</button>
     </div>
     <div class="popup-body popup-body--content">
@@ -462,7 +494,7 @@
 
 <div class="popup-panel" id="popup-transit" data-popup="transit">
     <div class="popup-header">
-        <h3>🚌 Transit</h3>
+        <h3><span class="popup-header__icon popup-header__icon--transit"></span> Transit</h3>
         <button class="popup-close" aria-label="Close">×</button>
     </div>
     <div class="popup-body popup-body--content">

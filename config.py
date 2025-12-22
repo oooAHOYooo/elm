@@ -30,7 +30,7 @@ class Config:
     WEATHER_LON: float = float(os.getenv("WEATHER_LON", "-72.9279"))
 
     # Networking and caching
-    REQUEST_TIMEOUT: int = int(os.getenv("REQUEST_TIMEOUT", "5"))
+    REQUEST_TIMEOUT: int = int(os.getenv("REQUEST_TIMEOUT", "3"))  # Reduced from 5 to 3 for faster loading
     CACHE_TTL_RSS_SECONDS: int = int(os.getenv("CACHE_TTL_RSS_SECONDS", "600"))
     CACHE_TTL_WEATHER_SECONDS: int = int(os.getenv("CACHE_TTL_WEATHER_SECONDS", "900"))
 

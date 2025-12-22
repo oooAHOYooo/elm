@@ -95,7 +95,7 @@ def fetch_air_quality(
                 "distance": 25,  # miles
                 "API_KEY": api_key,
             }
-            resp = requests.get(url, params=params, timeout=8)
+            resp = requests.get(url, params=params, timeout=4)
             resp.raise_for_status()
             data = resp.json()
 

@@ -196,10 +196,69 @@ img {
     padding: var(--space-xs);
     border-radius: 4px;
     transition: background 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
 }
 
 .masthead__theme:hover {
     background: var(--bg-hover);
+}
+
+/* Theme Icon */
+.theme-icon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    position: relative;
+}
+
+.theme-icon--sun::before {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.theme-icon--sun::after {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 4px;
+    background: currentColor;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 
+        0 14px 0 currentColor,
+        4px 4px 0 currentColor,
+        8px 7px 0 currentColor,
+        8px 9px 0 currentColor,
+        4px 12px 0 currentColor,
+        -4px 4px 0 currentColor,
+        -8px 7px 0 currentColor,
+        -8px 9px 0 currentColor,
+        -4px 12px 0 currentColor;
+}
+
+.theme-icon--moon::before {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: inset -3px 0 0 currentColor;
 }
 
 .masthead__rule {
@@ -224,7 +283,7 @@ img {
    -------------------------------------------------------------------------- */
 .broadsheet {
     display: grid;
-    grid-template-columns: 1fr 2fr 1fr;
+    grid-template-columns: 0.95fr 1.9fr 0.95fr;
     gap: var(--column-gap);
     margin-top: var(--space-lg);
 }
@@ -294,16 +353,47 @@ img {
 
 .weather-hero {
     text-align: center;
-    padding: var(--space-lg) 0;
+    padding: var(--space-md) 0;
 }
 
-.weather-hero__temp {
-    font-family: var(--font-display);
-    font-size: 3.2rem;
+.weather-ticker {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-xs);
+    font-family: var(--font-mono);
+}
+
+.weather-ticker__label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-family: var(--font-sans);
+}
+
+.weather-ticker__temp {
+    font-size: 1.5rem;
     font-weight: 700;
     color: var(--text-headline);
     line-height: 1;
     letter-spacing: -0.02em;
+    font-family: var(--font-mono);
+    min-width: 3.5ch;
+    text-align: right;
+}
+
+.weather-ticker__clock {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    line-height: 1;
+    font-family: var(--font-mono);
+    letter-spacing: 0.05em;
+    min-width: 8ch;
+    text-align: left;
 }
 
 .weather-hero__desc {
@@ -370,6 +460,424 @@ img {
 .tides-content {
     font-size: 0.9rem;
     line-height: 1.7;
+}
+
+/* Tide Status Indicator */
+.tide-status {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    background: var(--bg-hover);
+    border-radius: 6px;
+    margin-bottom: var(--space-md);
+    font-size: 0.875rem;
+    flex-wrap: wrap;
+}
+
+.tide-status__icon {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.tide-status__icon--rising::before {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-bottom: 10px solid currentColor;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.tide-status__icon--falling::before {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 10px solid currentColor;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.tide-status__icon--stable::before {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 2px;
+    background: currentColor;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: -4px 0 0 currentColor, 4px 0 0 currentColor;
+}
+
+.tide-status__text {
+    font-weight: 600;
+    color: var(--text-headline);
+}
+
+.tide-status__next {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    margin-left: auto;
+}
+
+/* Tide Chart */
+.tide-chart {
+    position: relative;
+    margin-bottom: var(--space-md);
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+    padding: var(--space-md);
+}
+
+.tide-chart__svg {
+    width: 100%;
+    height: 120px;
+    display: block;
+}
+
+.tide-chart__labels {
+    position: relative;
+    margin-top: var(--space-xs);
+    height: 40px;
+}
+
+.tide-chart__label {
+    position: absolute;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    font-size: 0.7rem;
+}
+
+.tide-chart__label-time {
+    font-weight: 600;
+    color: var(--text-headline);
+    font-family: var(--font-sans);
+}
+
+.tide-chart__label-height {
+    color: var(--text-muted);
+    font-size: 0.65rem;
+}
+
+.tide-chart__label-type {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.65rem;
+    font-family: var(--font-sans);
+}
+
+.tide-chart__label-type--h {
+    background: #4a90e2;
+    color: white;
+}
+
+.tide-chart__label-type--l {
+    background: #8b7355;
+    color: white;
+}
+
+/* Tides List */
+.tides-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-md);
+}
+
+.tide-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--bg-hover);
+    border-radius: 4px;
+    font-size: 0.875rem;
+    transition: background 0.15s ease;
+}
+
+.tide-item:hover {
+    background: var(--bg-card);
+}
+
+.tide-item__icon {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.tide-item__icon--high::before {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-bottom: 8px solid currentColor;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.tide-item__icon--low::before {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 8px solid currentColor;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.tide-item__type {
+    font-weight: 600;
+    color: var(--text-headline);
+    min-width: 45px;
+    font-family: var(--font-sans);
+}
+
+.tide-item--high .tide-item__type {
+    color: #4a90e2;
+}
+
+.tide-item--low .tide-item__type {
+    color: #8b7355;
+}
+
+.tide-item__time {
+    font-family: var(--font-mono);
+    color: var(--text-body);
+    margin-left: auto;
+    margin-right: var(--space-sm);
+}
+
+.tide-item__height {
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+/* Boat Traffic Widget */
+.boat-traffic {
+    margin-top: var(--space-lg);
+    padding: var(--space-md);
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 6px;
+}
+
+.boat-traffic__title {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-headline);
+    margin: 0 0 var(--space-md) 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.boat-traffic__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+}
+
+.boat-traffic__item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-sm);
+    padding: var(--space-sm);
+    border-radius: 4px;
+    background: var(--bg-hover);
+}
+
+.boat-traffic__item--out {
+    border-left: 3px solid #4a90e2;
+}
+
+.boat-traffic__item--in {
+    border-left: 3px solid #8b7355;
+}
+
+.boat-traffic__icon {
+    width: 24px;
+    height: 24px;
+    display: inline-block;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.boat-traffic__icon--out::before {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 8px;
+    border: 2px solid currentColor;
+    border-radius: 2px 2px 0 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.boat-traffic__icon--out::after {
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: currentColor;
+    top: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.boat-traffic__icon--in::before {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 8px;
+    border: 2px solid currentColor;
+    border-radius: 0 0 2px 2px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.boat-traffic__icon--in::after {
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: currentColor;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.boat-traffic__title-icon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    position: relative;
+    margin-right: var(--space-xs);
+    vertical-align: middle;
+}
+
+.boat-traffic__title-icon::before {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 8px;
+    border: 2px solid currentColor;
+    border-radius: 2px 2px 0 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.boat-traffic__title-icon::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 3px solid transparent;
+    border-right: 3px solid transparent;
+    border-top: 4px solid currentColor;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.boat-traffic__content {
+    flex: 1;
+    min-width: 0;
+}
+
+.boat-traffic__label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-family: var(--font-sans);
+    margin-bottom: 2px;
+}
+
+.boat-traffic__count {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-headline);
+    font-family: var(--font-display);
+    line-height: 1;
+    margin-bottom: var(--space-xs);
+}
+
+.boat-traffic__times {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-xs);
+    margin-top: var(--space-xs);
+}
+
+.boat-traffic__time {
+    font-size: 0.7rem;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    background: var(--bg-paper);
+    padding: 2px 6px;
+    border-radius: 3px;
+    cursor: help;
+}
+
+.boat-traffic__note {
+    margin-top: var(--space-sm);
+    padding-top: var(--space-sm);
+    border-top: 1px solid var(--border-light);
+    text-align: center;
+}
+
+.boat-traffic__note small {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+@media (max-width: 600px) {
+    .boat-traffic__grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .tide-chart__svg {
+        height: 100px;
+    }
+    
+    .tide-chart__labels {
+        height: 35px;
+    }
 }
 
 /* --------------------------------------------------------------------------
@@ -754,6 +1262,140 @@ img {
     color: var(--text-headline);
 }
 
+/* Moon Phases */
+.moon-phases {
+    display: flex;
+    justify-content: space-around;
+    gap: var(--space-sm);
+    padding: var(--space-sm) 0;
+}
+
+.moon-phase {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xs);
+    flex: 1;
+}
+
+.moon-phase__icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid var(--border-light);
+    position: relative;
+    background: var(--bg-hover);
+    flex-shrink: 0;
+}
+
+.moon-phase__icon--new::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: var(--bg-hover);
+    box-shadow: inset 0 0 0 2px var(--text-muted);
+}
+
+.moon-phase__icon--new::after {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: var(--text-muted);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.moon-phase__icon--waxing-crescent::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: var(--bg-hover);
+    box-shadow: inset -12px 0 0 0 var(--text-headline);
+}
+
+.moon-phase__icon--first-quarter::before {
+    content: '';
+    position: absolute;
+    width: 50%;
+    height: 100%;
+    left: 50%;
+    border-radius: 0 50% 50% 0;
+    background: var(--text-headline);
+}
+
+.moon-phase__icon--waxing-gibbous::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: var(--text-headline);
+    clip-path: inset(0 15% 0 0);
+}
+
+.moon-phase__icon--full::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: var(--text-headline);
+}
+
+.moon-phase__icon--waning-gibbous::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: var(--text-headline);
+    clip-path: inset(0 0 0 15%);
+}
+
+.moon-phase__icon--last-quarter::before {
+    content: '';
+    position: absolute;
+    width: 50%;
+    height: 100%;
+    left: 0;
+    border-radius: 50% 0 0 50%;
+    background: var(--text-headline);
+}
+
+.moon-phase__icon--waning-crescent::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: var(--bg-hover);
+    box-shadow: inset 12px 0 0 0 var(--text-headline);
+}
+
+.moon-phase__label {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-family: var(--font-sans);
+    font-weight: 500;
+}
+
+.moon-phase__name {
+    font-size: 0.7rem;
+    color: var(--text-body);
+    text-align: center;
+    font-family: var(--font-sans);
+    line-height: 1.2;
+}
+
 /* Meeting List */
 .meeting-list {
     list-style: none;
@@ -837,7 +1479,60 @@ img {
 }
 
 .sponsor__icon {
-    font-size: 1.25rem;
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.sponsor__icon--anchor::before {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    top: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.sponsor__icon--anchor::after {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 6px;
+    background: currentColor;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: -3px 4px 0 currentColor, 3px 4px 0 currentColor;
+}
+
+.sponsor__icon--pin::before {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 8px solid currentColor;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.sponsor__icon--pin::after {
+    content: '';
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .sponsor__name {
@@ -904,7 +1599,7 @@ img {
    -------------------------------------------------------------------------- */
 @media (max-width: 900px) {
     .broadsheet {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 0.95fr 1fr;
     }
 
     .col--lead {
@@ -1065,6 +1760,144 @@ img {
     font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.popup-header__icon {
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.popup-header__icon--report::before {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.popup-header__icon--report::after {
+    content: '!';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: 700;
+    font-size: 9px;
+    line-height: 1;
+    font-family: var(--font-sans);
+}
+
+.popup-header__icon--phone::before {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 14px;
+    border: 2px solid currentColor;
+    border-radius: 2px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.popup-header__icon--phone::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 2px solid transparent;
+    border-right: 2px solid transparent;
+    border-top: 3px solid currentColor;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.popup-header__icon--library::before {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 10px;
+    border: 2px solid currentColor;
+    border-bottom: none;
+    top: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.popup-header__icon--library::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 8px;
+    border: 2px solid currentColor;
+    border-top: none;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: inset 0 -1px 0 currentColor;
+}
+
+.popup-header__icon--recycle::before {
+    content: '♻';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 14px;
+    line-height: 1;
+    opacity: 0.8;
+}
+
+.popup-header__icon--parking::before {
+    content: 'P';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: 700;
+    font-size: 11px;
+    line-height: 1;
+    width: 12px;
+    height: 12px;
+    border: 2px solid currentColor;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.popup-header__icon--transit::before {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 10px;
+    border: 2px solid currentColor;
+    border-radius: 2px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.popup-header__icon--transit::after {
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: currentColor;
+    top: 1px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 5px 0 currentColor;
+}
     margin: 0;
     color: var(--text-headline);
 }
@@ -1199,12 +2032,156 @@ img {
     color: var(--text-body);
     transition: all 0.15s ease;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
 }
 
 .quick-link:hover {
     background: var(--accent-primary);
     color: white;
     border-color: var(--accent-primary);
+}
+
+.quick-link__icon {
+    width: 14px;
+    height: 14px;
+    display: inline-block;
+    position: relative;
+    flex-shrink: 0;
+}
+
+/* Report Issue Icon */
+.quick-link__icon--report::before {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.quick-link__icon--report::after {
+    content: '!';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: 700;
+    font-size: 8px;
+    line-height: 1;
+    font-family: var(--font-sans);
+}
+
+/* Phone Icon */
+.quick-link__icon--phone::before {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 12px;
+    border: 2px solid currentColor;
+    border-radius: 2px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.quick-link__icon--phone::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 2px solid transparent;
+    border-right: 2px solid transparent;
+    border-top: 3px solid currentColor;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Library Icon */
+.quick-link__icon--library::before {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 8px;
+    border: 2px solid currentColor;
+    border-bottom: none;
+    top: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.quick-link__icon--library::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 6px;
+    border: 2px solid currentColor;
+    border-top: none;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: inset 0 -1px 0 currentColor;
+}
+
+/* Recycle Icon */
+.quick-link__icon--recycle::before {
+    content: '♻';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 12px;
+    line-height: 1;
+    opacity: 0.8;
+}
+
+/* Parking Icon */
+.quick-link__icon--parking::before {
+    content: 'P';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: 700;
+    font-size: 10px;
+    line-height: 1;
+    width: 10px;
+    height: 10px;
+    border: 2px solid currentColor;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Transit Icon */
+.quick-link__icon--transit::before {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 8px;
+    border: 2px solid currentColor;
+    border-radius: 2px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.quick-link__icon--transit::after {
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: currentColor;
+    top: 1px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 4px 0 currentColor;
 }
 
 /* Footer freshness timestamp */
