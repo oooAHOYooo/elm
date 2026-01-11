@@ -133,94 +133,9 @@
         }
     }
 
-    function createSunVisualization(container, phaseData) {
-        if (!container || typeof THREE === 'undefined') return;
-        
-        const width = container.clientWidth || 80;
-        const height = container.clientHeight || 80;
-        
-        // Clear existing canvas
-        container.innerHTML = '';
-        
-        // Create scene
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-        renderer.setSize(width, height);
-        renderer.setClearColor(0x000000, 0);
-        container.appendChild(renderer.domElement);
-        
-        // Create sun
-        const sunGeometry = new THREE.SphereGeometry(1, 32, 32);
-        const sunMaterial = new THREE.MeshBasicMaterial({ 
-            color: phaseData.phase === 'night' ? 0x444444 : 0xffaa00,
-            emissive: phaseData.phase === 'night' ? 0x000000 : 0xff6600,
-            emissiveIntensity: phaseData.phase === 'night' ? 0 : 0.5
-        });
-        const sun = new THREE.Mesh(sunGeometry, sunMaterial);
-        scene.add(sun);
-        
-        // Add glow effect for day phases
-        if (phaseData.phase !== 'night') {
-            const glowGeometry = new THREE.SphereGeometry(1.2, 32, 32);
-            const glowMaterial = new THREE.MeshBasicMaterial({
-                color: 0xffaa00,
-                transparent: true,
-                opacity: 0.3
-            });
-            const glow = new THREE.Mesh(glowGeometry, glowMaterial);
-            scene.add(glow);
-        }
-        
-        // Position sun based on phase angle
-        const angle = (phaseData.angle * Math.PI) / 180;
-        const radius = 2.5;
-        sun.position.x = Math.cos(angle) * radius;
-        sun.position.y = Math.sin(angle) * radius;
-        if (phaseData.phase === 'night') {
-            sun.position.y = -3; // Below horizon
-        }
-        
-        if (phaseData.phase !== 'night') {
-            const glow = scene.children.find(child => child !== sun);
-            if (glow) {
-                glow.position.x = sun.position.x;
-                glow.position.y = sun.position.y;
-            }
-        }
-        
-        // Add horizon line
-        const horizonGeometry = new THREE.PlaneGeometry(10, 0.1);
-        const horizonMaterial = new THREE.MeshBasicMaterial({ 
-            color: 0x666666,
-            transparent: true,
-            opacity: 0.5
-        });
-        const horizon = new THREE.Mesh(horizonGeometry, horizonMaterial);
-        horizon.position.y = -2.5;
-        horizon.rotation.x = Math.PI / 2;
-        scene.add(horizon);
-        
-        // Position camera
-        camera.position.z = 5;
-        camera.lookAt(0, 0, 0);
-        
-        // Animate
-        let animationId;
-        function animate() {
-            animationId = requestAnimationFrame(animate);
-            sun.rotation.y += 0.01;
-            if (glow) {
-                glow.rotation.y = sun.rotation.y;
-            }
-            renderer.render(scene, camera);
-        }
-        animate();
-        
-        // Store animation ID and scene for cleanup
-        container._animationId = animationId;
-        container._scene = scene;
-        container._renderer = renderer;
+    function setSunIcon(iconEl, phaseData) {
+        if (!iconEl) return;
+        iconEl.className = 'sun-phase__icon sun-phase__icon--' + phaseData.phase;
     }
 
     function updateSunPhases() {
@@ -231,33 +146,16 @@
         day3.setDate(day3.getDate() + 2);
 
         const phases = [
-            { date: today, canvasEl: document.getElementById('js-sun-today'), nameEl: document.getElementById('js-sun-name-today') },
-            { date: tomorrow, canvasEl: document.getElementById('js-sun-tomorrow'), nameEl: document.getElementById('js-sun-name-tomorrow') },
-            { date: day3, canvasEl: document.getElementById('js-sun-day3'), nameEl: document.getElementById('js-sun-name-day3') }
+            { date: today, iconEl: document.getElementById('js-sun-icon-today'), nameEl: document.getElementById('js-sun-name-today') },
+            { date: tomorrow, iconEl: document.getElementById('js-sun-icon-tomorrow'), nameEl: document.getElementById('js-sun-name-tomorrow') },
+            { date: day3, iconEl: document.getElementById('js-sun-icon-day3'), nameEl: document.getElementById('js-sun-name-day3') }
         ];
 
-        phases.forEach(({ date, canvasEl, nameEl }) => {
-            if (!canvasEl || !nameEl) return;
-            
-            // Clean up previous animation if exists
-            if (canvasEl._animationId) {
-                cancelAnimationFrame(canvasEl._animationId);
-            }
-            
+        phases.forEach(({ date, iconEl, nameEl }) => {
+            if (!nameEl) return;
             const phaseData = getSunPhase(date);
             nameEl.textContent = phaseData.name;
-            
-            // Wait for Three.js to be available
-            if (typeof THREE !== 'undefined') {
-                createSunVisualization(canvasEl, phaseData);
-            } else {
-                // Retry after a short delay if Three.js isn't loaded yet
-                setTimeout(() => {
-                    if (typeof THREE !== 'undefined') {
-                        createSunVisualization(canvasEl, phaseData);
-                    }
-                }, 100);
-            }
+            setSunIcon(iconEl, phaseData);
         });
 
         // Update day 3 label
@@ -268,13 +166,11 @@
         }
     }
 
-    // Wait for DOM and Three.js to be ready
+    // Wait for DOM to be ready
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(updateSunPhases, 200);
-        });
+        document.addEventListener('DOMContentLoaded', () => setTimeout(updateSunPhases, 50));
     } else {
-        setTimeout(updateSunPhases, 200);
+        setTimeout(updateSunPhases, 50);
     }
 
     // ==========================================================================

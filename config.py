@@ -1,5 +1,6 @@
 import os
 from typing import List
+from datetime import timedelta
 
 
 def _get_bool(env_key: str, default: bool = False) -> bool:
@@ -39,5 +40,7 @@ class Config:
 
     # Flask
     DEBUG: bool = _get_bool("FLASK_DEBUG", False)
+    # Cache static assets (CSS/JS/images) for faster repeat loads
+    SEND_FILE_MAX_AGE_DEFAULT = timedelta(days=7)
 
 

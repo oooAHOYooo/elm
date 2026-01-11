@@ -1,0 +1,232 @@
+{
+  "neighborhoods": [
+    {
+      "name": "East Rock",
+      "kicker": "Coffee, corner stores, and late-night bites",
+      "businesses": [
+        {
+          "name": "Sample Café",
+          "category": "Coffee",
+          "status": "open",
+          "today": "7a–3p",
+          "address": "123 Orange St",
+          "phone": "(203) 555-0101",
+          "source": "Business website",
+          "week": [
+            { "day": "Mon", "hours": "7a–3p" },
+            { "day": "Tue", "hours": "7a–3p" },
+            { "day": "Wed", "hours": "7a–3p" },
+            { "day": "Thu", "hours": "7a–3p" },
+            { "day": "Fri", "hours": "7a–4p" },
+            { "day": "Sat", "hours": "8a–4p" },
+            { "day": "Sun", "hours": "8a–2p" }
+          ]
+        },
+        {
+          "name": "Sample Market",
+          "category": "Groceries",
+          "status": "open",
+          "today": "8a–9p",
+          "address": "45 State St",
+          "phone": "(203) 555-0133",
+          "source": "Google Business Profile",
+          "week": [
+            { "day": "Mon", "hours": "8a–9p" },
+            { "day": "Tue", "hours": "8a–9p" },
+            { "day": "Wed", "hours": "8a–9p" },
+            { "day": "Thu", "hours": "8a–9p" },
+            { "day": "Fri", "hours": "8a–10p" },
+            { "day": "Sat", "hours": "8a–10p" },
+            { "day": "Sun", "hours": "9a–8p" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Wooster Square",
+      "kicker": "Slices, parks, and neighborhood staples",
+      "businesses": [
+        {
+          "name": "Sample Pizzeria",
+          "category": "Food",
+          "status": "open",
+          "today": "11a–10p",
+          "address": "9 Wooster Pl",
+          "phone": "(203) 555-0199",
+          "source": "Phone call",
+          "week": [
+            { "day": "Mon", "hours": "11a–10p" },
+            { "day": "Tue", "hours": "11a–10p" },
+            { "day": "Wed", "hours": "11a–10p" },
+            { "day": "Thu", "hours": "11a–10p" },
+            { "day": "Fri", "hours": "11a–11p" },
+            { "day": "Sat", "hours": "11a–11p" },
+            { "day": "Sun", "hours": "12p–9p" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Ninth Square",
+      "kicker": "Downtown blocks: bars, bookstores, dinner",
+      "businesses": [
+        {
+          "name": "Koffee?",
+          "category": "Coffee",
+          "status": "open",
+          "today": "7a–8p",
+          "address": "104 Audubon St, New Haven, CT 06511",
+          "phone": "(203) 465-6244",
+          "source": "Business website",
+          "week": [
+            { "day": "Mon", "hours": "7a–8p" },
+            { "day": "Tue", "hours": "7a–8p" },
+            { "day": "Wed", "hours": "7a–8p" },
+            { "day": "Thu", "hours": "7a–8p" },
+            { "day": "Fri", "hours": "7a–8p" },
+            { "day": "Sat", "hours": "7a–8p" },
+            { "day": "Sun", "hours": "7a–8p" }
+          ]
+        },
+        {
+          "name": "Three Sheets",
+          "category": "Bar",
+          "status": "open",
+          "today": "Open · closes 12a",
+          "address": "372 Elm St, New Haven, CT 06511",
+          "phone": "(475) 202-6909",
+          "source": "Provided by user (verify weekly hours)",
+          "week": [
+            { "day": "Mon", "hours": "Verify" },
+            { "day": "Tue", "hours": "Verify" },
+            { "day": "Wed", "hours": "Verify" },
+            { "day": "Thu", "hours": "Verify" },
+            { "day": "Fri", "hours": "Verify" },
+            { "day": "Sat", "hours": "Verify" },
+            { "day": "Sun", "hours": "Verify" }
+          ]
+        },
+        {
+          "name": "Cafe Nine",
+          "category": "Live music",
+          "status": "open",
+          "today": "5p–1a",
+          "address": "250 State St, New Haven, CT 06510",
+          "phone": "(203) 800-4623",
+          "source": "Provided by user (verify as needed)",
+          "week": [
+            { "day": "Mon", "hours": "5p–1a" },
+            { "day": "Tue", "hours": "5p–1a" },
+            { "day": "Wed", "hours": "5p–1a" },
+            { "day": "Thu", "hours": "5p–1a" },
+            { "day": "Fri", "hours": "5p–2a" },
+            { "day": "Sat", "hours": "5p–2a" },
+            { "day": "Sun", "hours": "4p–1a" }
+          ]
+        },
+        {
+          "name": "Ordinary",
+          "category": "Cocktail bar",
+          "status": "open",
+          "today": "5p–12a",
+          "address": "990 Chapel St, New Haven, CT 06510",
+          "phone": "(203) 907-0238",
+          "source": "Provided by user (verify as needed)",
+          "week": [
+            { "day": "Mon", "hours": "Closed" },
+            { "day": "Tue", "hours": "5p–12a" },
+            { "day": "Wed", "hours": "5p–12a" },
+            { "day": "Thu", "hours": "5p–12a" },
+            { "day": "Fri", "hours": "5p–1a" },
+            { "day": "Sat", "hours": "5p–1a" },
+            { "day": "Sun", "hours": "Closed" }
+          ]
+        },
+        {
+          "name": "Sample Bookshop",
+          "category": "Retail",
+          "status": "closed",
+          "today": "10a–6p",
+          "address": "100 Crown St",
+          "phone": "(203) 555-0120",
+          "source": "Storefront sign",
+          "week": [
+            { "day": "Mon", "hours": "10a–6p" },
+            { "day": "Tue", "hours": "10a–6p" },
+            { "day": "Wed", "hours": "10a–6p" },
+            { "day": "Thu", "hours": "10a–8p" },
+            { "day": "Fri", "hours": "10a–8p" },
+            { "day": "Sat", "hours": "10a–6p" },
+            { "day": "Sun", "hours": "12p–5p" }
+          ]
+        },
+        {
+          "name": "Sample Bar",
+          "category": "Bar",
+          "status": "open",
+          "today": "4p–1a",
+          "address": "77 Temple St",
+          "phone": "(203) 555-0117",
+          "source": "Business website",
+          "week": [
+            { "day": "Mon", "hours": "4p–12a" },
+            { "day": "Tue", "hours": "4p–12a" },
+            { "day": "Wed", "hours": "4p–12a" },
+            { "day": "Thu", "hours": "4p–1a" },
+            { "day": "Fri", "hours": "4p–1a" },
+            { "day": "Sat", "hours": "2p–1a" },
+            { "day": "Sun", "hours": "2p–10p" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Westville",
+      "kicker": "Independent shops and weekend errands",
+      "businesses": [
+        {
+          "name": "Sample Florist",
+          "category": "Services",
+          "status": "open",
+          "today": "9a–5p",
+          "address": "12 Whalley Ave",
+          "phone": "(203) 555-0166",
+          "source": "Google Business Profile",
+          "week": [
+            { "day": "Mon", "hours": "9a–5p" },
+            { "day": "Tue", "hours": "9a–5p" },
+            { "day": "Wed", "hours": "9a–5p" },
+            { "day": "Thu", "hours": "9a–5p" },
+            { "day": "Fri", "hours": "9a–5p" },
+            { "day": "Sat", "hours": "10a–4p" },
+            { "day": "Sun", "hours": "Closed" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fair Haven",
+      "kicker": "Bakeries, markets, and community hubs",
+      "businesses": [
+        {
+          "name": "Sample Bakery",
+          "category": "Food",
+          "status": "open",
+          "today": "6a–2p",
+          "address": "200 Grand Ave",
+          "phone": "(203) 555-0144",
+          "source": "Storefront sign",
+          "week": [
+            { "day": "Mon", "hours": "6a–2p" },
+            { "day": "Tue", "hours": "6a–2p" },
+            { "day": "Wed", "hours": "6a–2p" },
+            { "day": "Thu", "hours": "6a–2p" },
+            { "day": "Fri", "hours": "6a–3p" },
+            { "day": "Sat", "hours": "7a–3p" },
+            { "day": "Sun", "hours": "7a–1p" }
+          ]
+        }
+      ]
+    }
+  ]
+}
