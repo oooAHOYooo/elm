@@ -19,11 +19,15 @@ from services import nws as nws_service
 from services import tides as tides_service
 from services import air_quality as aqi_service
 from feeds.aggregator import aggregate_all
+from utils.cache import TTLCache
 
 load_dotenv()
 
 # Thread pool for parallel API calls - increased workers for faster loading
 _executor = ThreadPoolExecutor(max_workers=8)
+
+# Short-lived HTML cache for the homepage. Keeps reloads snappy without changing features.
+_index_html_cache = TTLCache(ttl_seconds=25)
 
 
 def _sample_hours_neighborhoods() -> List[Dict[str, Any]]:
@@ -261,6 +265,19 @@ def create_app() -> Flask:
 
     @app.route("/")
     def index():
+        # Allow explicit bypass (e.g., Refresh button sets ?fresh=1)
+        if request.args.get("fresh") == "1":
+            try:
+                _index_html_cache.clear()
+            except Exception:
+                pass
+        else:
+            cached_html = _index_html_cache.get("index_html")
+            if cached_html:
+                resp = Response(cached_html, mimetype="text/html")
+                resp.headers["X-Elm-Cache"] = "HIT"
+                return resp
+
         tz = ZoneInfo("America/New_York")
         today = datetime.now(tz)
         date_str = today.strftime("%A, %B %d, %Y")
@@ -455,7 +472,7 @@ def create_app() -> Flask:
             if weather.get("sunset"):
                 weather["sunset"] = format_sun_time(weather["sunset"])
         
-        return render_template(
+        html = render_template(
             "index.html",
             app_name=app.config["APP_NAME"],
             date_str=date_str,
@@ -470,6 +487,10 @@ def create_app() -> Flask:
             week_start_date=week_start_date,
             hours_all=_sample_hours_neighborhoods(),
         )
+        _index_html_cache.set("index_html", html)
+        resp = Response(html, mimetype="text/html")
+        resp.headers["X-Elm-Cache"] = "MISS"
+        return resp
 
     @app.route("/about")
     def about():

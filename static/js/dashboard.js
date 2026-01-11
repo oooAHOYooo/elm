@@ -941,7 +941,14 @@
     const refreshBtn = document.getElementById('js-refresh');
     if (refreshBtn) {
         refreshBtn.addEventListener('click', () => {
-            window.location.reload();
+            // Bypass server-side HTML cache for an explicit "fresh" reload
+            try {
+                const url = new URL(window.location.href);
+                url.searchParams.set('fresh', '1');
+                window.location.href = url.toString();
+            } catch (e) {
+                window.location.reload();
+            }
         });
     }
 
