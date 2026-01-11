@@ -1457,30 +1457,84 @@ img {
 .sun-phase__icon {
     width: 80px;
     height: 80px;
-    border-radius: 50%;
-    border: 2px solid var(--border-light);
+    border-radius: 6px;
+    border: 1px solid var(--border-light);
     position: relative;
     overflow: hidden;
     flex-shrink: 0;
-    background: radial-gradient(circle at 30% 30%, rgba(255, 196, 0, 0.95), rgba(255, 126, 0, 0.85));
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    background: var(--bg-card);
+    box-shadow: none;
 }
 
 .sun-phase__icon--night {
-    background: radial-gradient(circle at 30% 30%, rgba(120, 120, 120, 0.8), rgba(50, 50, 50, 0.9));
+    background: var(--bg-card);
 }
 
 .sun-phase__icon--sunrise {
-    background: linear-gradient(180deg, rgba(255, 214, 102, 0.95), rgba(255, 126, 0, 0.8));
+    background: var(--bg-card);
 }
 
 .sun-phase__icon--sunset {
-    background: linear-gradient(180deg, rgba(255, 140, 90, 0.95), rgba(120, 70, 140, 0.85));
+    background: var(--bg-card);
 }
 
 .sun-phase__icon--day {
-    background: radial-gradient(circle at 30% 30%, rgba(255, 223, 102, 0.95), rgba(255, 140, 0, 0.85));
+    background: var(--bg-card);
 }
+
+/* Sun phases: make these look like "mini charts" (same visual language as tide chart cards) */
+.sun-phase__icon::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(to right, rgba(0,0,0,0.04) 1px, transparent 1px) 0 0 / 20px 20px,
+        linear-gradient(to bottom, rgba(0,0,0,0.04) 1px, transparent 1px) 0 0 / 20px 20px;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.sun-phase__icon::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: #ffb000;
+    box-shadow: 0 0 0 2px rgba(255, 176, 0, 0.22);
+    left: 50%;
+    top: 20%;
+    transform: translate(-50%, -50%);
+}
+
+.sun-phase__icon--night::after {
+    background: #777;
+    box-shadow: 0 0 0 2px rgba(120, 120, 120, 0.22);
+    top: 78%;
+}
+
+.sun-phase__icon--sunrise::after {
+    left: 26%;
+    top: 62%;
+    background: #ffb000;
+}
+
+.sun-phase__icon--day::after {
+    left: 50%;
+    top: 26%;
+    background: #ffcc33;
+}
+
+.sun-phase__icon--sunset::after {
+    left: 74%;
+    top: 62%;
+    background: #ff8a3d;
+}
+
+.sun-phase__icon .sun-phase__horizon {
+    display: none;
+}
+
 
 .sun-phase__label {
     font-size: 0.65rem;

@@ -421,6 +421,9 @@
                                     </span>
                                 </summary>
                                 <div class="biz__details">
+                                    {% if b.description %}
+                                    <p class="biz__desc">{{ b.description }}</p>
+                                    {% endif %}
                                     <div class="biz__grid">
                                         <div>
                                             <h4 class="section-head">Weekly
@@ -445,9 +448,6 @@
                                             <p
                                                 class="hours-note"><strong>Phone:</strong>
                                                 {{ b.phone }}</p>
-                                            <p
-                                                class="hours-note"><strong>Source:</strong>
-                                                {{ b.source }}</p>
                                         </div>
                                     </div>
                                 </div>

@@ -11,7 +11,7 @@
           "today": "7a–3p",
           "address": "123 Orange St",
           "phone": "(203) 555-0101",
-          "source": "Business website",
+          "description": "Neighborhood coffee counter with espresso and simple pastries.",
           "week": [
             { "day": "Mon", "hours": "7a–3p" },
             { "day": "Tue", "hours": "7a–3p" },
@@ -29,7 +29,7 @@
           "today": "8a–9p",
           "address": "45 State St",
           "phone": "(203) 555-0133",
-          "source": "Google Business Profile",
+          "description": "Small neighborhood market for quick staples and snacks.",
           "week": [
             { "day": "Mon", "hours": "8a–9p" },
             { "day": "Tue", "hours": "8a–9p" },
@@ -53,7 +53,7 @@
           "today": "11a–10p",
           "address": "9 Wooster Pl",
           "phone": "(203) 555-0199",
-          "source": "Phone call",
+          "description": "Local slice shop with pies, salads, and a steady lunch rush.",
           "week": [
             { "day": "Mon", "hours": "11a–10p" },
             { "day": "Tue", "hours": "11a–10p" },
@@ -77,7 +77,7 @@
           "today": "11a–1a",
           "address": "268 College St, New Haven, CT 06510",
           "phone": "(203) 624-3250",
-          "source": "Provided by user (verify as needed)",
+          "description": "Old-school tobacconist and lounge with cocktails and small bites.",
           "week": [
             { "day": "Mon", "hours": "4p–1a" },
             { "day": "Tue", "hours": "11a–1a" },
@@ -95,7 +95,7 @@
           "today": "7a–8p",
           "address": "104 Audubon St, New Haven, CT 06511",
           "phone": "(203) 465-6244",
-          "source": "Business website",
+          "description": "Fair-trade brews, housemade pastries, and sandwiches in a brick-walled space.",
           "week": [
             { "day": "Mon", "hours": "7a–8p" },
             { "day": "Tue", "hours": "7a–8p" },
@@ -113,15 +113,15 @@
           "today": "Open · closes 12a",
           "address": "372 Elm St, New Haven, CT 06511",
           "phone": "(475) 202-6909",
-          "source": "Provided by user (verify weekly hours)",
+          "description": "Lively local bar for cocktails and a bite—often with music on the calendar.",
           "week": [
-            { "day": "Mon", "hours": "Verify" },
-            { "day": "Tue", "hours": "Verify" },
-            { "day": "Wed", "hours": "Verify" },
-            { "day": "Thu", "hours": "Verify" },
-            { "day": "Fri", "hours": "Verify" },
-            { "day": "Sat", "hours": "Verify" },
-            { "day": "Sun", "hours": "Verify" }
+            { "day": "Mon", "hours": "—" },
+            { "day": "Tue", "hours": "—" },
+            { "day": "Wed", "hours": "—" },
+            { "day": "Thu", "hours": "—" },
+            { "day": "Fri", "hours": "—" },
+            { "day": "Sat", "hours": "—" },
+            { "day": "Sun", "hours": "—" }
           ]
         },
         {
@@ -131,7 +131,7 @@
           "today": "5p–1a",
           "address": "250 State St, New Haven, CT 06510",
           "phone": "(203) 800-4623",
-          "source": "Provided by user (verify as needed)",
+          "description": "High-energy room with a full bar plus regular live music and comedy.",
           "week": [
             { "day": "Mon", "hours": "5p–1a" },
             { "day": "Tue", "hours": "5p–1a" },
@@ -149,7 +149,7 @@
           "today": "5p–12a",
           "address": "990 Chapel St, New Haven, CT 06510",
           "phone": "(203) 907-0238",
-          "source": "Provided by user (verify as needed)",
+          "description": "Dark-wood cocktail haunt serving charcuterie and cheese boards.",
           "week": [
             { "day": "Mon", "hours": "Closed" },
             { "day": "Tue", "hours": "5p–12a" },
@@ -167,7 +167,7 @@
           "today": "10a–6p",
           "address": "100 Crown St",
           "phone": "(203) 555-0120",
-          "source": "Storefront sign",
+          "description": "Independent bookshop for browsing, gifts, and weekend pickups.",
           "week": [
             { "day": "Mon", "hours": "10a–6p" },
             { "day": "Tue", "hours": "10a–6p" },
@@ -185,7 +185,7 @@
           "today": "4p–1a",
           "address": "77 Temple St",
           "phone": "(203) 555-0117",
-          "source": "Business website",
+          "description": "Late-night neighborhood bar with a small rotating menu and cocktails.",
           "week": [
             { "day": "Mon", "hours": "4p–12a" },
             { "day": "Tue", "hours": "4p–12a" },
@@ -209,7 +209,7 @@
           "today": "9a–5p",
           "address": "12 Whalley Ave",
           "phone": "(203) 555-0166",
-          "source": "Google Business Profile",
+          "description": "Florals and simple gifts—good for last-minute errands.",
           "week": [
             { "day": "Mon", "hours": "9a–5p" },
             { "day": "Tue", "hours": "9a–5p" },
@@ -218,30 +218,6 @@
             { "day": "Fri", "hours": "9a–5p" },
             { "day": "Sat", "hours": "10a–4p" },
             { "day": "Sun", "hours": "Closed" }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Fair Haven",
-      "kicker": "Bakeries, markets, and community hubs",
-      "businesses": [
-        {
-          "name": "Sample Bakery",
-          "category": "Food",
-          "status": "open",
-          "today": "6a–2p",
-          "address": "200 Grand Ave",
-          "phone": "(203) 555-0144",
-          "source": "Storefront sign",
-          "week": [
-            { "day": "Mon", "hours": "6a–2p" },
-            { "day": "Tue", "hours": "6a–2p" },
-            { "day": "Wed", "hours": "6a–2p" },
-            { "day": "Thu", "hours": "6a–2p" },
-            { "day": "Fri", "hours": "6a–3p" },
-            { "day": "Sat", "hours": "7a–3p" },
-            { "day": "Sun", "hours": "7a–1p" }
           ]
         }
       ]
