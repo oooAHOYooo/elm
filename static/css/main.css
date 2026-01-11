@@ -236,7 +236,7 @@ img {
     top: 0;
     left: 50%;
     transform: translateX(-50%);
-    box-shadow: 
+    box-shadow:
         0 14px 0 currentColor,
         4px 4px 0 currentColor,
         8px 7px 0 currentColor,
@@ -912,11 +912,11 @@ img {
     .boat-traffic__grid {
         grid-template-columns: 1fr;
     }
-    
+
     .tide-chart__svg {
         height: 100px;
     }
-    
+
     .tide-chart__labels {
         height: 35px;
     }
@@ -1463,7 +1463,7 @@ img {
     overflow: hidden;
     flex-shrink: 0;
     background: radial-gradient(circle at 30% 30%, rgba(255, 196, 0, 0.95), rgba(255, 126, 0, 0.85));
-    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
 }
 
 .sun-phase__icon--night {

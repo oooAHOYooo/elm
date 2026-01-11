@@ -71,6 +71,24 @@
       "kicker": "Downtown blocks: bars, bookstores, dinner",
       "businesses": [
         {
+          "name": "The Owl Shop",
+          "category": "Cigar bar",
+          "status": "open",
+          "today": "11a–1a",
+          "address": "268 College St, New Haven, CT 06510",
+          "phone": "(203) 624-3250",
+          "source": "Provided by user (verify as needed)",
+          "week": [
+            { "day": "Mon", "hours": "4p–1a" },
+            { "day": "Tue", "hours": "11a–1a" },
+            { "day": "Wed", "hours": "11a–1a" },
+            { "day": "Thu", "hours": "11a–1a" },
+            { "day": "Fri", "hours": "11a–2a" },
+            { "day": "Sat", "hours": "11a–2a" },
+            { "day": "Sun", "hours": "12p–1a" }
+          ]
+        },
+        {
           "name": "Koffee?",
           "category": "Coffee",
           "status": "open",
