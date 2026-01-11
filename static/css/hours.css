@@ -1,0 +1,347 @@
+/* ==========================================================================
+   ELM CITY DAILY — HOURS DESK (Neighborhood Directory)
+   Compact, newspaper-style hours layout (no JS required)
+   ========================================================================== */
+
+.hours-page {
+    margin-top: var(--space-md);
+}
+
+.hours-home {
+    margin-top: var(--space-2xl);
+    padding-top: var(--space-lg);
+    border-top: 4px solid var(--border-rule);
+}
+
+.hours-home__details {
+    margin-top: var(--space-md);
+}
+
+.hours-home__summary {
+    cursor: pointer;
+    font-family: var(--font-sans);
+    font-size: 0.85rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-body);
+    padding: 10px 12px;
+    border: 1px solid var(--border-light);
+    border-radius: 10px;
+    background: var(--bg-paper);
+    position: relative;
+}
+
+.hours-home__details:not([open]) .hours-home__summary {
+    border-color: rgba(139, 69, 19, 0.45); /* accent-primary-ish */
+    box-shadow:
+        0 0 0 1px rgba(139, 69, 19, 0.15),
+        0 0 18px rgba(139, 69, 19, 0.18);
+    animation: hoursPulse 2.2s ease-in-out infinite;
+}
+
+.hours-home__details[open] .hours-home__summary {
+    animation: none;
+    box-shadow: none;
+    border-color: var(--border-light);
+}
+
+@keyframes hoursPulse {
+    0%, 100% {
+        box-shadow:
+            0 0 0 1px rgba(139, 69, 19, 0.12),
+            0 0 14px rgba(139, 69, 19, 0.14);
+    }
+    50% {
+        box-shadow:
+            0 0 0 1px rgba(139, 69, 19, 0.22),
+            0 0 26px rgba(139, 69, 19, 0.26);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hours-home__details:not([open]) .hours-home__summary {
+        animation: none;
+    }
+}
+
+.hours-home__summary:hover {
+    background: var(--bg-hover);
+}
+
+.hours-kicker {
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin: var(--space-xs) 0 var(--space-md);
+    text-align: center;
+}
+
+.hours-layout {
+    display: grid;
+    grid-template-columns: 0.95fr 1.9fr 0.95fr;
+    gap: var(--column-gap);
+}
+
+@media (max-width: 900px) {
+    .hours-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+.hours-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    padding: var(--space-md);
+}
+
+.hours-controls {
+    display: grid;
+    gap: var(--space-sm);
+}
+
+.hours-search {
+    display: grid;
+    gap: 4px;
+}
+
+.hours-search label {
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.hours-search input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
+    background: var(--bg-paper);
+    color: var(--text-body);
+    font-family: var(--font-sans);
+}
+
+.hours-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.hours-chip {
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    padding: 6px 10px;
+    border: 1px solid var(--border-light);
+    border-radius: 999px;
+    color: var(--text-body);
+    background: var(--bg-paper);
+    white-space: nowrap;
+}
+
+.hours-chip--strong {
+    border-color: var(--border-rule);
+}
+
+.hours-note {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+}
+
+.hours-sections {
+    display: grid;
+    gap: var(--space-md);
+}
+
+.hours-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.hours-section summary {
+    list-style: none;
+    cursor: pointer;
+    padding: var(--space-md);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--space-md);
+    align-items: center;
+    background: linear-gradient(180deg, rgba(0,0,0,0.02), transparent);
+}
+
+.hours-section summary::-webkit-details-marker {
+    display: none;
+}
+
+.hours-section__title {
+    display: grid;
+    gap: 2px;
+}
+
+.hours-section__name {
+    font-family: var(--font-display);
+    color: var(--text-headline);
+    font-size: 1.15rem;
+    letter-spacing: 0.02em;
+}
+
+.hours-section__dek {
+    font-family: var(--font-sans);
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.hours-section__meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-end;
+    font-family: var(--font-sans);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.hours-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border-light);
+    background: var(--bg-paper);
+    color: var(--text-body);
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+.hours-pill--open {
+    border-color: rgba(46, 125, 50, 0.35);
+}
+
+.hours-pill--closed {
+    border-color: rgba(198, 40, 40, 0.35);
+}
+
+.hours-list {
+    border-top: 1px solid var(--border-light);
+    padding: var(--space-sm) var(--space-md);
+    display: grid;
+    gap: 6px;
+}
+
+.biz {
+    border-radius: 8px;
+    border: 1px solid transparent;
+}
+
+.biz[open] {
+    border-color: var(--border-light);
+    background: var(--bg-paper);
+}
+
+.biz summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 10px 10px;
+    display: grid;
+    grid-template-columns: 1.2fr 0.9fr auto;
+    gap: 10px;
+    align-items: baseline;
+}
+
+.biz summary::-webkit-details-marker {
+    display: none;
+}
+
+.biz__name {
+    font-family: var(--font-body);
+    font-weight: 600;
+    color: var(--text-headline);
+}
+
+.biz__today {
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.biz__badges {
+    display: inline-flex;
+    gap: 6px;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.biz__badge {
+    font-family: var(--font-sans);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 5px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border-light);
+    color: var(--text-body);
+    background: transparent;
+}
+
+.biz__badge--open {
+    color: rgb(46, 125, 50);
+    border-color: rgba(46, 125, 50, 0.35);
+}
+
+.biz__badge--closed {
+    color: rgb(198, 40, 40);
+    border-color: rgba(198, 40, 40, 0.35);
+}
+
+.biz__details {
+    padding: 0 10px 12px;
+    color: var(--text-body);
+    font-size: 0.95rem;
+    display: grid;
+    gap: 10px;
+}
+
+.biz__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+@media (max-width: 900px) {
+    .biz summary {
+        grid-template-columns: 1fr;
+        gap: 4px;
+    }
+    .biz__badges {
+        justify-content: flex-start;
+    }
+    .biz__grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.biz__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+}
+
+.biz__table td {
+    padding: 6px 0;
+    border-bottom: 1px dotted var(--border-light);
+}
+
+.biz__table td:first-child {
+    color: var(--text-muted);
+    width: 90px;
+    padding-right: 10px;
+}
+

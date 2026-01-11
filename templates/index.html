@@ -1,4 +1,8 @@
 {% extends "base.html" %}
+{% block head_extra %}
+<link rel="stylesheet"
+    href="{{ url_for('static', filename='css/hours.css') }}" />
+{% endblock %}
 {% block content %}
 <div class="newspaper" id="js-fit">
     <!-- Masthead -->
@@ -9,6 +13,8 @@
             <time class="masthead__date">{{ date_str }}</time>
             <span class="masthead__separator">·</span>
             <span class="masthead__tagline">Your Daily Civic Digest</span>
+            <span class="masthead__separator">·</span>
+            <a href="#hours">Hours</a>
             <button class="masthead__theme" id="js-dark-toggle" type="button"
                 aria-label="Toggle theme">
                 <span id="js-theme-icon" class="theme-icon"></span>
@@ -27,11 +33,13 @@
                     <div class="weather-ticker">
                         <div class="weather-ticker__label">New Haven</div>
                         <div class="weather-ticker__temp" id="js-temp">
-                            {% if weather and weather.current_temp is not none %}
+                            {% if weather and weather.current_temp is not none
+                            %}
                             {{ weather.current_temp|round|int }}°
                             {% else %}--{% endif %}
                         </div>
-                        <div class="weather-ticker__clock" id="js-clock">--:--:--</div>
+                        <div class="weather-ticker__clock"
+                            id="js-clock">--:--:--</div>
                     </div>
                     <div class="weather-hero__desc">
                         {{ weather.weather_desc if weather else 'Loading...' }}
@@ -220,22 +228,29 @@
                     <div class="moon-phase">
                         <div class="moon-phase__icon" id="js-moon-today"></div>
                         <div class="moon-phase__label">Today</div>
-                        <div class="moon-phase__name" id="js-moon-name-today">--</div>
+                        <div class="moon-phase__name"
+                            id="js-moon-name-today">--</div>
                     </div>
                     <div class="moon-phase">
                         <div class="moon-phase__icon" id="js-moon-day3"></div>
-                        <div class="moon-phase__label" id="js-moon-label-day3">+3 days</div>
-                        <div class="moon-phase__name" id="js-moon-name-day3">--</div>
+                        <div class="moon-phase__label"
+                            id="js-moon-label-day3">+3 days</div>
+                        <div class="moon-phase__name"
+                            id="js-moon-name-day3">--</div>
                     </div>
                     <div class="moon-phase">
                         <div class="moon-phase__icon" id="js-moon-day7"></div>
-                        <div class="moon-phase__label" id="js-moon-label-day7">+7 days</div>
-                        <div class="moon-phase__name" id="js-moon-name-day7">--</div>
+                        <div class="moon-phase__label"
+                            id="js-moon-label-day7">+7 days</div>
+                        <div class="moon-phase__name"
+                            id="js-moon-name-day7">--</div>
                     </div>
                     <div class="moon-phase">
                         <div class="moon-phase__icon" id="js-moon-day14"></div>
-                        <div class="moon-phase__label" id="js-moon-label-day14">+14 days</div>
-                        <div class="moon-phase__name" id="js-moon-name-day14">--</div>
+                        <div class="moon-phase__label"
+                            id="js-moon-label-day14">+14 days</div>
+                        <div class="moon-phase__name"
+                            id="js-moon-name-day14">--</div>
                     </div>
                 </div>
             </article>
@@ -247,17 +262,22 @@
                     <div class="sun-phase">
                         <div class="sun-phase__canvas" id="js-sun-today"></div>
                         <div class="sun-phase__label">Today</div>
-                        <div class="sun-phase__name" id="js-sun-name-today">--</div>
+                        <div class="sun-phase__name"
+                            id="js-sun-name-today">--</div>
                     </div>
                     <div class="sun-phase">
-                        <div class="sun-phase__canvas" id="js-sun-tomorrow"></div>
+                        <div class="sun-phase__canvas"
+                            id="js-sun-tomorrow"></div>
                         <div class="sun-phase__label">Tomorrow</div>
-                        <div class="sun-phase__name" id="js-sun-name-tomorrow">--</div>
+                        <div class="sun-phase__name"
+                            id="js-sun-name-tomorrow">--</div>
                     </div>
                     <div class="sun-phase">
                         <div class="sun-phase__canvas" id="js-sun-day3"></div>
-                        <div class="sun-phase__label" id="js-sun-label-day3">Day 3</div>
-                        <div class="sun-phase__name" id="js-sun-name-day3">--</div>
+                        <div class="sun-phase__label" id="js-sun-label-day3">Day
+                            3</div>
+                        <div class="sun-phase__name"
+                            id="js-sun-name-day3">--</div>
                     </div>
                 </div>
             </article>
@@ -286,22 +306,28 @@
                 <h2 class="section-head">Quick Links</h2>
                 <div class="quick-links">
                     <button class="quick-link" data-popup="seeclickfix">
-                        <span class="quick-link__icon quick-link__icon--report"></span>
+                        <span
+                            class="quick-link__icon quick-link__icon--report"></span>
                         Report Issue</button>
                     <button class="quick-link" data-popup="cityhall">
-                        <span class="quick-link__icon quick-link__icon--phone"></span>
+                        <span
+                            class="quick-link__icon quick-link__icon--phone"></span>
                         City Hall</button>
                     <button class="quick-link" data-popup="library">
-                        <span class="quick-link__icon quick-link__icon--library"></span>
+                        <span
+                            class="quick-link__icon quick-link__icon--library"></span>
                         Library</button>
                     <button class="quick-link" data-popup="recycling">
-                        <span class="quick-link__icon quick-link__icon--recycle"></span>
+                        <span
+                            class="quick-link__icon quick-link__icon--recycle"></span>
                         Recycling</button>
                     <button class="quick-link" data-popup="parking">
-                        <span class="quick-link__icon quick-link__icon--parking"></span>
+                        <span
+                            class="quick-link__icon quick-link__icon--parking"></span>
                         Parking</button>
                     <button class="quick-link" data-popup="transit">
-                        <span class="quick-link__icon quick-link__icon--transit"></span>
+                        <span
+                            class="quick-link__icon quick-link__icon--transit"></span>
                         Transit</button>
                 </div>
             </article>
@@ -333,6 +359,114 @@
         </section>
     </main>
 
+    <!-- Hours Directory (Pull-out Supplement) -->
+    {% if hours_all %}
+    <section class="hours-home" id="hours" aria-label="Hours Directory">
+        <h2 class="section-head section-head--large">Hours Directory</h2>
+        <p class="hours-kicker">A pull-out neighborhood directory — expand
+            sections to browse without leaving the front page.</p>
+        <details class="hours-home__details">
+            <summary class="hours-home__summary">Open the Hours
+                Directory</summary>
+            <div class="hours-layout"
+                aria-label="Business hours by neighborhood">
+                <aside class="hours-card" aria-label="Hours tools">
+                    <h3 class="section-head">Browse</h3>
+                    <p class="hours-note">
+                        Neighborhoods are “sections.” Rows show <strong>today’s
+                            hours</strong>; expand for the weekly table.
+                    </p>
+                </aside>
+
+                <section class="hours-sections"
+                    aria-label="Neighborhood sections">
+                    {% for n in hours_all %}
+                    <details class="hours-section" {% if loop.index <=2 %}open{%
+                        endif %}>
+                        <summary>
+                            <div class="hours-section__title">
+                                <div class="hours-section__name">{{ n.name
+                                    }}</div>
+                                <div class="hours-section__dek">{{ n.kicker
+                                    }}</div>
+                            </div>
+                            <div class="hours-section__meta"
+                                aria-label="Neighborhood summary">
+                                <span class="hours-pill hours-pill--open">Open
+                                    now: {{ n.open_now }}</span>
+                                <span class="hours-pill">Listed: {{ n.total
+                                    }}</span>
+                            </div>
+                        </summary>
+
+                        <div class="hours-list">
+                            {% for b in n.businesses %}
+                            <details class="biz">
+                                <summary>
+                                    <span class="biz__name">{{ b.name }}</span>
+                                    <span class="biz__today">Today: {{ b.today
+                                        }}</span>
+                                    <span class="biz__badges">
+                                        <span class="biz__badge">{{ b.category
+                                            }}</span>
+                                        {% if b.status == "open" %}
+                                        <span
+                                            class="biz__badge biz__badge--open">Open</span>
+                                        {% else %}
+                                        <span
+                                            class="biz__badge biz__badge--closed">Closed</span>
+                                        {% endif %}
+                                    </span>
+                                </summary>
+                                <div class="biz__details">
+                                    <div class="biz__grid">
+                                        <div>
+                                            <h4 class="section-head">Weekly
+                                                hours</h4>
+                                            <table class="biz__table"
+                                                aria-label="Weekly hours for {{ b.name }}">
+                                                <tbody>
+                                                    {% for row in b.week %}
+                                                    <tr>
+                                                        <td>{{ row.day }}</td>
+                                                        <td>{{ row.hours }}</td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div>
+                                            <h4 class="section-head">Record</h4>
+                                            <p
+                                                class="hours-note"><strong>Address:</strong>
+                                                {{ b.address }}</p>
+                                            <p
+                                                class="hours-note"><strong>Phone:</strong>
+                                                {{ b.phone }}</p>
+                                            <p
+                                                class="hours-note"><strong>Source:</strong>
+                                                {{ b.source }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </details>
+                            {% endfor %}
+                        </div>
+                    </details>
+                    {% endfor %}
+                </section>
+
+                <aside class="hours-card" aria-label="Editorial note">
+                    <h3 class="section-head">Editor’s note</h3>
+                    <p class="hours-note">When you have lots of businesses,
+                        we’ll keep this fast by loading neighborhoods on-demand
+                        (still on the homepage).</p>
+                </aside>
+            </div>
+        </details>
+    </section>
+    {% endif %}
+
     <!-- Footer -->
     <footer class="footer">
         <div class="footer__rule"></div>
@@ -358,7 +492,8 @@
 
 <div class="popup-panel" id="popup-seeclickfix" data-popup="seeclickfix">
     <div class="popup-header">
-        <h3><span class="popup-header__icon popup-header__icon--report"></span> Report an Issue</h3>
+        <h3><span class="popup-header__icon popup-header__icon--report"></span>
+            Report an Issue</h3>
         <button class="popup-close" aria-label="Close">×</button>
     </div>
     <div class="popup-body">
@@ -373,7 +508,8 @@
 
 <div class="popup-panel" id="popup-cityhall" data-popup="cityhall">
     <div class="popup-header">
-        <h3><span class="popup-header__icon popup-header__icon--phone"></span> City Hall</h3>
+        <h3><span class="popup-header__icon popup-header__icon--phone"></span>
+            City Hall</h3>
         <button class="popup-close" aria-label="Close">×</button>
     </div>
     <div class="popup-body popup-body--content">
@@ -406,7 +542,8 @@
 
 <div class="popup-panel" id="popup-library" data-popup="library">
     <div class="popup-header">
-        <h3><span class="popup-header__icon popup-header__icon--library"></span> Library</h3>
+        <h3><span class="popup-header__icon popup-header__icon--library"></span>
+            Library</h3>
         <button class="popup-close" aria-label="Close">×</button>
     </div>
     <div class="popup-body popup-body--content">
@@ -444,7 +581,8 @@
 
 <div class="popup-panel" id="popup-recycling" data-popup="recycling">
     <div class="popup-header">
-        <h3><span class="popup-header__icon popup-header__icon--recycle"></span> Trash & Recycling</h3>
+        <h3><span class="popup-header__icon popup-header__icon--recycle"></span>
+            Trash & Recycling</h3>
         <button class="popup-close" aria-label="Close">×</button>
     </div>
     <div class="popup-body popup-body--content">
@@ -484,7 +622,8 @@
 
 <div class="popup-panel" id="popup-parking" data-popup="parking">
     <div class="popup-header">
-        <h3><span class="popup-header__icon popup-header__icon--parking"></span> Parking</h3>
+        <h3><span class="popup-header__icon popup-header__icon--parking"></span>
+            Parking</h3>
         <button class="popup-close" aria-label="Close">×</button>
     </div>
     <div class="popup-body popup-body--content">
@@ -521,7 +660,8 @@
 
 <div class="popup-panel" id="popup-transit" data-popup="transit">
     <div class="popup-header">
-        <h3><span class="popup-header__icon popup-header__icon--transit"></span> Transit</h3>
+        <h3><span class="popup-header__icon popup-header__icon--transit"></span>
+            Transit</h3>
         <button class="popup-close" aria-label="Close">×</button>
     </div>
     <div class="popup-body popup-body--content">

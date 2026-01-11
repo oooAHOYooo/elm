@@ -106,6 +106,7 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Old+Standard+TT:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+        {% block head_extra %}{% endblock %}
     </head>
     <body class="loading">
         <!-- Loading Splash Screen -->
