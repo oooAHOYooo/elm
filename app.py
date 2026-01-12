@@ -93,7 +93,37 @@ def create_app() -> Flask:
                         "neighborhood": n.get("name") or "",
                         "day": h.get("day") or "",
                         "time": h.get("time") or "",
+                        "note": "",
                     })
+
+        # Also load trivia items from data/trivia.json (for listings not yet in hours directory)
+        try:
+            trivia_path = Path(__file__).with_name("data") / "trivia.json"
+            with open(trivia_path, "r", encoding="utf-8") as f:
+                trivia_payload = json.load(f)
+            for it in (trivia_payload.get("items") or []):
+                if (it.get("type") or "").lower() != "trivia":
+                    continue
+                trivia_items.append({
+                    "business": it.get("business") or "Business",
+                    "neighborhood": (it.get("address") or "New Haven, CT"),
+                    "day": it.get("day") or "",
+                    "time": it.get("time") or "",
+                    "note": it.get("note") or "",
+                })
+        except Exception:
+            pass
+
+        # De-dupe and sort
+        seen = set()
+        uniq: List[Dict[str, str]] = []
+        for t in trivia_items:
+            key = (t.get("business") or "", t.get("day") or "", t.get("time") or "", t.get("neighborhood") or "")
+            if key in seen:
+                continue
+            seen.add(key)
+            uniq.append(t)
+        trivia_items = uniq
         trivia_items.sort(key=lambda x: (day_order.get(x.get("day") or "", 99), x.get("business") or ""))
         
         # Format sunrise/sunset times in EST with 12-hour format

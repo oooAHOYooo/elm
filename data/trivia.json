@@ -1,0 +1,40 @@
+{
+  "items": [
+    {
+      "type": "trivia",
+      "provider": "Immodest Trivia",
+      "business": "Rudy's Bar",
+      "address": "1227 Chapel St, New Haven, CT 06511",
+      "day": "Tue",
+      "time": "7:30pm",
+      "note": "Sign-ups"
+    },
+    {
+      "type": "trivia",
+      "provider": "Immodest Trivia",
+      "business": "Blue Orchid",
+      "address": "130 Court St, New Haven, CT",
+      "day": "Thu",
+      "time": "7pm",
+      "note": "Sign-ups"
+    },
+    {
+      "type": "trivia",
+      "provider": "Immodest Trivia",
+      "business": "51 Broadway (venue TBD)",
+      "address": "51 Broadway, New Haven, CT",
+      "day": "Sun",
+      "time": "6pm",
+      "note": "*NEW* starts 1/18"
+    },
+    {
+      "type": "trivia",
+      "provider": "Immodest Trivia",
+      "business": "860 State St (venue TBD)",
+      "address": "860 State St, New Haven, CT",
+      "day": "Wed",
+      "time": "7pm",
+      "note": "Sign-ups"
+    }
+  ]
+}

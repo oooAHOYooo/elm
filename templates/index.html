@@ -303,6 +303,26 @@
             </article>
             {% endif %}
 
+            <!-- Trivia Desk -->
+            <article class="infobox">
+                <h2 class="section-head">Trivia Desk</h2>
+                {% if trivia_items and trivia_items|length > 0 %}
+                <ul class="hours-trivia">
+                    {% for t in trivia_items %}
+                    <li class="hours-trivia__item">
+                        <span class="hours-trivia__when">
+                            {{ t.day }} {{ t.time }}{% if t.note %} · {{ t.note }}{% endif %}
+                        </span>
+                        <span class="hours-trivia__what">{{ t.business }}</span>
+                        <span class="hours-trivia__where">{{ t.neighborhood }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="hours-note">No trivia listed yet.</p>
+                {% endif %}
+            </article>
+
             <!-- Quick Links with Popups -->
             <article class="infobox infobox--links">
                 <h2 class="section-head">Quick Links</h2>
@@ -458,23 +478,7 @@
                     {% endfor %}
                 </section>
 
-                <aside class="hours-card" aria-label="Trivia and notes">
-                    <h3 class="section-head">Trivia Desk</h3>
-                    {% if trivia_items and trivia_items|length > 0 %}
-                    <ul class="hours-trivia">
-                        {% for t in trivia_items %}
-                        <li class="hours-trivia__item">
-                            <span class="hours-trivia__when">{{ t.day }} {{ t.time }}</span>
-                            <span class="hours-trivia__what">{{ t.business }}</span>
-                            <span class="hours-trivia__where">{{ t.neighborhood }}</span>
-                        </li>
-                        {% endfor %}
-                    </ul>
-                    {% else %}
-                    <p class="hours-note">No trivia listed yet.</p>
-                    {% endif %}
-
-                    <div class="hours-divider"></div>
+                <aside class="hours-card" aria-label="Editorial note">
                     <h3 class="section-head">Editor’s note</h3>
                     <p class="hours-note">When you have lots of businesses,
                         we’ll keep this fast by loading neighborhoods on-demand
