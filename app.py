@@ -78,6 +78,23 @@ def create_app() -> Flask:
         tz = ZoneInfo("America/New_York")
         today = datetime.now(tz)
         date_str = today.strftime("%A, %B %d, %Y")
+
+        # Hours directory + Trivia digest (kept lightweight; rendered on homepage)
+        hours_all = _sample_hours_neighborhoods()
+        trivia_items: List[Dict[str, str]] = []
+        day_order = {"Mon": 0, "Tue": 1, "Wed": 2, "Thu": 3, "Fri": 4, "Sat": 5, "Sun": 6}
+        for n in hours_all:
+            for b in (n.get("businesses") or []):
+                for h in (b.get("happenings") or []):
+                    if (h.get("type") or "").lower() != "trivia":
+                        continue
+                    trivia_items.append({
+                        "business": b.get("name") or "Business",
+                        "neighborhood": n.get("name") or "",
+                        "day": h.get("day") or "",
+                        "time": h.get("time") or "",
+                    })
+        trivia_items.sort(key=lambda x: (day_order.get(x.get("day") or "", 99), x.get("business") or ""))
         
         # Format sunrise/sunset times in EST with 12-hour format
         def format_sun_time(iso_time_str: str) -> str:
@@ -282,7 +299,8 @@ def create_app() -> Flask:
             boards_upcoming=boards_upcoming,
             week_grid=week_grid,
             week_start_date=week_start_date,
-            hours_all=_sample_hours_neighborhoods(),
+            hours_all=hours_all,
+            trivia_items=trivia_items,
         )
         _index_html_cache.set("index_html", html)
         resp = Response(html, mimetype="text/html")

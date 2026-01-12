@@ -71,6 +71,28 @@
       "kicker": "Downtown blocks: bars, bookstores, dinner",
       "businesses": [
         {
+          "name": "Rudy's Bar",
+          "category": "Bar",
+          "status": "open",
+          "today": "11:30a–1a",
+          "address": "1227 Chapel St, New Haven, CT 06511",
+          "phone": "(203) 865-1242",
+          "description": "New digs for a longtime gathering spot: beers, Belgian fries, and pub fare—minus the old graffiti.",
+          "week": [
+            { "day": "Mon", "hours": "11:30a–1a" },
+            { "day": "Tue", "hours": "11:30a–1a" },
+            { "day": "Wed", "hours": "11:30a–1a" },
+            { "day": "Thu", "hours": "11:30a–1a" },
+            { "day": "Fri", "hours": "11:30a–2a" },
+            { "day": "Sat", "hours": "11:30a–2a" },
+            { "day": "Sun", "hours": "11:30a–1a" }
+          ],
+          "happenings": [
+            { "type": "trivia", "day": "Tue", "time": "7:30–9:30p" },
+            { "type": "karaoke", "day": "Sat", "time": "10p–1a" }
+          ]
+        },
+        {
           "name": "The Owl Shop",
           "category": "Cigar bar",
           "status": "open",
