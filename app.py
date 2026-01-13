@@ -50,6 +50,18 @@ def _sample_hours_neighborhoods() -> List[Dict[str, Any]]:
     return neighborhoods
 
 
+def _load_manual_events() -> List[Dict[str, Any]]:
+    """Load manually curated events (e.g., DowntownNHV email) from JSON."""
+    try:
+        data_path = Path(__file__).with_name("data") / "manual_events.json"
+        with open(data_path, "r", encoding="utf-8") as f:
+            payload = json.load(f)
+        items = payload.get("items") or []
+        return [it for it in items if isinstance(it, dict)]
+    except Exception:
+        return []
+
+
 def create_app() -> Flask:
     app = Flask(__name__)
     app.config.from_object(Config)
@@ -256,6 +268,21 @@ def create_app() -> Flask:
                 return False
 
         week_events = [e for e in unified_events if within_current_week(e.get("date_iso") or "")]
+
+        # Merge manual events into the same "this week" feed
+        for it in _load_manual_events():
+            iso = it.get("date_iso") or ""
+            if not within_current_week(iso):
+                continue
+            week_events.append({
+                "title": it.get("title"),
+                "link": it.get("link") or "",
+                "summary": it.get("summary") or "",
+                "source": it.get("source") or "Manual",
+                "date_iso": iso,
+                "location": it.get("location") or "",
+            })
+
         week_events.sort(key=lambda x: x.get("date_iso", ""))
         week_events = week_events[:14]
 
@@ -429,6 +456,25 @@ def create_app() -> Flask:
                         "link": it.get("link"),
                         "location": it.get("location") or "",
                         "source": (it.get("source") or {}).get("name") or "Source",
+                        "date_iso": date_iso,
+                        "summary": it.get("summary") or "",
+                    })
+            except Exception:
+                continue
+
+        # Merge manual events
+        for it in _load_manual_events():
+            date_iso = it.get("date_iso") or ""
+            if not date_iso:
+                continue
+            try:
+                dt = datetime.fromisoformat(date_iso.replace("Z", "+00:00")).astimezone(tz)
+                if start_of_week <= dt < end_of_week:
+                    week_events.append({
+                        "title": it.get("title"),
+                        "link": it.get("link") or "",
+                        "location": it.get("location") or "",
+                        "source": it.get("source") or "Manual",
                         "date_iso": date_iso,
                         "summary": it.get("summary") or "",
                     })

@@ -1,0 +1,20 @@
+{
+  "items": [
+    {
+      "title": "New Haven Hobby Fair",
+      "source": "DowntownNHV",
+      "location": "New Haven Pride Center, 50 Orange Street",
+      "date_iso": "2026-01-24T11:00:00-05:00",
+      "link": "",
+      "summary": "New Year, New Hobby, New Haven — a community hobby fair featuring groups like Mahjong Haven, Hotties Hiking Club, New Haven Pottery Studio, CT Roller Derby, and more."
+    },
+    {
+      "title": "Freedom Songs (MLK Day)",
+      "source": "DowntownNHV",
+      "location": "GRAILS, 1020 Chapel Street",
+      "date_iso": "2026-01-19T11:00:00-05:00",
+      "link": "",
+      "summary": "A daylong exploration of music and the civil rights movement — a communal listening experience honoring Dr. King’s legacy through the songs that sustained the movement."
+    }
+  ]
+}

@@ -311,10 +311,12 @@
                     {% for t in trivia_items %}
                     <li class="hours-trivia__item">
                         <span class="hours-trivia__when">
-                            {{ t.day }} {{ t.time }}{% if t.note %} · {{ t.note }}{% endif %}
+                            {{ t.day }} {{ t.time }}{% if t.note %} · {{ t.note
+                            }}{% endif %}
                         </span>
                         <span class="hours-trivia__what">{{ t.business }}</span>
-                        <span class="hours-trivia__where">{{ t.neighborhood }}</span>
+                        <span class="hours-trivia__where">{{ t.neighborhood
+                            }}</span>
                     </li>
                     {% endfor %}
                 </ul>
