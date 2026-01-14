@@ -32,11 +32,12 @@ def aggregate_all(timeout_rss: int = 5, timeout_ical: int = 6) -> Dict[str, Any]
     items: List[Dict[str, Any]] = []
 
     # Parallel RSS feed fetching for better performance
+    # Limit to 4 items per feed for faster processing (most users only see top items)
     rss_futures = {}
     for name, url in RSS_SOURCES.items():
         if name == "iaff_headlines":
             continue  # Handle separately below
-        rss_futures[_feed_executor.submit(parse_rss, url, timeout_rss, name)] = name
+        rss_futures[_feed_executor.submit(parse_rss, url, timeout_rss, name, 4)] = name  # Limit to 4 items
 
     # Fetch RSS feeds in parallel
     for future in as_completed(rss_futures, timeout=timeout_rss * 2):
@@ -74,8 +75,14 @@ def aggregate_all(timeout_rss: int = 5, timeout_ical: int = 6) -> Dict[str, Any]
         except Exception as e:
             _logger.error("IAFF scraper error: %s", e)
 
-    # Sort newest first
-    items.sort(key=_sort_key, reverse=True)
+    # Sort newest first, but limit to top 50 items before sorting for performance
+    # Most users only see top items anyway
+    if len(items) > 50:
+        # Quick partial sort - get top 50 by date
+        items.sort(key=_sort_key, reverse=True)
+        items = items[:50]
+    else:
+        items.sort(key=_sort_key, reverse=True)
 
     result = {
         "updated": datetime.utcnow().isoformat() + "Z",

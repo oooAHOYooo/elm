@@ -154,17 +154,23 @@ def create_app() -> Flask:
                 _file_data_cache.set(cache_key_trivia, [])
                 pass
 
-        # De-dupe and sort
-        seen = set()
-        uniq: List[Dict[str, str]] = []
-        for t in trivia_items:
-            key = (t.get("business") or "", t.get("day") or "", t.get("time") or "", t.get("neighborhood") or "")
-            if key in seen:
-                continue
-            seen.add(key)
-            uniq.append(t)
-        trivia_items = uniq
-        trivia_items.sort(key=lambda x: (day_order.get(x.get("day") or "", 99), x.get("business") or ""))
+        # De-dupe and sort (cached for performance)
+        cache_key_trivia_processed = "trivia_items_processed"
+        cached_processed = _file_data_cache.get(cache_key_trivia_processed)
+        if cached_processed is not None:
+            trivia_items = cached_processed
+        else:
+            seen = set()
+            uniq: List[Dict[str, str]] = []
+            for t in trivia_items:
+                key = (t.get("business") or "", t.get("day") or "", t.get("time") or "", t.get("neighborhood") or "")
+                if key in seen:
+                    continue
+                seen.add(key)
+                uniq.append(t)
+            trivia_items = uniq
+            trivia_items.sort(key=lambda x: (day_order.get(x.get("day") or "", 99), x.get("business") or ""))
+            _file_data_cache.set(cache_key_trivia_processed, trivia_items)
         
         # Format sunrise/sunset times in EST with 12-hour format
         def format_sun_time(iso_time_str: str) -> str:
@@ -348,8 +354,10 @@ def create_app() -> Flask:
                 "location": it.get("location") or "",
             })
 
-        week_events.sort(key=lambda x: x.get("date_iso", ""))
-        week_events = week_events[:14]
+        # Only sort if we have events (early return optimization)
+        if week_events:
+            week_events.sort(key=lambda x: x.get("date_iso", ""))
+            week_events = week_events[:14]
 
         # Fallback to stub events
         if not week_events:

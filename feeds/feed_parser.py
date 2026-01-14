@@ -11,7 +11,8 @@ from .sources import SOURCE_CREDIT, SOURCE_META
 _logger = logging.getLogger(__name__)
 
 
-def parse_rss(url: str, timeout: int = 6, source_key: Optional[str] = None) -> List[Dict[str, Any]]:
+def parse_rss(url: str, timeout: int = 6, source_key: Optional[str] = None, limit: int = 5) -> List[Dict[str, Any]]:
+    """Parse RSS feed with optional limit for performance"""
     try:
         headers = {
             "User-Agent": "ElmCityDaily/1.0 (+https://example.local)",
@@ -21,7 +22,9 @@ def parse_rss(url: str, timeout: int = 6, source_key: Optional[str] = None) -> L
         resp.raise_for_status()
         parsed = feedparser.parse(resp.content)
         items: List[Dict[str, Any]] = []
-        for e in parsed.entries:
+        # Limit entries early for performance
+        entries = parsed.entries[:limit] if limit else parsed.entries
+        for e in entries:
             items.append(
                 normalize_item(
                     raw=e,
