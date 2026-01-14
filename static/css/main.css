@@ -1796,11 +1796,18 @@ img {
     }
 
     .masthead__title {
-        font-size: 2rem;
+        font-size: 1.75rem;
+    }
+
+    .masthead__meta {
+        font-size: 0.85rem;
+        flex-wrap: wrap;
+        gap: 4px;
     }
 
     .broadsheet {
         grid-template-columns: 1fr;
+        gap: var(--space-lg);
     }
 
     .col--lead,
@@ -1821,6 +1828,44 @@ img {
         display: block;
     }
 
+    /* Mobile-optimized infoboxes */
+    .infobox {
+        margin-bottom: var(--space-lg);
+        padding: var(--space-md);
+    }
+
+    .section-head {
+        font-size: 1.1rem;
+        margin-bottom: var(--space-md);
+    }
+
+    .stat-row {
+        padding: var(--space-sm) 0;
+        font-size: 0.9rem;
+    }
+
+    .stat-row__label {
+        font-size: 0.85rem;
+    }
+
+    .stat-row__value {
+        font-size: 1rem;
+    }
+
+    /* Better touch targets */
+    .quick-links {
+        grid-template-columns: 1fr;
+        gap: var(--space-sm);
+    }
+
+    .quick-link {
+        padding: var(--space-md);
+        min-height: 44px; /* iOS touch target minimum */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
     .event-drawer__panel {
         width: 95%;
         max-height: 90vh;
@@ -1829,6 +1874,7 @@ img {
     .event-card {
         flex-direction: column;
         gap: var(--space-sm);
+        padding: var(--space-md);
     }
 
     .event-card__time {
@@ -1838,12 +1884,98 @@ img {
         gap: var(--space-sm);
     }
 
-    .quick-links {
+    .weather-hero__temp {
+        font-size: 2.5rem;
+    }
+
+    .weather-hero__summary {
+        font-size: 0.9rem;
+    }
+
+    /* Compact week calendar on mobile */
+    .week-grid {
+        gap: var(--space-xs);
+    }
+
+    .events-day-group {
+        margin-bottom: var(--space-md);
+    }
+
+    .events-day-group__header {
+        font-size: 0.9rem;
+        padding: var(--space-sm);
+    }
+
+    .events-day-group__cards {
         grid-template-columns: 1fr;
+        gap: var(--space-sm);
+    }
+
+    /* Footer mobile */
+    .footer {
+        font-size: 0.8rem;
+        padding: var(--space-md) var(--space-sm);
+    }
+
+    /* Better spacing for mobile */
+    .weather-block {
+        margin-bottom: var(--space-lg);
+    }
+
+    .alerts-block {
+        padding: var(--space-md);
+        font-size: 0.85rem;
+    }
+}
+
+/* Extra small devices (phones in portrait) */
+@media (max-width: 480px) {
+    .newspaper {
+        padding: 8px;
+    }
+
+    .masthead__title {
+        font-size: 1.5rem;
+    }
+
+    .masthead__meta {
+        font-size: 0.75rem;
     }
 
     .weather-hero__temp {
-        font-size: 3rem;
+        font-size: 2rem;
+    }
+
+    .section-head {
+        font-size: 1rem;
+    }
+
+    .infobox {
+        padding: var(--space-sm);
+    }
+
+    .stat-row {
+        font-size: 0.85rem;
+    }
+
+    .event-card {
+        padding: var(--space-sm);
+    }
+
+    .quick-link {
+        padding: var(--space-sm);
+        font-size: 0.9rem;
+    }
+}
+
+/* Landscape mobile optimization */
+@media (max-width: 900px) and (orientation: landscape) {
+    .col--sidebar {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .infobox {
+        margin-bottom: var(--space-md);
     }
 }
 
