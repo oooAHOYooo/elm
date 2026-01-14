@@ -22,6 +22,8 @@ from services import tides as tides_service
 from services import air_quality as aqi_service
 from feeds.aggregator import aggregate_all
 from utils.cache import TTLCache
+from modules.legislation_tracker import LegislationTracker
+from modules.budget_tracker import BudgetTracker
 
 load_dotenv()
 
@@ -29,11 +31,19 @@ load_dotenv()
 _executor = ThreadPoolExecutor(max_workers=8)
 
 # Short-lived HTML cache for the homepage. Keeps reloads snappy without changing features.
-_index_html_cache = TTLCache(ttl_seconds=25)
+_index_html_cache = TTLCache(ttl_seconds=60)  # Increased from 25s for better performance
+
+# Cache for file-based data (longer TTL since files don't change often)
+_file_data_cache = TTLCache(ttl_seconds=300, filepath=".cache_file_data.pkl")
 
 
 def _sample_hours_neighborhoods() -> List[Dict[str, Any]]:
     """Load Hours directory data from JSON and add computed fields."""
+    cache_key = "hours_neighborhoods"
+    cached = _file_data_cache.get(cache_key)
+    if cached is not None:
+        return cached
+    
     try:
         data_path = Path(__file__).with_name("data") / "hours.json"
         with open(data_path, "r", encoding="utf-8") as f:
@@ -47,18 +57,27 @@ def _sample_hours_neighborhoods() -> List[Dict[str, Any]]:
         n["total"] = len(businesses)
         n["open_now"] = sum(1 for b in businesses if (b.get("status") == "open"))
 
+    _file_data_cache.set(cache_key, neighborhoods)
     return neighborhoods
 
 
 def _load_manual_events() -> List[Dict[str, Any]]:
     """Load manually curated events (e.g., DowntownNHV email) from JSON."""
+    cache_key = "manual_events"
+    cached = _file_data_cache.get(cache_key)
+    if cached is not None:
+        return cached
+    
     try:
         data_path = Path(__file__).with_name("data") / "manual_events.json"
         with open(data_path, "r", encoding="utf-8") as f:
             payload = json.load(f)
         items = payload.get("items") or []
-        return [it for it in items if isinstance(it, dict)]
+        result = [it for it in items if isinstance(it, dict)]
+        _file_data_cache.set(cache_key, result)
+        return result
     except Exception:
+        _file_data_cache.set(cache_key, [])
         return []
 
 
@@ -109,22 +128,31 @@ def create_app() -> Flask:
                     })
 
         # Also load trivia items from data/trivia.json (for listings not yet in hours directory)
-        try:
-            trivia_path = Path(__file__).with_name("data") / "trivia.json"
-            with open(trivia_path, "r", encoding="utf-8") as f:
-                trivia_payload = json.load(f)
-            for it in (trivia_payload.get("items") or []):
-                if (it.get("type") or "").lower() != "trivia":
-                    continue
-                trivia_items.append({
-                    "business": it.get("business") or "Business",
-                    "neighborhood": (it.get("address") or "New Haven, CT"),
-                    "day": it.get("day") or "",
-                    "time": it.get("time") or "",
-                    "note": it.get("note") or "",
-                })
-        except Exception:
-            pass
+        cache_key_trivia = "trivia_items_parsed"
+        cached_trivia = _file_data_cache.get(cache_key_trivia)
+        if cached_trivia is not None:
+            trivia_items.extend(cached_trivia)
+        else:
+            try:
+                trivia_path = Path(__file__).with_name("data") / "trivia.json"
+                with open(trivia_path, "r", encoding="utf-8") as f:
+                    trivia_payload = json.load(f)
+                trivia_list = []
+                for it in (trivia_payload.get("items") or []):
+                    if (it.get("type") or "").lower() != "trivia":
+                        continue
+                    trivia_list.append({
+                        "business": it.get("business") or "Business",
+                        "neighborhood": (it.get("address") or "New Haven, CT"),
+                        "day": it.get("day") or "",
+                        "time": it.get("time") or "",
+                        "note": it.get("note") or "",
+                    })
+                trivia_items.extend(trivia_list)
+                _file_data_cache.set(cache_key_trivia, trivia_list)
+            except Exception:
+                _file_data_cache.set(cache_key_trivia, [])
+                pass
 
         # De-dupe and sort
         seen = set()
@@ -163,6 +191,23 @@ def create_app() -> Flask:
         # Parallel API fetching for speed
         airnow_key = app.config.get("AIRNOW_API_KEY", "")
         
+        # Fetch legislation stats (lightweight, just for homepage widget)
+        def get_legislation_stats():
+            try:
+                tracker = LegislationTracker()
+                legislation = tracker.get_passed_legislation(days_back=30, limit=100)
+                return tracker.get_stats(legislation)
+            except Exception:
+                return {"total_passed": 0, "this_week": 0, "this_month": 0, "last_30_days": 0}
+        
+        # Fetch budget stats (lightweight, just for homepage widget)
+        def get_budget_stats():
+            try:
+                budget_tracker = BudgetTracker()
+                return budget_tracker.get_budget_stats()
+            except Exception:
+                return {"fiscal_year": None, "total_budget": None, "total_spent": None, "percentage_spent": None}
+        
         futures = {
             _executor.submit(weather_service.fetch_weather, lat, lon, timeout): "weather",
             _executor.submit(nws_service.fetch_nws_alerts, "ctz010"): "nws_alerts",
@@ -171,6 +216,8 @@ def create_app() -> Flask:
             _executor.submit(fetch_city_calendar, 6): "cal_upcoming",
             _executor.submit(fetch_legistar_events, "newhaven", 6): "legis_upcoming",
             _executor.submit(aggregate_all): "agg",
+            _executor.submit(get_legislation_stats): "legislation_stats",
+            _executor.submit(get_budget_stats): "budget_stats",
         }
         
         results = {}
@@ -183,7 +230,12 @@ def create_app() -> Flask:
                     completed_count += 1
                 except Exception as e:
                     app.logger.warning(f"Failed to fetch {key}: {e}")
-                    results[key] = {} if key in ("weather", "air_quality", "tax_info", "agg") else []
+                    if key == "legislation_stats":
+                        results[key] = {"total_passed": 0, "this_week": 0, "this_month": 0, "last_30_days": 0}
+                    elif key == "budget_stats":
+                        results[key] = {"fiscal_year": None, "total_budget": None, "total_spent": None, "percentage_spent": None}
+                    else:
+                        results[key] = {} if key in ("weather", "air_quality", "tax_info", "agg") else []
                     completed_count += 1
         except TimeoutError:
             # Some futures didn't complete in time - process what we have
@@ -198,10 +250,20 @@ def create_app() -> Flask:
                     else:
                         # Future didn't complete - set default
                         app.logger.warning(f"Future {key} did not complete in time - using default")
-                        results[key] = {} if key in ("weather", "air_quality", "tax_info", "agg") else []
+                        if key == "legislation_stats":
+                            results[key] = {"total_passed": 0, "this_week": 0, "this_month": 0, "last_30_days": 0}
+                        elif key == "budget_stats":
+                            results[key] = {"fiscal_year": None, "total_budget": None, "total_spent": None, "percentage_spent": None}
+                        else:
+                            results[key] = {} if key in ("weather", "air_quality", "tax_info", "agg") else []
                 except Exception as e:
                     app.logger.warning(f"Failed to fetch {key}: {e}")
-                    results[key] = {} if key in ("weather", "air_quality", "tax_info", "agg") else []
+                    if key == "legislation_stats":
+                        results[key] = {"total_passed": 0, "this_week": 0, "this_month": 0, "last_30_days": 0}
+                    elif key == "budget_stats":
+                        results[key] = {"fiscal_year": None, "total_budget": None, "total_spent": None, "percentage_spent": None}
+                    else:
+                        results[key] = {} if key in ("weather", "air_quality", "tax_info", "agg") else []
         
         # Ensure all expected keys have defaults
         weather = results.get("weather", {})
@@ -210,6 +272,8 @@ def create_app() -> Flask:
         tax_info = results.get("tax_info", {})
         cal_upcoming = results.get("cal_upcoming", [])
         legis_upcoming = results.get("legis_upcoming", [])
+        legislation_stats = results.get("legislation_stats", {"total_passed": 0, "this_week": 0, "this_month": 0, "last_30_days": 0})
+        budget_stats = results.get("budget_stats", {"fiscal_year": None, "total_budget": None, "total_spent": None, "percentage_spent": None})
         
         boards_upcoming = []
         boards_upcoming.extend([
@@ -358,6 +422,8 @@ def create_app() -> Flask:
             week_start_date=week_start_date,
             hours_all=hours_all,
             trivia_items=trivia_items,
+            legislation_stats=legislation_stats,
+            budget_stats=budget_stats,
         )
         _index_html_cache.set("index_html", html)
         resp = Response(html, mimetype="text/html")
@@ -526,6 +592,111 @@ def create_app() -> Flask:
             "week_start_date": start_of_week.strftime("%b %d"),
             "week_offset": week_offset,
         })
+
+    # Legislation Tracker Routes
+    tracker = LegislationTracker()
+    
+    @app.route("/legislation")
+    def legislation_tracker():
+        """Track passed legislation in New Haven"""
+        try:
+            # Get passed legislation from last 90 days
+            legislation = tracker.get_passed_legislation(days_back=90, limit=500)
+            
+            # Group by week and month
+            weekly = tracker.group_by_week(legislation)
+            monthly = tracker.group_by_month(legislation)
+            monthly_counts = tracker.get_monthly_counts(legislation)
+            stats = tracker.get_stats(legislation)
+            
+            return render_template(
+                "legislation/tracker.html",
+                app_name=app.config["APP_NAME"],
+                legislation=legislation,
+                weekly=weekly,
+                monthly=monthly,
+                monthly_counts=monthly_counts,
+                stats=stats,
+            )
+        except Exception as e:
+            app.logger.error(f"Error fetching legislation: {e}")
+            return render_template(
+                "legislation/tracker.html",
+                app_name=app.config["APP_NAME"],
+                legislation=[],
+                weekly={},
+                monthly={},
+                monthly_counts=[],
+                stats={"total_passed": 0, "this_week": 0, "this_month": 0, "last_30_days": 0},
+                error=str(e)
+            )
+    
+    @app.route("/api/legislation")
+    def api_legislation():
+        """API endpoint for legislation data"""
+        try:
+            legislation = tracker.get_passed_legislation(days_back=90, limit=500)
+            weekly = tracker.group_by_week(legislation)
+            monthly = tracker.group_by_month(legislation)
+            monthly_counts = tracker.get_monthly_counts(legislation)
+            stats = tracker.get_stats(legislation)
+            
+            return jsonify({
+                "legislation": legislation,
+                "weekly": weekly,
+                "monthly": monthly,
+                "monthly_counts": monthly_counts,
+                "stats": stats
+            })
+        except Exception as e:
+            app.logger.error(f"Error in API: {e}")
+            return jsonify({"error": str(e)}), 500
+    
+    # Budget Tracker Routes
+    budget_tracker = BudgetTracker()
+    
+    @app.route("/budget")
+    def budget_tracker_page():
+        """Budget spending tracker page"""
+        try:
+            summary = budget_tracker.fetch_budget_summary()
+            categories = budget_tracker.get_spending_by_category()
+            stats = budget_tracker.get_budget_stats()
+            
+            return render_template(
+                "budget/tracker.html",
+                app_name=app.config["APP_NAME"],
+                summary=summary,
+                categories=categories,
+                stats=stats,
+            )
+        except Exception as e:
+            app.logger.error(f"Error fetching budget data: {e}")
+            return render_template(
+                "budget/tracker.html",
+                app_name=app.config["APP_NAME"],
+                summary={},
+                categories={"categories": []},
+                stats={},
+                error=str(e)
+            )
+    
+    @app.route("/api/budget")
+    def api_budget():
+        """API endpoint for budget data"""
+        try:
+            summary = budget_tracker.fetch_budget_summary()
+            categories = budget_tracker.get_spending_by_category()
+            stats = budget_tracker.get_budget_stats()
+            
+            return jsonify({
+                "summary": summary,
+                "categories": categories,
+                "stats": stats
+            })
+        except Exception as e:
+            app.logger.error(f"Error in budget API: {e}")
+            return jsonify({"error": str(e)}), 500
 
     return app
 

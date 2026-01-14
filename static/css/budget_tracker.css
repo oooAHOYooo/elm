@@ -1,0 +1,317 @@
+/* Budget Tracker Styles */
+
+.budget-tracker-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    font-family: 'IBM Plex Sans', sans-serif;
+}
+
+.budget-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid #e0dcd5;
+}
+
+.budget-header h1 {
+    font-family: 'Old Standard TT', serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    color: #6b6b6b;
+    font-style: italic;
+}
+
+.error-message {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    color: #856404;
+}
+
+.error-message a {
+    color: #856404;
+    text-decoration: underline;
+}
+
+/* Summary Statistics */
+.budget-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 3rem;
+}
+
+.summary-card {
+    background: white;
+    border: 1px solid #e0dcd5;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.summary-label {
+    font-size: 0.9rem;
+    color: #6b6b6b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.summary-value {
+    font-family: 'Old Standard TT', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #8b4513;
+}
+
+/* Categories Section */
+.budget-categories {
+    background: white;
+    border: 1px solid #e0dcd5;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 3rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.section-title {
+    font-family: 'Old Standard TT', serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #e0dcd5;
+}
+
+.categories-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.category-item {
+    padding: 1rem;
+    background: #faf8f5;
+    border-radius: 6px;
+    border-left: 3px solid #8b4513;
+}
+
+.category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.category-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+.category-percentage {
+    font-size: 0.85rem;
+    color: #6b6b6b;
+    font-weight: 500;
+}
+
+.category-details {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.category-stat {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: #6b6b6b;
+}
+
+.stat-value {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.category-bar {
+    height: 8px;
+    background: #e0dcd5;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.category-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #8b4513, #d4a574);
+    transition: width 0.3s ease;
+}
+
+/* Departments Table */
+.budget-departments {
+    background: white;
+    border: 1px solid #e0dcd5;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 3rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.departments-table {
+    overflow-x: auto;
+}
+
+.departments-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.departments-table th {
+    background: #faf8f5;
+    padding: 0.75rem;
+    text-align: left;
+    font-weight: 600;
+    color: #1a1a1a;
+    border-bottom: 2px solid #e0dcd5;
+    font-size: 0.9rem;
+}
+
+.departments-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #f0ece4;
+    color: #4a4a4a;
+}
+
+.departments-table tr:hover {
+    background: #faf8f5;
+}
+
+.dept-name {
+    font-weight: 500;
+    color: #1a1a1a;
+}
+
+/* Data Source */
+.data-source {
+    background: #faf8f5;
+    border: 1px solid #e0dcd5;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+}
+
+.data-source p {
+    margin: 0.5rem 0;
+    color: #4a4a4a;
+}
+
+.data-source a {
+    color: #8b4513;
+    text-decoration: none;
+}
+
+.data-source a:hover {
+    text-decoration: underline;
+}
+
+.no-data {
+    text-align: center;
+    padding: 3rem;
+    color: #6b6b6b;
+}
+
+.no-data ul {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+}
+
+.no-data li {
+    margin: 0.5rem 0;
+}
+
+.no-data a {
+    color: #8b4513;
+    text-decoration: none;
+}
+
+.no-data a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .budget-tracker-page {
+        padding: 1rem 0.5rem;
+    }
+
+    .budget-header h1 {
+        font-size: 2rem;
+    }
+
+    .budget-summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .summary-value {
+        font-size: 1.5rem;
+    }
+
+    .category-details {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .departments-table {
+        font-size: 0.85rem;
+    }
+}
+
+/* Dark theme support */
+[data-theme="dark"] .budget-tracker-page {
+    background: #0a0a0a;
+    color: #f0ece4;
+}
+
+[data-theme="dark"] .summary-card,
+[data-theme="dark"] .budget-categories,
+[data-theme="dark"] .budget-departments,
+[data-theme="dark"] .data-source {
+    background: #1a1a1a;
+    border-color: #2a2825;
+    color: #f0ece4;
+}
+
+[data-theme="dark"] .category-item {
+    background: #2a2825;
+    border-left-color: #d4a574;
+}
+
+[data-theme="dark"] .departments-table th {
+    background: #2a2825;
+    border-color: #3a3835;
+}
+
+[data-theme="dark"] .departments-table tr:hover {
+    background: #2a2825;
+}
+
+[data-theme="dark"] .category-bar {
+    background: #2a2825;
+}

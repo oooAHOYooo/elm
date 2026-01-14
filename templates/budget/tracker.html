@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="budget-tracker-page">
+    <header class="budget-header">
+        <h1>City Budget Tracker</h1>
+        <p class="subtitle">New Haven Municipal Budget and Spending Data</p>
+    </header>
+
+    {% if error %}
+    <div class="error-message">
+        <p>⚠️ Unable to load budget data: {{ error }}</p>
+        <p>Official budget documents are available at <a href="https://www.newhavenct.gov/government/departments-divisions/office-of-policy-management-and-grants/annual-city-budgets-audits" target="_blank">newhavenct.gov</a></p>
+    </div>
+    {% endif %}
+
+    <div class="budget-container">
+        {% if stats and stats.fiscal_year %}
+        <!-- Summary Statistics -->
+        <section class="budget-summary">
+            <div class="summary-card">
+                <div class="summary-label">Fiscal Year</div>
+                <div class="summary-value">{{ stats.fiscal_year }}</div>
+            </div>
+            {% if stats.total_budget %}
+            <div class="summary-card">
+                <div class="summary-label">Total Budget</div>
+                <div class="summary-value">${{ "{:,.0f}".format(stats.total_budget) }}</div>
+            </div>
+            {% endif %}
+            {% if stats.total_spent %}
+            <div class="summary-card">
+                <div class="summary-label">Total Spent</div>
+                <div class="summary-value">${{ "{:,.0f}".format(stats.total_spent) }}</div>
+            </div>
+            {% endif %}
+            {% if stats.remaining %}
+            <div class="summary-card">
+                <div class="summary-label">Remaining</div>
+                <div class="summary-value">${{ "{:,.0f}".format(stats.remaining) }}</div>
+            </div>
+            {% endif %}
+            {% if stats.percentage_spent is not none %}
+            <div class="summary-card">
+                <div class="summary-label">Percentage Spent</div>
+                <div class="summary-value">{{ "{:.1f}".format(stats.percentage_spent) }}%</div>
+            </div>
+            {% endif %}
+        </section>
+
+        <!-- Spending by Category -->
+        {% if categories and categories.categories %}
+        <section class="budget-categories">
+            <h2 class="section-title">Spending by Category</h2>
+            <div class="categories-list">
+                {% for cat in categories.categories %}
+                <div class="category-item">
+                    <div class="category-header">
+                        <h3 class="category-name">{{ cat.category }}</h3>
+                        <span class="category-percentage">{{ "{:.1f}".format(cat.percentage_of_total) }}% of total</span>
+                    </div>
+                    <div class="category-details">
+                        <div class="category-stat">
+                            <span class="stat-label">Budgeted:</span>
+                            <span class="stat-value">${{ "{:,.0f}".format(cat.budget) }}</span>
+                        </div>
+                        <div class="category-stat">
+                            <span class="stat-label">Spent:</span>
+                            <span class="stat-value">${{ "{:,.0f}".format(cat.spent) }}</span>
+                        </div>
+                        <div class="category-stat">
+                            <span class="stat-label">Spent:</span>
+                            <span class="stat-value">{{ "{:.1f}".format(cat.percentage_spent) }}%</span>
+                        </div>
+                    </div>
+                    <div class="category-bar">
+                        <div class="category-bar-fill" style="width: {{ cat.percentage_spent }}%"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- Department Breakdown -->
+        {% if summary and summary.departments %}
+        <section class="budget-departments">
+            <h2 class="section-title">Department Breakdown</h2>
+            <div class="departments-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Department</th>
+                            <th>Budgeted</th>
+                            <th>Spent</th>
+                            <th>Remaining</th>
+                            <th>% Spent</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for dept in summary.departments %}
+                        <tr>
+                            <td class="dept-name">{{ dept.name }}</td>
+                            <td>${{ "{:,.0f}".format(dept.budget) }}</td>
+                            <td>${{ "{:,.0f}".format(dept.spent) }}</td>
+                            <td>${{ "{:,.0f}".format(dept.remaining) }}</td>
+                            <td>{{ "{:.1f}".format(dept.percentage_spent) }}%</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        {% endif %}
+
+        <!-- Data Source Note -->
+        <section class="data-source">
+            <p><strong>Data Source:</strong> {{ summary.source if summary else "City of New Haven" }}</p>
+            {% if summary.last_updated %}
+            <p><strong>Last Updated:</strong> {{ summary.last_updated[:10] }}</p>
+            {% endif %}
+            <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-muted);">
+                This data is presented for informational purposes only. For official budget documents and detailed financial reports, visit the 
+                <a href="https://www.newhavenct.gov/government/departments-divisions/office-of-policy-management-and-grants/annual-city-budgets-audits" target="_blank">City of New Haven website</a>.
+            </p>
+        </section>
+        {% else %}
+        <section class="no-data">
+            <p>Budget data is not currently available.</p>
+            <p>Official budget documents are available at:</p>
+            <ul>
+                <li><a href="https://www.newhavenct.gov/government/departments-divisions/office-of-policy-management-and-grants/annual-city-budgets-audits" target="_blank">Annual City Budgets & Audits</a></li>
+                <li><a href="https://www.newhavenct.gov/government/departments-divisions/office-of-policy-management-and-grants/monthly-reports" target="_blank">Monthly Financial Reports</a></li>
+            </ul>
+            <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-muted);">
+                <strong>Note:</strong> To enable automated budget tracking, configure the CT_BUDGET_DATA_URL environment variable with a data source URL, or implement parsing of city budget documents.
+            </p>
+        </section>
+        {% endif %}
+    </div>
+</div>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/budget_tracker.css') }}">
+{% endblock %}

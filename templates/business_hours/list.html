@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="business-hours-page">
+    <header class="business-hours-header">
+        <h1>Business Hours Directory</h1>
+        <p class="subtitle">Find operating hours for restaurants, shops, and services in New Haven</p>
+    </header>
+
+    <div class="business-hours-container">
+        <!-- Search and Filter -->
+        <div class="business-hours-filters">
+            <form method="GET" action="{{ url_for('business_hours_list') }}" class="filter-form">
+                <div class="filter-group">
+                    <input 
+                        type="text" 
+                        name="q" 
+                        placeholder="Search businesses..." 
+                        value="{{ search_query }}"
+                        class="search-input"
+                    >
+                </div>
+                <div class="filter-group">
+                    <select name="category" class="category-select">
+                        <option value="">All Categories</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat }}" {% if category_filter == cat %}selected{% endif %}>
+                            {{ cat|title }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="filter-button">Search</button>
+                <a href="{{ url_for('business_hours_list') }}" class="clear-button">Clear</a>
+            </form>
+            <div class="manage-link">
+                <a href="{{ url_for('business_hours_manage') }}" class="manage-button">Manage Hours</a>
+            </div>
+        </div>
+
+        <!-- Business List -->
+        <div class="business-list">
+            {% if businesses %}
+                {% for business in businesses %}
+                <div class="business-card">
+                    <div class="business-header">
+                        <h2 class="business-name">{{ business.name }}</h2>
+                        <span class="business-category">{{ business.category|title }}</span>
+                    </div>
+                    
+                    {% if business.address %}
+                    <div class="business-info">
+                        <span class="info-label">📍</span>
+                        <span>{{ business.address }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if business.phone %}
+                    <div class="business-info">
+                        <span class="info-label">📞</span>
+                        <a href="tel:{{ business.phone }}">{{ business.phone }}</a>
+                    </div>
+                    {% endif %}
+                    
+                    {% if business.website %}
+                    <div class="business-info">
+                        <span class="info-label">🌐</span>
+                        <a href="{{ business.website }}" target="_blank" rel="noopener">Visit Website</a>
+                    </div>
+                    {% endif %}
+
+                    <!-- Hours Table -->
+                    <div class="business-hours-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Day</th>
+                                    <th>Hours</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+                                {% for day in days %}
+                                <tr>
+                                    <td class="day-cell">{{ day }}</td>
+                                    <td class="hours-cell">
+                                        {% set day_hours = business.hours|selectattr('day', 'equalto', day)|list %}
+                                        {% if day_hours %}
+                                            {% set h = day_hours[0] %}
+                                            {% if h.is_closed %}
+                                                <span class="closed">Closed</span>
+                                            {% elif h.open_time and h.close_time %}
+                                                <span class="open">{{ h.open_time|format_time_12h }} - {{ h.close_time|format_time_12h }}</span>
+                                            {% else %}
+                                                <span class="varies">Hours vary</span>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="not-set">Not set</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {% if business.notes %}
+                    <div class="business-notes">
+                        <strong>Notes:</strong> {{ business.notes }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-results">
+                    <p>No businesses found{% if search_query or category_filter %}. Try adjusting your search.{% endif %}</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/business_hours.css') }}">
+{% endblock %}
+

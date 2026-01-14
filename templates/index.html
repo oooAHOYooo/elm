@@ -221,6 +221,65 @@
             </article>
             {% endif %}
 
+            <!-- Legislation Tracker -->
+            <article class="infobox">
+                <h2 class="section-head">Legislation</h2>
+                <div class="stat-row">
+                    <span class="stat-row__label">This Week</span>
+                    <span class="stat-row__value">{{ legislation_stats.this_week }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-row__label">This Month</span>
+                    <span class="stat-row__value">{{ legislation_stats.this_month }}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-row__label">Last 30 Days</span>
+                    <span class="stat-row__value">{{ legislation_stats.last_30_days }}</span>
+                </div>
+                <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border-light);">
+                    <a href="{{ url_for('legislation_tracker') }}" class="legislation-link" style="display: block; text-align: center; color: var(--accent-primary); text-decoration: none; font-weight: 500; font-size: 0.9rem;">
+                        View Full Tracker →
+                    </a>
+                </div>
+            </article>
+
+            <!-- Budget Tracker -->
+            <article class="infobox">
+                <h2 class="section-head">City Budget</h2>
+                {% if budget_stats and budget_stats.fiscal_year %}
+                <div class="stat-row">
+                    <span class="stat-row__label">Fiscal Year</span>
+                    <span class="stat-row__value">{{ budget_stats.fiscal_year }}</span>
+                </div>
+                {% if budget_stats.total_budget %}
+                <div class="stat-row">
+                    <span class="stat-row__label">Total Budget</span>
+                    <span class="stat-row__value">${{ "{:,.0f}".format(budget_stats.total_budget / 1000000) }}M</span>
+                </div>
+                {% endif %}
+                {% if budget_stats.percentage_spent is not none %}
+                <div class="stat-row">
+                    <span class="stat-row__label">Spent</span>
+                    <span class="stat-row__value">{{ "{:.1f}".format(budget_stats.percentage_spent) }}%</span>
+                </div>
+                {% endif %}
+                <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border-light);">
+                    <a href="{{ url_for('budget_tracker_page') }}" style="display: block; text-align: center; color: var(--accent-primary); text-decoration: none; font-weight: 500; font-size: 0.9rem;">
+                        View Full Budget →
+                    </a>
+                </div>
+                {% else %}
+                <div class="stat-row">
+                    <span class="stat-row__label" style="font-style: italic; color: var(--text-muted);">Budget data loading...</span>
+                </div>
+                <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border-light);">
+                    <a href="https://www.newhavenct.gov/government/departments-divisions/office-of-policy-management-and-grants/annual-city-budgets-audits" target="_blank" rel="noopener" style="display: block; text-align: center; color: var(--accent-primary); text-decoration: none; font-weight: 500; font-size: 0.9rem;">
+                        View Official Budget →
+                    </a>
+                </div>
+                {% endif %}
+            </article>
+
             <!-- Moon Phases -->
             <article class="infobox infobox--moon">
                 <h2 class="section-head">Moon Phases</h2>
@@ -353,6 +412,9 @@
                         <span
                             class="quick-link__icon quick-link__icon--transit"></span>
                         Transit</button>
+                    <a href="{{ url_for('legislation_tracker') }}" class="quick-link quick-link--link">
+                        <span class="quick-link__icon quick-link__icon--gavel"></span>
+                        Legislation</a>
                 </div>
             </article>
 
@@ -496,6 +558,7 @@
         <div class="footer__rule"></div>
         <nav class="footer__nav">
             <a href="{{ url_for('about') }}">About</a>
+            <a href="{{ url_for('legislation_tracker') }}">Legislation</a>
             <a href="{{ url_for('feeds_api') }}">API</a>
             <a href="{{ url_for('feeds_rss') }}" title="RSS Feed">📰 RSS</a>
             <button type="button" id="js-refresh" class="footer__refresh">↻

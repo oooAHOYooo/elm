@@ -1,0 +1,461 @@
+/* Legislation Tracker Styles */
+
+.legislation-tracker-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    font-family: 'IBM Plex Sans', sans-serif;
+}
+
+.legislation-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid #e0dcd5;
+}
+
+.legislation-header h1 {
+    font-family: 'Old Standard TT', serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    color: #6b6b6b;
+    font-style: italic;
+}
+
+.error-message {
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    color: #856404;
+}
+
+/* Statistics Section */
+.stats-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 3rem;
+}
+
+.stat-card {
+    background: white;
+    border: 1px solid #e0dcd5;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.stat-value {
+    font-family: 'Old Standard TT', serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #8b4513;
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #6b6b6b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Monthly Section */
+.monthly-section {
+    background: white;
+    border: 1px solid #e0dcd5;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 3rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.section-title {
+    font-family: 'Old Standard TT', serif;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #e0dcd5;
+}
+
+.monthly-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.month-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.month-label {
+    min-width: 120px;
+    font-weight: 500;
+    color: #4a4a4a;
+    font-size: 0.95rem;
+}
+
+.month-bar-container {
+    flex: 1;
+    height: 30px;
+    background: #f0ece4;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+}
+
+.month-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #8b4513, #d4a574);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.month-count {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: 600;
+    color: #1a1a1a;
+    font-size: 0.9rem;
+}
+
+/* Weekly Section */
+.weekly-section {
+    margin-bottom: 3rem;
+}
+
+.week-group {
+    background: white;
+    border: 1px solid #e0dcd5;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.week-header {
+    font-family: 'Old Standard TT', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #f0ece4;
+}
+
+.week-count {
+    font-size: 1rem;
+    font-weight: normal;
+    color: #6b6b6b;
+    font-family: 'IBM Plex Sans', sans-serif;
+}
+
+.legislation-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.legislation-item {
+    padding: 1rem;
+    background: #faf8f5;
+    border-radius: 6px;
+    border-left: 3px solid #8b4513;
+    transition: all 0.2s;
+}
+
+.legislation-item:hover {
+    background: #f5f3f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.leg-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.leg-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+    flex: 1;
+}
+
+.leg-title a {
+    color: #8b4513;
+    text-decoration: none;
+}
+
+.leg-title a:hover {
+    text-decoration: underline;
+}
+
+.leg-date {
+    font-size: 0.85rem;
+    color: #6b6b6b;
+    white-space: nowrap;
+}
+
+.leg-item-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.leg-file,
+.leg-type {
+    font-size: 0.85rem;
+    padding: 0.25rem 0.5rem;
+    background: white;
+    border-radius: 4px;
+    color: #4a4a4a;
+}
+
+.leg-status {
+    font-size: 0.85rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.leg-status--passed {
+    background: #d4edda;
+    color: #155724;
+}
+
+/* Civic Education Section */
+.civic-education {
+    background: #faf8f5;
+    border: 1px solid #e0dcd5;
+    border-radius: 8px;
+    padding: 2rem;
+    margin-top: 3rem;
+}
+
+.education-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.education-block {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 6px;
+    border-left: 4px solid #8b4513;
+}
+
+.education-block h3 {
+    font-family: 'Old Standard TT', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 1rem;
+}
+
+.education-block p {
+    color: #4a4a4a;
+    line-height: 1.7;
+    margin-bottom: 0.75rem;
+}
+
+.education-block a {
+    color: #8b4513;
+    text-decoration: none;
+}
+
+.education-block a:hover {
+    text-decoration: underline;
+}
+
+.process-steps {
+    list-style: none;
+    counter-reset: step-counter;
+    padding-left: 0;
+}
+
+.process-steps li {
+    counter-increment: step-counter;
+    position: relative;
+    padding-left: 2.5rem;
+    margin-bottom: 1rem;
+    color: #4a4a4a;
+    line-height: 1.7;
+}
+
+.process-steps li::before {
+    content: counter(step-counter);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 2rem;
+    height: 2rem;
+    background: #8b4513;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.process-steps strong {
+    color: #1a1a1a;
+}
+
+.rights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.right-item {
+    background: #faf8f5;
+    padding: 1.25rem;
+    border-radius: 6px;
+    border: 1px solid #e0dcd5;
+}
+
+.right-item h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 0.5rem;
+}
+
+.right-item p {
+    font-size: 0.95rem;
+    color: #4a4a4a;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.leg-types {
+    list-style: none;
+    padding-left: 0;
+}
+
+.leg-types li {
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+    background: #faf8f5;
+    border-radius: 4px;
+    border-left: 3px solid #8b4513;
+}
+
+.leg-types strong {
+    color: #1a1a1a;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.education-block--highlight {
+    background: linear-gradient(135deg, #fff9e6 0%, #fff3cd 100%);
+    border-left-color: #ffc107;
+}
+
+.education-block--highlight h3 {
+    color: #856404;
+}
+
+.no-data {
+    text-align: center;
+    padding: 2rem;
+    color: #6b6b6b;
+    font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .legislation-tracker-page {
+        padding: 1rem 0.5rem;
+    }
+
+    .legislation-header h1 {
+        font-size: 2rem;
+    }
+
+    .stats-section {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .stat-value {
+        font-size: 2rem;
+    }
+
+    .leg-item-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .rights-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .month-label {
+        min-width: 100px;
+        font-size: 0.85rem;
+    }
+}
+
+/* Dark theme support */
+[data-theme="dark"] .legislation-tracker-page {
+    background: #0a0a0a;
+    color: #f0ece4;
+}
+
+[data-theme="dark"] .stat-card,
+[data-theme="dark"] .monthly-section,
+[data-theme="dark"] .week-group,
+[data-theme="dark"] .education-block {
+    background: #1a1a1a;
+    border-color: #2a2825;
+    color: #f0ece4;
+}
+
+[data-theme="dark"] .legislation-item {
+    background: #2a2825;
+    border-left-color: #d4a574;
+}
+
+[data-theme="dark"] .month-bar-container {
+    background: #2a2825;
+}
+
+[data-theme="dark"] .right-item {
+    background: #2a2825;
+    border-color: #3a3835;
+}
+
+[data-theme="dark"] .leg-types li {
+    background: #2a2825;
+}
+
+[data-theme="dark"] .civic-education {
+    background: #141414;
+    border-color: #2a2825;
+}

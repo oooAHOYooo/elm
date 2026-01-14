@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="legislation-tracker-page">
+    <header class="legislation-header">
+        <h1>Legislation Tracker</h1>
+        <p class="subtitle">Track laws passed by the New Haven Board of Alders</p>
+    </header>
+
+    {% if error %}
+    <div class="error-message">
+        <p>⚠️ Unable to load legislation data: {{ error }}</p>
+        <p>This may be due to a temporary issue with the Legistar API. Please try again later.</p>
+    </div>
+    {% endif %}
+
+    <div class="legislation-container">
+        <!-- Statistics Summary -->
+        <section class="stats-section">
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.total_passed }}</div>
+                <div class="stat-label">Total Passed (90 days)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.this_week }}</div>
+                <div class="stat-label">This Week</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.this_month }}</div>
+                <div class="stat-label">This Month</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.last_30_days }}</div>
+                <div class="stat-label">Last 30 Days</div>
+            </div>
+        </section>
+
+        <!-- Monthly Counts -->
+        <section class="monthly-section">
+            <h2 class="section-title">Monthly Count</h2>
+            {% if monthly_counts %}
+            <div class="monthly-chart">
+                {% for month_data in monthly_counts[:6] %}
+                <div class="month-bar">
+                    <div class="month-label">{{ month_data.month_label }}</div>
+                    <div class="month-bar-container">
+                        <div class="month-bar-fill" style="width: {{ (month_data.count / monthly_counts[0].count * 100) if monthly_counts[0].count > 0 else 0 }}%"></div>
+                        <span class="month-count">{{ month_data.count }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="no-data">No legislation data available for the selected period.</p>
+            {% endif %}
+        </section>
+
+        <!-- Weekly View -->
+        <section class="weekly-section">
+            <h2 class="section-title">Weekly Breakdown</h2>
+            {% if weekly %}
+                {% for week_key, items in weekly.items()|list[:8] %}
+                <div class="week-group">
+                    <h3 class="week-header">
+                        Week of {{ items[0].week_label if items else week_key }}
+                        <span class="week-count">({{ items|length }} passed)</span>
+                    </h3>
+                    <div class="legislation-list">
+                        {% for item in items %}
+                        <div class="legislation-item">
+                            <div class="leg-item-header">
+                                <h4 class="leg-title">
+                                    {% if item.link %}
+                                    <a href="{{ item.link }}" target="_blank" rel="noopener">{{ item.title }}</a>
+                                    {% else %}
+                                    {{ item.title }}
+                                    {% endif %}
+                                </h4>
+                                <span class="leg-date">{{ item.date_display }}</span>
+                            </div>
+                            <div class="leg-item-meta">
+                                {% if item.file %}
+                                <span class="leg-file">File #{{ item.file }}</span>
+                                {% endif %}
+                                {% if item.type %}
+                                <span class="leg-type">{{ item.type }}</span>
+                                {% endif %}
+                                <span class="leg-status leg-status--passed">{{ item.status }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+            <p class="no-data">No legislation passed in the selected period.</p>
+            {% endif %}
+        </section>
+
+        <!-- Civic Education Section -->
+        <section class="civic-education">
+            <h2 class="section-title">How New Haven's Legislative Process Works</h2>
+            
+            <div class="education-content">
+                <div class="education-block">
+                    <h3>📋 The Board of Alders</h3>
+                    <p>New Haven is governed by a 30-member Board of Alders, the largest municipal legislative body in Connecticut. Each of the city's 30 wards elects one Alder to represent them.</p>
+                </div>
+
+                <div class="education-block">
+                    <h3>🔄 How Laws Are Made</h3>
+                    <ol class="process-steps">
+                        <li><strong>Introduction:</strong> An Alder or the Mayor introduces a proposed ordinance or resolution.</li>
+                        <li><strong>Committee Review:</strong> The matter is assigned to a relevant committee (e.g., Finance, Public Safety, Health & Human Services) for review and public hearing.</li>
+                        <li><strong>Public Input:</strong> Residents can attend committee meetings and public hearings to voice support or concerns.</li>
+                        <li><strong>Committee Vote:</strong> The committee votes to recommend approval, rejection, or modification.</li>
+                        <li><strong>Full Board Vote:</strong> The matter goes before the full Board of Alders for a vote. Most items require a majority vote (16 of 30) to pass.</li>
+                        <li><strong>Mayor's Approval:</strong> If passed, the Mayor can sign it into law or veto it. The Board can override a veto with a 2/3 majority (20 votes).</li>
+                    </ol>
+                </div>
+
+                <div class="education-block">
+                    <h3>👥 Your Rights to Change Laws</h3>
+                    <div class="rights-grid">
+                        <div class="right-item">
+                            <h4>🗳️ Vote</h4>
+                            <p>Elect Alders who represent your values. Municipal elections are held every two years in odd-numbered years.</p>
+                        </div>
+                        <div class="right-item">
+                            <h4>📢 Testify</h4>
+                            <p>Attend Board of Alders meetings and committee hearings to speak directly to your representatives. Public comment periods are required by law.</p>
+                        </div>
+                        <div class="right-item">
+                            <h4>✍️ Contact Your Alder</h4>
+                            <p>Reach out to your Ward Alder to express concerns, propose changes, or request action. Find your Alder at <a href="https://www.newhavenct.gov/government/board-of-alders" target="_blank">newhavenct.gov</a>.</p>
+                        </div>
+                        <div class="right-item">
+                            <h4>📝 Petition</h4>
+                            <p>Organize community petitions and gather signatures to show public support for or against legislation.</p>
+                        </div>
+                        <div class="right-item">
+                            <h4>📰 Stay Informed</h4>
+                            <p>Monitor legislation through Legistar, attend meetings, and subscribe to city notifications to track what's being proposed.</p>
+                        </div>
+                        <div class="right-item">
+                            <h4>🏛️ Run for Office</h4>
+                            <p>Any registered voter in your ward can run for Alder. Campaign finance rules apply, and you must collect petition signatures to get on the ballot.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="education-block">
+                    <h3>📅 Meeting Schedule</h3>
+                    <p>Board of Alders meetings are typically held on the first and third Monday of each month at 6:00 PM in the Aldermanic Chamber at City Hall (165 Church Street). Committee meetings are scheduled throughout the month. All meetings are open to the public.</p>
+                    <p><strong>Find meeting schedules:</strong> <a href="https://newhavenct.legistar.com/Calendar.aspx" target="_blank">Legistar Calendar</a></p>
+                </div>
+
+                <div class="education-block">
+                    <h3>🔍 Understanding Legislation Types</h3>
+                    <ul class="leg-types">
+                        <li><strong>Ordinance:</strong> A local law that becomes part of the city's code. Examples: zoning changes, parking regulations, business licensing.</li>
+                        <li><strong>Resolution:</strong> A formal statement of policy or intent. Examples: supporting state legislation, recognizing community members, setting city priorities.</li>
+                        <li><strong>Order:</strong> Administrative actions like approving contracts, accepting grants, or authorizing expenditures.</li>
+                    </ul>
+                </div>
+
+                <div class="education-block education-block--highlight">
+                    <h3>💡 Pro Tip</h3>
+                    <p>Most legislation is introduced months before it's voted on. By tracking legislation early, you have time to organize, contact your Alder, and attend committee hearings where your voice can have the most impact.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/legislation_tracker.css') }}">
+{% endblock %}

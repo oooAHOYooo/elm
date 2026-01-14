@@ -1,4 +1,5 @@
 import logging
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
@@ -10,6 +11,8 @@ from utils.cache import TTLCache
 
 _logger = logging.getLogger(__name__)
 _cache = TTLCache(ttl_seconds=600, filepath=".cache_feeds.pkl")
+# Thread pool for parallel RSS feed fetching
+_feed_executor = ThreadPoolExecutor(max_workers=6)
 
 
 def _sort_key(item: Dict[str, Any]) -> float:
@@ -28,17 +31,30 @@ def aggregate_all(timeout_rss: int = 6, timeout_ical: int = 8) -> Dict[str, Any]
 
     items: List[Dict[str, Any]] = []
 
-    # RSS sources (skip iaff_headlines as it's not an RSS feed)
+    # Parallel RSS feed fetching for better performance
+    rss_futures = {}
     for name, url in RSS_SOURCES.items():
         if name == "iaff_headlines":
             continue  # Handle separately below
-        items.extend(parse_rss(url, timeout=timeout_rss, source_key=name))
+        rss_futures[_feed_executor.submit(parse_rss, url, timeout_rss, name)] = name
 
-    # iCal sources
+    # Fetch RSS feeds in parallel
+    for future in as_completed(rss_futures, timeout=timeout_rss * 2):
+        try:
+            feed_items = future.result()
+            items.extend(feed_items)
+        except Exception as e:
+            name = rss_futures[future]
+            _logger.warning(f"Failed to fetch RSS feed {name}: {e}")
+
+    # iCal sources (usually empty, but handle if present)
     for name, url in ICAL_SOURCES.items():
-        items.extend(parse_ical(url, timeout=timeout_ical))
+        try:
+            items.extend(parse_ical(url, timeout=timeout_ical))
+        except Exception as e:
+            _logger.warning(f"Failed to fetch iCal {name}: {e}")
 
-    # The New Haven List (local events)
+    # The New Haven List (local events) - fast, local file
     try:
         from zoneinfo import ZoneInfo
         tz = ZoneInfo("America/New_York")
@@ -50,7 +66,7 @@ def aggregate_all(timeout_rss: int = 6, timeout_ical: int = 8) -> Dict[str, Any]
     except Exception as e:
         _logger.error("New Haven List error: %s", e)
 
-    # IAFF Headlines special scraper
+    # IAFF Headlines special scraper (can be slow, run separately)
     if "iaff_headlines" in RSS_SOURCES:
         try:
             iaff_items = fetch_iaff_headlines(RSS_SOURCES["iaff_headlines"])

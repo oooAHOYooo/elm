@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="business-hours-manage-page">
+    <header class="manage-header">
+        <h1>Manage Business Hours</h1>
+        <p class="subtitle">Add, edit, or remove business hours</p>
+    </header>
+
+    <div class="manage-container">
+        <div class="manage-actions">
+            <button id="add-business-btn" class="btn btn-primary">+ Add New Business</button>
+        </div>
+
+        <!-- Business List -->
+        <div class="business-list-manage">
+            {% if businesses %}
+                {% for business in businesses %}
+                <div class="business-card-manage" data-business-id="{{ business.id }}">
+                    <div class="business-card-header">
+                        <h3>{{ business.name }}</h3>
+                        <div class="business-actions">
+                            <button class="btn btn-edit" onclick="editBusiness('{{ business.id }}')">Edit</button>
+                            <button class="btn btn-delete" onclick="deleteBusiness('{{ business.id }}')">Delete</button>
+                        </div>
+                    </div>
+                    <div class="business-details">
+                        <p><strong>Category:</strong> {{ business.category|title }}</p>
+                        {% if business.address %}<p><strong>Address:</strong> {{ business.address }}</p>{% endif %}
+                        {% if business.phone %}<p><strong>Phone:</strong> {{ business.phone }}</p>{% endif %}
+                        {% if business.website %}<p><strong>Website:</strong> <a href="{{ business.website }}" target="_blank">{{ business.website }}</a></p>{% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-businesses">
+                    <p>No businesses yet. Click "Add New Business" to get started.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div id="business-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Add New Business</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="business-form" class="business-form">
+                <input type="hidden" id="business-id" name="id">
+                
+                <div class="form-group">
+                    <label for="business-name">Business Name *</label>
+                    <input type="text" id="business-name" name="name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="business-category">Category *</label>
+                    <select id="business-category" name="category" required>
+                        <option value="restaurant">Restaurant</option>
+                        <option value="retail">Retail</option>
+                        <option value="service">Service</option>
+                        <option value="cafe">Cafe</option>
+                        <option value="bar">Bar</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="business-address">Address</label>
+                    <input type="text" id="business-address" name="address">
+                </div>
+
+                <div class="form-group">
+                    <label for="business-phone">Phone</label>
+                    <input type="tel" id="business-phone" name="phone">
+                </div>
+
+                <div class="form-group">
+                    <label for="business-website">Website</label>
+                    <input type="url" id="business-website" name="website" placeholder="https://...">
+                </div>
+
+                <div class="form-group">
+                    <label>Hours</label>
+                    <div class="hours-container" id="hours-container">
+                        <!-- Hours will be populated here -->
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="business-notes">Notes</label>
+                    <textarea id="business-notes" name="notes" rows="3"></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save Business</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/business_hours.css') }}">
+    <script src="{{ url_for('static', filename='js/business_hours.js') }}"></script>
+    <script>
+        // Initialize hours form
+        const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        
+        function initializeHoursForm() {
+            const container = document.getElementById('hours-container');
+            container.innerHTML = '';
+            
+            daysOfWeek.forEach(day => {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'hours-day-row';
+                dayDiv.innerHTML = `
+                    <div class="hours-day-label">${day}</div>
+                    <div class="hours-day-controls">
+                        <label>
+                            <input type="checkbox" class="day-closed" data-day="${day}">
+                            Closed
+                        </label>
+                        <input type="time" class="day-open-time" data-day="${day}" placeholder="Open">
+                        <span>to</span>
+                        <input type="time" class="day-close-time" data-day="${day}" placeholder="Close">
+                    </div>
+                `;
+                container.appendChild(dayDiv);
+            });
+        }
+
+        function loadBusinessData(businessId) {
+            fetch(`/api/business-hours/${businessId}`)
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('business-id').value = data.id;
+                    document.getElementById('business-name').value = data.name;
+                    document.getElementById('business-category').value = data.category || 'other';
+                    document.getElementById('business-address').value = data.address || '';
+                    document.getElementById('business-phone').value = data.phone || '';
+                    document.getElementById('business-website').value = data.website || '';
+                    document.getElementById('business-notes').value = data.notes || '';
+                    
+                    // Load hours
+                    if (data.hours) {
+                        data.hours.forEach(h => {
+                            const day = h.day;
+                            const closedCheckbox = document.querySelector(`.day-closed[data-day="${day}"]`);
+                            const openTime = document.querySelector(`.day-open-time[data-day="${day}"]`);
+                            const closeTime = document.querySelector(`.day-close-time[data-day="${day}"]`);
+                            
+                            if (closedCheckbox) {
+                                closedCheckbox.checked = h.is_closed;
+                                if (h.open_time) openTime.value = h.open_time;
+                                if (h.close_time) closeTime.value = h.close_time;
+                            }
+                        });
+                    }
+                })
+                .catch(err => {
+                    console.error('Error loading business:', err);
+                    alert('Failed to load business data');
+                });
+        }
+
+        function editBusiness(businessId) {
+            document.getElementById('modal-title').textContent = 'Edit Business';
+            initializeHoursForm();
+            loadBusinessData(businessId);
+            document.getElementById('business-modal').style.display = 'block';
+        }
+
+        function deleteBusiness(businessId) {
+            if (!confirm('Are you sure you want to delete this business?')) {
+                return;
+            }
+            
+            fetch(`/api/business-hours/${businessId}`, {
+                method: 'DELETE'
+            })
+            .then(res => {
+                if (res.ok) {
+                    location.reload();
+                } else {
+                    alert('Failed to delete business');
+                }
+            })
+            .catch(err => {
+                console.error('Error deleting business:', err);
+                alert('Failed to delete business');
+            });
+        }
+
+        function closeModal() {
+            document.getElementById('business-modal').style.display = 'none';
+            document.getElementById('business-form').reset();
+            document.getElementById('business-id').value = '';
+        }
+
+        document.getElementById('add-business-btn').addEventListener('click', () => {
+            document.getElementById('modal-title').textContent = 'Add New Business';
+            document.getElementById('business-form').reset();
+            document.getElementById('business-id').value = '';
+            initializeHoursForm();
+            document.getElementById('business-modal').style.display = 'block';
+        });
+
+        document.getElementById('business-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const businessId = formData.get('id');
+            
+            // Collect hours
+            const hours = [];
+            daysOfWeek.forEach(day => {
+                const closedCheckbox = document.querySelector(`.day-closed[data-day="${day}"]`);
+                const openTime = document.querySelector(`.day-open-time[data-day="${day}"]`);
+                const closeTime = document.querySelector(`.day-close-time[data-day="${day}"]`);
+                
+                hours.push({
+                    day: day,
+                    is_closed: closedCheckbox.checked,
+                    open_time: closedCheckbox.checked ? null : openTime.value || null,
+                    close_time: closedCheckbox.checked ? null : closeTime.value || null
+                });
+            });
+            
+            const data = {
+                name: formData.get('name'),
+                category: formData.get('category'),
+                address: formData.get('address') || null,
+                phone: formData.get('phone') || null,
+                website: formData.get('website') || null,
+                notes: formData.get('notes') || null,
+                hours: hours
+            };
+            
+            if (businessId) {
+                data.id = businessId;
+            }
+            
+            const url = businessId ? `/api/business-hours/${businessId}` : '/api/business-hours';
+            const method = businessId ? 'PUT' : 'POST';
+            
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(res => {
+                if (res.ok) {
+                    location.reload();
+                } else {
+                    return res.json().then(err => {
+                        alert(err.error || 'Failed to save business');
+                    });
+                }
+            })
+            .catch(err => {
+                console.error('Error saving business:', err);
+                alert('Failed to save business');
+            });
+        });
+
+        // Initialize on load
+        initializeHoursForm();
+    </script>
+{% endblock %}
+
+
+
+
+

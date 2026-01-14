@@ -991,7 +991,7 @@ img {
 
 /* Events List */
 .events-list {
-    margin-bottom: var(--space-lg);
+    margin-bottom: var(--space-md);
 }
 
 .events-list.loading {
@@ -1000,7 +1000,7 @@ img {
 }
 
 .events-day-group {
-    margin-bottom: var(--space-md);
+    margin-bottom: var(--space-xs);
 }
 
 .events-day-group:last-child {
@@ -1009,20 +1009,20 @@ img {
 
 .events-day-group__header {
     font-family: var(--font-sans);
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 600;
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    margin-bottom: var(--space-xs);
-    padding-bottom: 2px;
+    margin-bottom: 3px;
+    padding-bottom: 1px;
     border-bottom: 1px solid var(--border-light);
 }
 
 .events-day-group__cards {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--space-xs);
+    gap: 2px;
 }
 
 .events-day-group__empty {
@@ -1035,8 +1035,8 @@ img {
 /* Event Cards */
 .event-card {
     display: flex;
-    gap: var(--space-sm);
-    padding: var(--space-sm) var(--space-xs);
+    gap: var(--space-xs);
+    padding: 4px 3px;
     background: var(--bg-card);
     border: 1px solid var(--border-light);
     border-left: 2px solid var(--accent-primary);
@@ -1060,24 +1060,24 @@ img {
 
 .event-card__time {
     flex-shrink: 0;
-    width: 50px;
+    width: 42px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 1px;
+    gap: 0;
 }
 
 .event-card__time-value {
     font-family: var(--font-sans);
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 600;
     color: var(--accent-primary);
-    line-height: 1.1;
+    line-height: 1;
 }
 
 .event-card__day-label {
     font-family: var(--font-sans);
-    font-size: 0.6rem;
+    font-size: 0.55rem;
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -1090,42 +1090,42 @@ img {
 
 .event-card__title {
     font-family: var(--font-display);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 600;
     color: var(--text-headline);
-    margin: 0 0 2px 0;
-    line-height: 1.25;
+    margin: 0 0 1px 0;
+    line-height: 1.2;
 }
 
 .event-card__location {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: var(--text-muted);
-    margin: 0 0 2px 0;
-    line-height: 1.3;
+    margin: 0 0 1px 0;
+    line-height: 1.2;
 }
 
 .event-card__description {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: var(--text-body);
-    margin: 0 0 var(--space-xs) 0;
-    line-height: 1.4;
+    margin: 0 0 2px 0;
+    line-height: 1.3;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
 
 .event-card__more {
     font-family: var(--font-sans);
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: var(--accent-primary);
     background: none;
     border: none;
     padding: 0;
-    margin-top: 2px;
+    margin-top: 1px;
     cursor: pointer;
     text-decoration: underline;
-    text-underline-offset: 2px;
+    text-underline-offset: 1px;
 }
 
 .event-card__more:hover {
@@ -2337,6 +2337,31 @@ img {
     left: 50%;
     transform: translateX(-50%);
     box-shadow: 0 4px 0 currentColor;
+}
+
+/* Legislation/Gavel Icon */
+.quick-link__icon--gavel::before {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 2px;
+    background: currentColor;
+    top: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 3px 0 currentColor, 0 6px 0 currentColor;
+}
+
+.quick-link__icon--gavel::after {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border: 2px solid currentColor;
+    border-radius: 2px;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 /* Footer freshness timestamp */
