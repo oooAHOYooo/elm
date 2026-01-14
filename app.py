@@ -319,15 +319,17 @@ def create_app() -> Flask:
         agg_items = agg_items[:20]
         
         unified_events: List[Dict[str, Any]] = []
+        # Optimized: Cache category set lookup
+        event_categories = {"events", "city_events", "city_calendar_items", "music_arts"}
         for it in agg_items:
             category = it.get("category") or "news"
-            if category in {"events", "city_events", "city_calendar_items", "music_arts"}:
+            if category in event_categories:
                 source_meta = it.get("source") or {}
                 unified_events.append({
                     "title": it.get("title"),
                     "link": it.get("link"),
                     "summary": it.get("summary"),
-                    "source": source_meta.get("name") or "Source",
+                    "source": source_meta.get("name") if isinstance(source_meta, dict) else (source_meta or "Source"),
                     "date_iso": it.get("date"),
                     "location": it.get("location"),
                 })
