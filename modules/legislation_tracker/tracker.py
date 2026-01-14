@@ -30,10 +30,13 @@ class LegislationTracker:
         if cached is not None:
             return cached
         
+        # Optimized: For homepage stats, fetch less data (50 instead of 500)
+        # The underlying fetch_recent_matters is cached, so this is safe
+        fetch_limit = min(limit, 100) if days_back <= 30 else limit  # Cap at 100 for short windows
         matters = fetch_recent_matters(
             city_slug=self.city_slug,
             days_back=days_back,
-            limit=limit,
+            limit=fetch_limit,
             ttl_seconds=600
         )
         

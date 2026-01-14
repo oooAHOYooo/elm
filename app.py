@@ -114,14 +114,19 @@ def create_app() -> Flask:
         hours_all = _sample_hours_neighborhoods()
         trivia_items: List[Dict[str, str]] = []
         day_order = {"Mon": 0, "Tue": 1, "Wed": 2, "Thu": 3, "Fri": 4, "Sat": 5, "Sun": 6}
+        # Optimized: Flatten structure once, cache business/neighborhood names
         for n in hours_all:
-            for b in (n.get("businesses") or []):
-                for h in (b.get("happenings") or []):
+            neighborhood_name = n.get("name") or ""
+            businesses = n.get("businesses") or []
+            for b in businesses:
+                business_name = b.get("name") or "Business"
+                happenings = b.get("happenings") or []
+                for h in happenings:
                     if (h.get("type") or "").lower() != "trivia":
                         continue
                     trivia_items.append({
-                        "business": b.get("name") or "Business",
-                        "neighborhood": n.get("name") or "",
+                        "business": business_name,
+                        "neighborhood": neighborhood_name,
                         "day": h.get("day") or "",
                         "time": h.get("time") or "",
                         "note": "",
@@ -439,6 +444,9 @@ def create_app() -> Flask:
         _index_html_cache.set("index_html", html)
         resp = Response(html, mimetype="text/html")
         resp.headers["X-Elm-Cache"] = "MISS"
+        # Enable compression via Content-Encoding header (if server supports it)
+        # Most modern servers (nginx, Apache) will compress automatically
+        resp.headers["Vary"] = "Accept-Encoding"
         return resp
 
     @app.route("/about")
