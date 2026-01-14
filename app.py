@@ -310,6 +310,8 @@ def create_app() -> Flask:
         # Events from aggregator (already fetched in parallel)
         agg = results.get("agg", {})
         agg_items = agg.get("items", [])
+        # Limit to most recent 20 items for homepage performance (reduced from 30)
+        agg_items = agg_items[:20]
         
         unified_events: List[Dict[str, Any]] = []
         for it in agg_items:
@@ -570,7 +572,9 @@ def create_app() -> Flask:
                         "summary": e.description,
                     })
         
-        week_events.sort(key=lambda x: x.get("date_iso", ""))
+        # Only sort if we have events
+        if week_events:
+            week_events.sort(key=lambda x: x.get("date_iso", ""))
         
         # Build grid
         week_grid = []
