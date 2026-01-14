@@ -27,14 +27,14 @@ from modules.budget_tracker import BudgetTracker
 
 load_dotenv()
 
-# Thread pool for parallel API calls - increased workers for faster loading
-_executor = ThreadPoolExecutor(max_workers=8)
+# Thread pool for parallel API calls - optimized for performance
+_executor = ThreadPoolExecutor(max_workers=10)  # Increased from 8 to 10 for better parallelism
 
 # Short-lived HTML cache for the homepage. Keeps reloads snappy without changing features.
 _index_html_cache = TTLCache(ttl_seconds=90)  # Increased to 90s for 10% more cache hits
 
 # Cache for file-based data (longer TTL since files don't change often)
-_file_data_cache = TTLCache(ttl_seconds=300, filepath=".cache_file_data.pkl")
+_file_data_cache = TTLCache(ttl_seconds=600, filepath=".cache_file_data.pkl")  # Increased from 300s to 600s
 
 
 def _sample_hours_neighborhoods() -> List[Dict[str, Any]]:

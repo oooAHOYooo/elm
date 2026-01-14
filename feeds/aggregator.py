@@ -12,7 +12,7 @@ from utils.cache import TTLCache
 _logger = logging.getLogger(__name__)
 _cache = TTLCache(ttl_seconds=600, filepath=".cache_feeds.pkl")
 # Thread pool for parallel RSS feed fetching
-_feed_executor = ThreadPoolExecutor(max_workers=6)
+_feed_executor = ThreadPoolExecutor(max_workers=8)  # Increased from 6 to 8 for faster RSS aggregation
 
 
 def _sort_key(item: Dict[str, Any]) -> float:
