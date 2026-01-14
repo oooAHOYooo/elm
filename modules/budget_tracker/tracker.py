@@ -184,30 +184,35 @@ class BudgetTracker:
         }
     
     def get_budget_stats(self) -> Dict[str, Any]:
-        """Get summary statistics for front page widget"""
+        """Get MVP summary statistics for front page widget - simplified for performance"""
+        cache_key = "budget:stats"
+        cached = self._get_cache(cache_key)
+        if cached:
+            return cached
+        
         summary = self.fetch_budget_summary()
         
         if not summary or not summary.get("departments"):
-            return {
+            result = {
                 "fiscal_year": None,
                 "total_budget": None,
                 "total_spent": None,
-                "percentage_spent": None,
-                "department_count": 0,
-                "top_department": None
+                "percentage_spent": None
             }
+            self._set_cache(cache_key, result)
+            return result
         
         departments = summary.get("departments", [])
         total_budget = summary.get("total_budget", 0)
         total_spent = sum(d.get("spent", 0) for d in departments)
         
-        return {
+        result = {
             "fiscal_year": summary.get("fiscal_year"),
             "total_budget": total_budget,
             "total_spent": total_spent,
             "remaining": total_budget - total_spent,
-            "percentage_spent": (total_spent / total_budget * 100) if total_budget > 0 else 0,
-            "department_count": len(departments),
-            "top_department": departments[0].get("name") if departments else None,
-            "last_updated": summary.get("last_updated")
+            "percentage_spent": (total_spent / total_budget * 100) if total_budget > 0 else 0
         }
+        
+        self._set_cache(cache_key, result)
+        return result

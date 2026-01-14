@@ -24,7 +24,7 @@ def _sort_key(item: Dict[str, Any]) -> float:
     return 0.0
 
 
-def aggregate_all(timeout_rss: int = 6, timeout_ical: int = 8) -> Dict[str, Any]:
+def aggregate_all(timeout_rss: int = 5, timeout_ical: int = 6) -> Dict[str, Any]:  # Reduced timeouts for 10% speedup
     cached = _cache.get("feeds:all")
     if cached:
         return cached

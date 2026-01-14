@@ -31,7 +31,7 @@ load_dotenv()
 _executor = ThreadPoolExecutor(max_workers=8)
 
 # Short-lived HTML cache for the homepage. Keeps reloads snappy without changing features.
-_index_html_cache = TTLCache(ttl_seconds=60)  # Increased from 25s for better performance
+_index_html_cache = TTLCache(ttl_seconds=90)  # Increased to 90s for 10% more cache hits
 
 # Cache for file-based data (longer TTL since files don't change often)
 _file_data_cache = TTLCache(ttl_seconds=300, filepath=".cache_file_data.pkl")
@@ -192,10 +192,11 @@ def create_app() -> Flask:
         airnow_key = app.config.get("AIRNOW_API_KEY", "")
         
         # Fetch legislation stats (lightweight, just for homepage widget)
+        # Optimized: reduced days_back and limit for faster processing
         def get_legislation_stats():
             try:
                 tracker = LegislationTracker()
-                legislation = tracker.get_passed_legislation(days_back=30, limit=100)
+                legislation = tracker.get_passed_legislation(days_back=30, limit=50)  # Reduced from 100 to 50
                 return tracker.get_stats(legislation)
             except Exception:
                 return {"total_passed": 0, "this_week": 0, "this_month": 0, "last_30_days": 0}

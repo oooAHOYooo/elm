@@ -1,72 +1,6 @@
 {
   "neighborhoods": [
     {
-      "name": "East Rock",
-      "kicker": "Coffee, corner stores, and late-night bites",
-      "businesses": [
-        {
-          "name": "Sample Café",
-          "category": "Coffee",
-          "status": "open",
-          "today": "7a–3p",
-          "address": "123 Orange St",
-          "phone": "(203) 555-0101",
-          "description": "Neighborhood coffee counter with espresso and simple pastries.",
-          "week": [
-            { "day": "Mon", "hours": "7a–3p" },
-            { "day": "Tue", "hours": "7a–3p" },
-            { "day": "Wed", "hours": "7a–3p" },
-            { "day": "Thu", "hours": "7a–3p" },
-            { "day": "Fri", "hours": "7a–4p" },
-            { "day": "Sat", "hours": "8a–4p" },
-            { "day": "Sun", "hours": "8a–2p" }
-          ]
-        },
-        {
-          "name": "Sample Market",
-          "category": "Groceries",
-          "status": "open",
-          "today": "8a–9p",
-          "address": "45 State St",
-          "phone": "(203) 555-0133",
-          "description": "Small neighborhood market for quick staples and snacks.",
-          "week": [
-            { "day": "Mon", "hours": "8a–9p" },
-            { "day": "Tue", "hours": "8a–9p" },
-            { "day": "Wed", "hours": "8a–9p" },
-            { "day": "Thu", "hours": "8a–9p" },
-            { "day": "Fri", "hours": "8a–10p" },
-            { "day": "Sat", "hours": "8a–10p" },
-            { "day": "Sun", "hours": "9a–8p" }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Wooster Square",
-      "kicker": "Slices, parks, and neighborhood staples",
-      "businesses": [
-        {
-          "name": "Sample Pizzeria",
-          "category": "Food",
-          "status": "open",
-          "today": "11a–10p",
-          "address": "9 Wooster Pl",
-          "phone": "(203) 555-0199",
-          "description": "Local slice shop with pies, salads, and a steady lunch rush.",
-          "week": [
-            { "day": "Mon", "hours": "11a–10p" },
-            { "day": "Tue", "hours": "11a–10p" },
-            { "day": "Wed", "hours": "11a–10p" },
-            { "day": "Thu", "hours": "11a–10p" },
-            { "day": "Fri", "hours": "11a–11p" },
-            { "day": "Sat", "hours": "11a–11p" },
-            { "day": "Sun", "hours": "12p–9p" }
-          ]
-        }
-      ]
-    },
-    {
       "name": "Ninth Square",
       "kicker": "Downtown blocks: bars, bookstores, dinner",
       "businesses": [
@@ -179,66 +113,6 @@
             { "day": "Thu", "hours": "5p–12a" },
             { "day": "Fri", "hours": "5p–1a" },
             { "day": "Sat", "hours": "5p–1a" },
-            { "day": "Sun", "hours": "Closed" }
-          ]
-        },
-        {
-          "name": "Sample Bookshop",
-          "category": "Retail",
-          "status": "closed",
-          "today": "10a–6p",
-          "address": "100 Crown St",
-          "phone": "(203) 555-0120",
-          "description": "Independent bookshop for browsing, gifts, and weekend pickups.",
-          "week": [
-            { "day": "Mon", "hours": "10a–6p" },
-            { "day": "Tue", "hours": "10a–6p" },
-            { "day": "Wed", "hours": "10a–6p" },
-            { "day": "Thu", "hours": "10a–8p" },
-            { "day": "Fri", "hours": "10a–8p" },
-            { "day": "Sat", "hours": "10a–6p" },
-            { "day": "Sun", "hours": "12p–5p" }
-          ]
-        },
-        {
-          "name": "Sample Bar",
-          "category": "Bar",
-          "status": "open",
-          "today": "4p–1a",
-          "address": "77 Temple St",
-          "phone": "(203) 555-0117",
-          "description": "Late-night neighborhood bar with a small rotating menu and cocktails.",
-          "week": [
-            { "day": "Mon", "hours": "4p–12a" },
-            { "day": "Tue", "hours": "4p–12a" },
-            { "day": "Wed", "hours": "4p–12a" },
-            { "day": "Thu", "hours": "4p–1a" },
-            { "day": "Fri", "hours": "4p–1a" },
-            { "day": "Sat", "hours": "2p–1a" },
-            { "day": "Sun", "hours": "2p–10p" }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "Westville",
-      "kicker": "Independent shops and weekend errands",
-      "businesses": [
-        {
-          "name": "Sample Florist",
-          "category": "Services",
-          "status": "open",
-          "today": "9a–5p",
-          "address": "12 Whalley Ave",
-          "phone": "(203) 555-0166",
-          "description": "Florals and simple gifts—good for last-minute errands.",
-          "week": [
-            { "day": "Mon", "hours": "9a–5p" },
-            { "day": "Tue", "hours": "9a–5p" },
-            { "day": "Wed", "hours": "9a–5p" },
-            { "day": "Thu", "hours": "9a–5p" },
-            { "day": "Fri", "hours": "9a–5p" },
-            { "day": "Sat", "hours": "10a–4p" },
             { "day": "Sun", "hours": "Closed" }
           ]
         }
