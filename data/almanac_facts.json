@@ -10,7 +10,10 @@
     "elevation_ft": 59,
     "timezone": "America/New_York",
     "zip_codes": ["06510", "06511", "06513", "06515", "06519"],
-    "area_code": "203"
+    "area_code": "203",
+    "motto": "Ipsa scientia potestas est (Knowledge itself is power)",
+    "county": "New Haven County",
+    "neighboring_cities": ["West Haven", "Hamden", "East Haven", "North Haven", "Woodbridge"]
   },
   "government": {
     "mayor": "Justin Elicker",
@@ -24,13 +27,15 @@
     {
       "name": "Yale University",
       "founded": 1701,
-      "type": "University"
+      "type": "University",
+      "note": "One of the oldest universities in America"
     },
     {
       "name": "New Haven Green",
       "established": 1638,
       "type": "Public Park",
-      "acres": 16
+      "acres": 16,
+      "note": "One of the oldest public parks in America, site of many historic events"
     },
     {
       "name": "Peabody Museum",
@@ -40,7 +45,8 @@
     {
       "name": "Shubert Theatre",
       "opened": 1914,
-      "type": "Theater"
+      "type": "Theater",
+      "note": "Known as 'Birthplace of the Nation's Greatest Hits'"
     }
   ],
   "historical_dates": [
@@ -129,6 +135,123 @@
       "event": "First electric streetcar runs in New Haven"
     }
   ],
+  "famous_residents": [
+    {
+      "name": "Eli Whitney",
+      "years": "1765-1825",
+      "notable": "Inventor of the cotton gin, revolutionized manufacturing"
+    },
+    {
+      "name": "Charles Goodyear",
+      "years": "1800-1860",
+      "notable": "Inventor of vulcanized rubber"
+    },
+    {
+      "name": "Samuel F.B. Morse",
+      "years": "1791-1872",
+      "notable": "Inventor of the telegraph and Morse code"
+    },
+    {
+      "name": "Noah Webster",
+      "years": "1758-1843",
+      "notable": "Lexicographer, author of American Dictionary"
+    },
+    {
+      "name": "Roger Sherman",
+      "years": "1721-1793",
+      "notable": "Signer of Declaration of Independence and Constitution"
+    },
+    {
+      "name": "Paul Newman",
+      "years": "1925-2008",
+      "notable": "Actor, philanthropist, co-founder of Newman's Own"
+    }
+  ],
+  "annual_events": [
+    {
+      "name": "International Festival of Arts & Ideas",
+      "month": 6,
+      "typical_dates": "Mid-June",
+      "description": "Multi-day festival featuring music, theater, dance, and ideas"
+    },
+    {
+      "name": "New Haven Road Race",
+      "month": 9,
+      "typical_dates": "Labor Day weekend",
+      "description": "Annual road race through downtown New Haven"
+    },
+    {
+      "name": "Wooster Square Cherry Blossom Festival",
+      "month": 4,
+      "typical_dates": "Late April",
+      "description": "Celebration of cherry blossoms in Wooster Square"
+    },
+    {
+      "name": "Independence Day Parade",
+      "month": 7,
+      "typical_dates": "July 4th",
+      "description": "Annual Fourth of July parade"
+    },
+    {
+      "name": "New Haven Jazz Festival",
+      "month": 8,
+      "typical_dates": "Early August",
+      "description": "Free outdoor jazz festival on the Green"
+    }
+  ],
+  "local_traditions": [
+    {
+      "name": "Apizza",
+      "description": "New Haven-style pizza (thin crust, coal-fired), famous at places like Frank Pepe's, Sally's, and Modern"
+    },
+    {
+      "name": "Yale-Harvard Game",
+      "description": "The Game - annual football rivalry between Yale and Harvard, one of oldest in college football"
+    },
+    {
+      "name": "Elm Trees",
+      "description": "City known as 'Elm City' - historically had many elm trees, though many were lost to Dutch elm disease"
+    }
+  ],
+  "climate_normals": {
+    "january": {"avg_high": 37, "avg_low": 22, "avg_precip_inches": 3.5},
+    "february": {"avg_high": 40, "avg_low": 24, "avg_precip_inches": 3.1},
+    "march": {"avg_high": 48, "avg_low": 31, "avg_precip_inches": 4.2},
+    "april": {"avg_high": 60, "avg_low": 41, "avg_precip_inches": 4.3},
+    "may": {"avg_high": 71, "avg_low": 51, "avg_precip_inches": 4.0},
+    "june": {"avg_high": 80, "avg_low": 61, "avg_precip_inches": 3.8},
+    "july": {"avg_high": 85, "avg_low": 67, "avg_precip_inches": 3.9},
+    "august": {"avg_high": 83, "avg_low": 66, "avg_precip_inches": 4.1},
+    "september": {"avg_high": 76, "avg_low": 58, "avg_precip_inches": 4.0},
+    "october": {"avg_high": 65, "avg_low": 47, "avg_precip_inches": 4.2},
+    "november": {"avg_high": 54, "avg_low": 38, "avg_precip_inches": 4.0},
+    "december": {"avg_high": 43, "avg_low": 29, "avg_precip_inches": 4.1}
+  },
+  "gardening_calendar": {
+    "last_frost": "April 15",
+    "first_frost": "October 15",
+    "growing_season_days": 183,
+    "planting_tips": {
+      "spring": "Start seeds indoors in March, transplant after last frost",
+      "summer": "Direct sow warm-weather crops in May-June",
+      "fall": "Plant cool-weather crops in August for fall harvest"
+    }
+  },
+  "nature_calendar": {
+    "cherry_blossoms": {
+      "peak": "Late April",
+      "location": "Wooster Square"
+    },
+    "fall_foliage": {
+      "peak": "Mid-October",
+      "best_locations": ["East Rock Park", "West Rock Ridge"]
+    },
+    "bird_migration": {
+      "spring": "March-April",
+      "fall": "September-October",
+      "note": "New Haven is on Atlantic Flyway"
+    }
+  },
   "school_calendar": {
     "district": "New Haven Public Schools",
     "school_year_start": "September",
@@ -163,5 +286,26 @@
     "parks": 100,
     "museums": 5,
     "theaters": 3
-  }
+  },
+  "demographics": {
+    "population": 134023,
+    "median_age": 29.8,
+    "median_household_income": 44389,
+    "homeownership_rate": 0.32,
+    "languages": ["English", "Spanish", "Other"]
+  },
+  "major_employers": [
+    "Yale University",
+    "Yale New Haven Hospital",
+    "City of New Haven",
+    "Southern Connecticut State University",
+    "United Illuminating"
+  ],
+  "industries": [
+    "Education",
+    "Healthcare",
+    "Biotechnology",
+    "Financial Services",
+    "Manufacturing"
+  ]
 }

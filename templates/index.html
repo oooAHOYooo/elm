@@ -68,6 +68,12 @@
                         <span class="weather-stat__value">{{ weather.sunset if
                             weather and weather.sunset else '--' }}</span>
                     </div>
+                    {% if day_length %}
+                    <div class="weather-stat">
+                        <span class="weather-stat__label">Daylight</span>
+                        <span class="weather-stat__value">{{ day_length }}</span>
+                    </div>
+                    {% endif %}
                 </div>
                 {% if air_quality and air_quality.available %}
                 <div class="aqi-inline">
