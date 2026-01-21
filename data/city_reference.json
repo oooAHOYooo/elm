@@ -1,0 +1,298 @@
+{
+  "emergency_services": {
+    "police": {
+      "non_emergency": "(203) 946-6333",
+      "emergency": "911",
+      "headquarters": "1 Union Ave, New Haven, CT 06519"
+    },
+    "fire": {
+      "non_emergency": "(203) 946-6300",
+      "emergency": "911",
+      "headquarters": "952 Grand Ave, New Haven, CT 06511"
+    },
+    "poison_control": "(800) 222-1222",
+    "211_united_way": "211",
+    "description": "For life-threatening emergencies, call 911. For non-emergency police or fire services, use the numbers above."
+  },
+  "hospitals": [
+    {
+      "name": "Yale New Haven Hospital",
+      "type": "Level I Trauma Center",
+      "address": "20 York St, New Haven, CT 06510",
+      "phone": "(203) 688-4242",
+      "emergency": "24/7",
+      "note": "Adult and pediatric trauma center"
+    },
+    {
+      "name": "Yale New Haven Hospital - Saint Raphael Campus",
+      "address": "1450 Chapel St, New Haven, CT 06511",
+      "phone": "(203) 789-3000",
+      "emergency": "24/7"
+    }
+  ],
+  "utilities": {
+    "water_sewer": {
+      "name": "Greater New Haven Water Pollution Control Authority (GNHWPCA)",
+      "emergency": "(203) 466-5260",
+      "phone": "(203) 466-5280",
+      "website": "https://gnhwpca.com"
+    },
+    "electric": {
+      "name": "United Illuminating (UI)",
+      "outage_reporting": "(800) 722-5584",
+      "phone": "(800) 722-5584",
+      "website": "https://www.uinet.com"
+    },
+    "gas": {
+      "name": "Southern Connecticut Gas",
+      "emergency": "(203) 389-4000",
+      "phone": "(800) 513-8898",
+      "website": "https://www.soconngas.com"
+    }
+  },
+  "transit": {
+    "union_station": {
+      "name": "New Haven Union Station",
+      "address": "50 Union Ave, New Haven, CT 06519",
+      "hours": "4am-1am daily",
+      "ticket_office": "6:30am-10:30pm",
+      "services": ["Metro-North", "Shore Line East", "Amtrak", "CTrail"],
+      "amenities": ["Food court", "Bike racks", "ADA accessible", "Parking garages"]
+    },
+    "state_street_station": {
+      "name": "New Haven State Street Station",
+      "services": ["CTrail", "Shore Line East", "Some Metro-North trains"],
+      "note": "Smaller station, primarily for commuter rail"
+    },
+    "union_station_shuttle": {
+      "name": "Union Station Shuttle",
+      "description": "Free shuttle connecting Union Station, New Haven Green, and downtown parking garages",
+      "frequency": "Every 20 minutes",
+      "hours": "6:05am-12:55am daily",
+      "route": "Union Station ↔ Green ↔ Downtown Garages"
+    },
+    "via_nhv": {
+      "name": "Via NHV",
+      "type": "On-demand shared ride service",
+      "hours": "7am-7pm daily",
+      "coverage": "Many neighborhoods in New Haven",
+      "fare": "$1.75 standard (discounted for low-income/seniors)",
+      "phone": "(203) 946-8222",
+      "website": "https://portal.ct.gov/dot/travel-gateway/public-transportation/microtransit-pilot-program"
+    },
+    "ct_transit": {
+      "name": "CT Transit New Haven",
+      "routes": 24,
+      "hub": "New Haven Green",
+      "phone": "(203) 624-0151",
+      "website": "https://www.cttransit.com"
+    }
+  },
+  "parks": [
+    {
+      "name": "Lighthouse Point Park",
+      "acres": 82,
+      "features": ["Beach", "Carousel", "Lighthouse", "Picnic areas", "Playground"],
+      "seasonal": "Beach open Memorial Day - Labor Day",
+      "address": "2 Lighthouse Rd, New Haven, CT 06512"
+    },
+    {
+      "name": "East Rock Park",
+      "acres": 427,
+      "features": ["Hiking trails", "Summit views", "Playground", "Seasonal road access"],
+      "note": "Road to summit seasonally open/closed"
+    },
+    {
+      "name": "West Rock Ridge State Park",
+      "acres": 1500,
+      "features": ["Hiking", "Rock climbing", "Historic sites", "Scenic overlooks"]
+    },
+    {
+      "name": "New Haven Green",
+      "acres": 16,
+      "features": ["Historic site", "Events venue", "Downtown center"],
+      "established": 1638,
+      "note": "One of the oldest public parks in America"
+    }
+  ],
+  "libraries": [
+    {
+      "name": "Ives Main Library",
+      "address": "133 Elm St, New Haven, CT 06511",
+      "phone": "(203) 946-8130",
+      "hours": {
+        "monday": "9am-8pm",
+        "tuesday": "9am-8pm",
+        "wednesday": "9am-8pm",
+        "thursday": "9am-8pm",
+        "friday": "9am-5pm",
+        "saturday": "10am-5pm",
+        "sunday": "1pm-5pm"
+      },
+      "features": ["Memory Lab", "Study rooms", "WiFi", "Events"]
+    },
+    {
+      "name": "Fair Haven Branch",
+      "address": "182 Grand Ave, New Haven, CT 06513",
+      "phone": "(203) 946-8115"
+    },
+    {
+      "name": "Mitchell Branch",
+      "address": "37 Harrison St, New Haven, CT 06515",
+      "phone": "(203) 946-8117"
+    },
+    {
+      "name": "Stetson Branch",
+      "address": "200 Dixwell Ave, New Haven, CT 06511",
+      "phone": "(203) 946-8119"
+    },
+    {
+      "name": "Wilson Branch",
+      "address": "303 Washington Ave, New Haven, CT 06519",
+      "phone": "(203) 946-8125"
+    }
+  ],
+  "museums": [
+    {
+      "name": "New Haven Museum & Historical Society",
+      "address": "114 Whitney Ave, New Haven, CT 06510",
+      "phone": "(203) 562-4183",
+      "hours": "Tue-Fri 10am-5pm, Sat 12pm-5pm",
+      "note": "Collections include New Haven history, artifacts, and exhibits"
+    },
+    {
+      "name": "Yale Peabody Museum",
+      "address": "170 Whitney Ave, New Haven, CT 06511",
+      "note": "Natural history museum (currently closed for renovation)"
+    }
+  ],
+  "city_departments": {
+    "mayor_office": {
+      "name": "Mayor's Office",
+      "phone": "(203) 946-8200",
+      "address": "165 Church St, New Haven, CT 06510"
+    },
+    "city_clerk": {
+      "name": "City Clerk",
+      "phone": "(203) 946-8350",
+      "services": ["Vital records", "DMV services", "Licenses"]
+    },
+    "public_works": {
+      "name": "Public Works",
+      "phone": "(203) 946-8112",
+      "services": ["Trash/recycling", "Street maintenance", "Snow removal"]
+    },
+    "parks_rec": {
+      "name": "Parks & Recreation",
+      "phone": "(203) 946-8027",
+      "services": ["Parks", "Recreation programs", "Community centers"]
+    },
+    "parking_authority": {
+      "name": "New Haven Parking Authority",
+      "phone": "(203) 946-8075",
+      "services": ["Parking permits", "Garage information", "Meter enforcement"]
+    },
+    "health_department": {
+      "name": "Health Department",
+      "phone": "(203) 946-6998",
+      "services": ["Public health", "Food safety", "Health alerts"]
+    },
+    "registrar_voters": {
+      "name": "Registrar of Voters",
+      "phone": "(203) 946-8035",
+      "services": ["Voter registration", "Election information", "Early voting"]
+    }
+  },
+  "neighborhoods": [
+    {"name": "Downtown", "zip": "06510"},
+    {"name": "East Rock", "zip": "06511"},
+    {"name": "Fair Haven", "zip": "06513"},
+    {"name": "Westville", "zip": "06515"},
+    {"name": "West Haven", "zip": "06519"},
+    {"name": "Wooster Square", "zip": "06510"},
+    {"name": "Hill", "zip": "06519"},
+    {"name": "Dixwell", "zip": "06511"},
+    {"name": "Newhallville", "zip": "06511"}
+  ],
+  "major_highways": [
+    {"name": "I-95", "description": "North-south highway, major commuter route"},
+    {"name": "I-91", "description": "North-south highway, connects to Hartford"},
+    {"name": "Route 1", "description": "Boston Post Road, historic route"},
+    {"name": "Route 34", "description": "Connector highway, downtown access"}
+  ],
+  "historic_sites": [
+    {
+      "name": "Grove Street Cemetery",
+      "established": 1797,
+      "note": "First chartered burial ground in America"
+    },
+    {
+      "name": "Fort Nathan Hale",
+      "note": "Historic fort site, now a park"
+    },
+    {
+      "name": "New Haven Armory",
+      "address": "Goffe St",
+      "note": "Historic armory building"
+    }
+  ],
+  "social_services": {
+    "legal_assistance": {
+      "name": "New Haven Legal Assistance Association",
+      "phone": "(203) 946-4811",
+      "services": ["Free legal aid", "Tenant rights", "Family law"]
+    },
+    "food_pantries": {
+      "note": "Multiple locations throughout city",
+      "info": "Contact 211 United Way for locations and hours"
+    },
+    "shelters": {
+      "note": "Emergency and transitional housing available",
+      "info": "Contact 211 United Way or Community Navigators"
+    }
+  },
+  "waste_management": {
+    "trash_collection": {
+      "provider": "City of New Haven",
+      "frequency": "Weekly",
+      "bins": "Brown toter for trash, Blue bin for recycling"
+    },
+    "bulk_trash": {
+      "policy": "One free appointment per year, $50 after",
+      "phone": "(203) 946-8112",
+      "note": "Requires appointment"
+    },
+    "recycling": {
+      "accepted": "Paper, cardboard, plastics 1-7, glass",
+      "not_accepted": "Styrofoam, plastic bags, food waste"
+    },
+    "yard_waste": {
+      "season": "April - December",
+      "method": "Paper bags only",
+      "schedule": "Weekly during season"
+    }
+  },
+  "parking_garages": [
+    {
+      "name": "Temple Street Garage",
+      "location": "Temple St, Downtown",
+      "note": "Near New Haven Green"
+    },
+    {
+      "name": "Crown Street Garage",
+      "location": "Crown St, Downtown"
+    },
+    {
+      "name": "Air Rights Garage",
+      "location": "Union Station area"
+    },
+    {
+      "name": "Church Street South Garage",
+      "location": "Church St, Downtown"
+    }
+  ],
+  "payment_methods": {
+    "parking": ["GoNewHaven app", "ParkMobile app", "Pay-by-meter", "Pay-by-text"],
+    "utilities": ["Online", "Phone", "Mail", "In-person at City Hall"]
+  }
+}

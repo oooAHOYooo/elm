@@ -270,6 +270,16 @@
                     </div>
                 </div>
                 {% endif %}
+                {% if city_reference and city_reference.emergency_services %}
+                <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border-light);">
+                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Quick Contacts</div>
+                    <div style="font-size: 0.85rem;">
+                        <div style="margin-bottom: 0.25rem;"><strong>Emergency:</strong> <a href="tel:911" style="color: var(--accent-primary);">911</a></div>
+                        <div style="margin-bottom: 0.25rem;"><strong>Police:</strong> <a href="tel:+12039466333" style="color: var(--accent-link);">{{ city_reference.emergency_services.police.non_emergency }}</a></div>
+                        <div><strong>Fire:</strong> <a href="tel:+12039466300" style="color: var(--accent-link);">{{ city_reference.emergency_services.fire.non_emergency }}</a></div>
+                    </div>
+                </div>
+                {% endif %}
             </article>
             {% endif %}
 
@@ -871,6 +881,104 @@
     <div class="popup-footer">
         <a href="https://www.cttransit.com" target="_blank" rel="noopener">CT
             Transit →</a>
+    </div>
+</div>
+
+<!-- City Reference Popup -->
+<div class="popup-panel" id="popup-reference" data-popup="reference">
+    <div class="popup-header">
+        <h3><span class="popup-header__icon popup-header__icon--info"></span>
+            City Reference</h3>
+        <button class="popup-close" aria-label="Close">×</button>
+    </div>
+    <div class="popup-body popup-body--content">
+        {% if city_reference %}
+        {% if city_reference.emergency_services %}
+        <div class="popup-section">
+            <h4>Emergency Services</h4>
+            <div class="popup-stat"><strong>Police (Non-Emergency):</strong> <a
+                    href="tel:+12039466333">{{ city_reference.emergency_services.police.non_emergency }}</a></div>
+            <div class="popup-stat"><strong>Fire (Non-Emergency):</strong> <a
+                    href="tel:+12039466300">{{ city_reference.emergency_services.fire.non_emergency }}</a></div>
+            <div class="popup-stat"><strong>Emergency:</strong> <a href="tel:911">911</a></div>
+            <div class="popup-stat"><strong>211 United Way:</strong> <a href="tel:211">211</a></div>
+        </div>
+        {% endif %}
+        {% if city_reference.hospitals %}
+        <div class="popup-section">
+            <h4>Hospitals</h4>
+            {% for hospital in city_reference.hospitals %}
+            <div style="margin-bottom: var(--space-sm);">
+                <strong>{{ hospital.name }}</strong>
+                {% if hospital.type %}<span style="font-size: 0.85rem; color: var(--text-muted);"> ({{ hospital.type }})</span>{% endif %}
+                <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem;">
+                    <a href="tel:{{ hospital.phone|replace('(', '')|replace(')', '')|replace(' ', '')|replace('-', '') }}">{{ hospital.phone }}</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% if city_reference.utilities %}
+        <div class="popup-section">
+            <h4>Utilities</h4>
+            {% if city_reference.utilities.water_sewer %}
+            <div class="popup-stat"><strong>Water/Sewer:</strong> <a
+                    href="tel:+12034665280">{{ city_reference.utilities.water_sewer.phone }}</a></div>
+            <div class="popup-stat" style="font-size: 0.85rem; color: var(--text-muted);">Emergency: <a
+                    href="tel:+12034665260">{{ city_reference.utilities.water_sewer.emergency }}</a></div>
+            {% endif %}
+            {% if city_reference.utilities.electric %}
+            <div class="popup-stat"><strong>Electric (UI):</strong> <a
+                    href="tel:+18007225584">{{ city_reference.utilities.electric.outage_reporting }}</a></div>
+            {% endif %}
+            {% if city_reference.utilities.gas %}
+            <div class="popup-stat"><strong>Gas:</strong> <a
+                    href="tel:+12033894000">{{ city_reference.utilities.gas.emergency }}</a></div>
+            {% endif %}
+        </div>
+        {% endif %}
+        {% if city_reference.transit %}
+        <div class="popup-section">
+            <h4>Transit</h4>
+            {% if city_reference.transit.union_station %}
+            <div style="margin-bottom: var(--space-sm);">
+                <strong>Union Station</strong>
+                <div style="font-size: 0.85rem; color: var(--text-muted);">{{ city_reference.transit.union_station.hours }}</div>
+            </div>
+            {% endif %}
+            {% if city_reference.transit.union_station_shuttle %}
+            <div style="margin-bottom: var(--space-sm);">
+                <strong>Union Station Shuttle</strong> (Free)
+                <div style="font-size: 0.85rem; color: var(--text-muted);">{{ city_reference.transit.union_station_shuttle.frequency }}, {{ city_reference.transit.union_station_shuttle.hours }}</div>
+            </div>
+            {% endif %}
+            {% if city_reference.transit.via_nhv %}
+            <div style="margin-bottom: var(--space-sm);">
+                <strong>Via NHV</strong> (On-demand)
+                <div style="font-size: 0.85rem; color: var(--text-muted);">{{ city_reference.transit.via_nhv.hours }}, {{ city_reference.transit.via_nhv.fare }}</div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+        {% if city_reference.city_departments %}
+        <div class="popup-section">
+            <h4>City Departments</h4>
+            <ul style="list-style: none; padding: 0;">
+                {% for key, dept in city_reference.city_departments.items() %}
+                <li style="margin-bottom: 0.5rem;">
+                    <strong>{{ dept.name }}:</strong> <a href="tel:{{ dept.phone|replace('(', '')|replace(')', '')|replace(' ', '')|replace('-', '') }}">{{ dept.phone }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+        {% else %}
+        <p class="hours-note">City reference data loading...</p>
+        {% endif %}
+    </div>
+    <div class="popup-footer">
+        <a href="https://www.newhavenct.gov/contact" target="_blank"
+            rel="noopener">Full City Directory →</a>
     </div>
 </div>
 

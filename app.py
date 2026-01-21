@@ -95,6 +95,22 @@ def _load_daily_info() -> Dict[str, Any]:
     return info
 
 
+def _load_city_reference() -> Dict[str, Any]:
+    """Load static city reference information (emergency services, transit, etc.)"""
+    cache_key = "city_reference"
+    cached = _file_data_cache.get(cache_key)
+    if cached is not None:
+        return cached
+    try:
+        data_path = Path(__file__).with_name("data") / "city_reference.json"
+        with open(data_path, "r", encoding="utf-8") as f:
+            ref = json.load(f)
+    except Exception:
+        ref = {}
+    _file_data_cache.set(cache_key, ref)
+    return ref
+
+
 def _get_current_season(now: datetime) -> str:
     """Get current season name."""
     month = now.month
