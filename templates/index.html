@@ -313,6 +313,12 @@
                     <span class="stat-row__label">Current</span>
                     <span class="stat-row__value">{{ current_season }}</span>
                 </div>
+                {% if climate_normal %}
+                <div class="stat-row" style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--border-light);">
+                    <span class="stat-row__label">Avg Temp</span>
+                    <span class="stat-row__value">{{ climate_normal.avg_high }}° / {{ climate_normal.avg_low }}°</span>
+                </div>
+                {% endif %}
                 {% if upcoming_holidays %}
                 <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border-light);">
                     <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-muted);">
