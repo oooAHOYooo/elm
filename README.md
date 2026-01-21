@@ -233,7 +233,6 @@ Elm City Daily is a single-page, live-feed driven dashboard that aggregates civi
 | **Historical Charts** | Mill rate trends, crime stats, permits over time |
 | **Comparative Dashboards** | New Haven vs. CT averages |
 | **Heat Maps** | Geographic distribution of permits, incidents |
-| **Budget Visualization** | City budget treemap or sunburst |
 
 ---
 
@@ -313,7 +312,6 @@ elm-city-daily/
 │   ├── tides.py           # NOAA tides
 │   └── weather.py         # Open-Meteo weather
 ├── modules/
-│   └── change_new_haven_live/  # City homepage scraper
 ├── templates/
 │   ├── base.html          # Base template
 │   ├── index.html         # Main dashboard
