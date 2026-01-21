@@ -152,6 +152,9 @@ def _load_manual_events() -> List[Dict[str, Any]]:
 def create_app() -> Flask:
     app = Flask(__name__)
     app.config.from_object(Config)
+    
+    # Enable response compression for faster transfers
+    Compress(app)
 
     logging.basicConfig(
         level=logging.INFO,
