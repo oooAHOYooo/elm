@@ -180,6 +180,11 @@ def create_app() -> Flask:
         # Almanac facts (reference data)
         almanac_facts = _load_almanac_facts()
         
+        # Seasonal and historical information
+        current_season = _get_current_season(today)
+        upcoming_holidays = _get_upcoming_holidays(today, days_ahead=90)
+        on_this_date = _get_on_this_date_events(today, almanac_facts)
+        
         # Hours directory + Trivia digest (kept lightweight; rendered on homepage)
         hours_all = _load_hours_neighborhoods()
         trivia_items: List[Dict[str, str]] = []
@@ -496,6 +501,9 @@ def create_app() -> Flask:
             trivia_items=trivia_items,
             legislation_stats=legislation_stats,
             almanac_facts=almanac_facts,
+            current_season=current_season,
+            upcoming_holidays=upcoming_holidays,
+            on_this_date=on_this_date,
         )
         _index_html_cache.set("index_html", html)
         resp = Response(html, mimetype="text/html")
