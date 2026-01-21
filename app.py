@@ -78,6 +78,22 @@ def _load_almanac_facts() -> Dict[str, Any]:
         return {}
 
 
+def _load_daily_info() -> Dict[str, Any]:
+    """Load daily city information (parking, services, etc.)"""
+    cache_key = "daily_info"
+    cached = _file_data_cache.get(cache_key)
+    if cached is not None:
+        return cached
+    try:
+        data_path = Path(__file__).with_name("data") / "daily_info.json"
+        with open(data_path, "r", encoding="utf-8") as f:
+            info = json.load(f)
+    except Exception:
+        info = {}
+    _file_data_cache.set(cache_key, info)
+    return info
+
+
 def _get_current_season(now: datetime) -> str:
     """Get current season name."""
     month = now.month
