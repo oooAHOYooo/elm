@@ -36,7 +36,7 @@ _index_html_cache = TTLCache(ttl_seconds=90)  # Increased to 90s for 10% more ca
 _file_data_cache = TTLCache(ttl_seconds=600, filepath=".cache_file_data.pkl")  # Increased from 300s to 600s
 
 
-def _sample_hours_neighborhoods() -> List[Dict[str, Any]]:
+def _load_hours_neighborhoods() -> List[Dict[str, Any]]:
     """Load Hours directory data from JSON and add computed fields."""
     cache_key = "hours_neighborhoods"
     cached = _file_data_cache.get(cache_key)
@@ -110,7 +110,7 @@ def create_app() -> Flask:
         date_str = today.strftime("%A, %B %d, %Y")
 
         # Hours directory + Trivia digest (kept lightweight; rendered on homepage)
-        hours_all = _sample_hours_neighborhoods()
+        hours_all = _load_hours_neighborhoods()
         trivia_items: List[Dict[str, str]] = []
         day_order = {"Mon": 0, "Tue": 1, "Wed": 2, "Thu": 3, "Fri": 4, "Sat": 5, "Sun": 6}
         # Optimized: Flatten structure once, cache business/neighborhood names
