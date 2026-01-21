@@ -2233,6 +2233,24 @@ img {
     box-shadow: 0 5px 0 currentColor;
 }
 
+.popup-header__icon--info::before {
+    content: 'ℹ';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 1;
+    width: 16px;
+    height: 16px;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .popup-close {
     font-size: 1.5rem;
     line-height: 1;
