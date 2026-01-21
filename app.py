@@ -23,7 +23,6 @@ from services import air_quality as aqi_service
 from feeds.aggregator import aggregate_all
 from utils.cache import TTLCache
 from modules.legislation_tracker import LegislationTracker
-from modules.budget_tracker import BudgetTracker
 
 load_dotenv()
 
@@ -212,14 +211,6 @@ def create_app() -> Flask:
             except Exception:
                 return {"total_passed": 0, "this_week": 0, "this_month": 0, "last_30_days": 0}
         
-        # Fetch budget stats (lightweight, just for homepage widget)
-        def get_budget_stats():
-            try:
-                budget_tracker = BudgetTracker()
-                return budget_tracker.get_budget_stats()
-            except Exception:
-                return {"fiscal_year": None, "total_budget": None, "total_spent": None, "percentage_spent": None}
-        
         futures = {
             _executor.submit(weather_service.fetch_weather, lat, lon, timeout): "weather",
             _executor.submit(nws_service.fetch_nws_alerts, "ctz010"): "nws_alerts",
@@ -229,7 +220,6 @@ def create_app() -> Flask:
             _executor.submit(fetch_legistar_events, "newhaven", 6): "legis_upcoming",
             _executor.submit(aggregate_all): "agg",
             _executor.submit(get_legislation_stats): "legislation_stats",
-            _executor.submit(get_budget_stats): "budget_stats",
         }
         
         results = {}
@@ -244,8 +234,6 @@ def create_app() -> Flask:
                     app.logger.warning(f"Failed to fetch {key}: {e}")
                     if key == "legislation_stats":
                         results[key] = {"total_passed": 0, "this_week": 0, "this_month": 0, "last_30_days": 0}
-                    elif key == "budget_stats":
-                        results[key] = {"fiscal_year": None, "total_budget": None, "total_spent": None, "percentage_spent": None}
                     else:
                         results[key] = {} if key in ("weather", "air_quality", "tax_info", "agg") else []
                     completed_count += 1
@@ -264,16 +252,12 @@ def create_app() -> Flask:
                         app.logger.warning(f"Future {key} did not complete in time - using default")
                         if key == "legislation_stats":
                             results[key] = {"total_passed": 0, "this_week": 0, "this_month": 0, "last_30_days": 0}
-                        elif key == "budget_stats":
-                            results[key] = {"fiscal_year": None, "total_budget": None, "total_spent": None, "percentage_spent": None}
                         else:
                             results[key] = {} if key in ("weather", "air_quality", "tax_info", "agg") else []
                 except Exception as e:
                     app.logger.warning(f"Failed to fetch {key}: {e}")
                     if key == "legislation_stats":
                         results[key] = {"total_passed": 0, "this_week": 0, "this_month": 0, "last_30_days": 0}
-                    elif key == "budget_stats":
-                        results[key] = {"fiscal_year": None, "total_budget": None, "total_spent": None, "percentage_spent": None}
                     else:
                         results[key] = {} if key in ("weather", "air_quality", "tax_info", "agg") else []
         
@@ -285,7 +269,6 @@ def create_app() -> Flask:
         cal_upcoming = results.get("cal_upcoming", [])
         legis_upcoming = results.get("legis_upcoming", [])
         legislation_stats = results.get("legislation_stats", {"total_passed": 0, "this_week": 0, "this_month": 0, "last_30_days": 0})
-        budget_stats = results.get("budget_stats", {"fiscal_year": None, "total_budget": None, "total_spent": None, "percentage_spent": None})
         
         boards_upcoming = []
         boards_upcoming.extend([
@@ -441,7 +424,6 @@ def create_app() -> Flask:
             hours_all=hours_all,
             trivia_items=trivia_items,
             legislation_stats=legislation_stats,
-            budget_stats=budget_stats,
         )
         _index_html_cache.set("index_html", html)
         resp = Response(html, mimetype="text/html")
@@ -675,52 +657,6 @@ def create_app() -> Flask:
             app.logger.error(f"Error in API: {e}")
             return jsonify({"error": str(e)}), 500
     
-    # Budget Tracker Routes
-    budget_tracker = BudgetTracker()
-    
-    @app.route("/budget")
-    def budget_tracker_page():
-        """Budget spending tracker page"""
-        try:
-            summary = budget_tracker.fetch_budget_summary()
-            categories = budget_tracker.get_spending_by_category()
-            stats = budget_tracker.get_budget_stats()
-            
-            return render_template(
-                "budget/tracker.html",
-                app_name=app.config["APP_NAME"],
-                summary=summary,
-                categories=categories,
-                stats=stats,
-            )
-        except Exception as e:
-            app.logger.error(f"Error fetching budget data: {e}")
-            return render_template(
-                "budget/tracker.html",
-                app_name=app.config["APP_NAME"],
-                summary={},
-                categories={"categories": []},
-                stats={},
-                error=str(e)
-            )
-    
-    @app.route("/api/budget")
-    def api_budget():
-        """API endpoint for budget data"""
-        try:
-            summary = budget_tracker.fetch_budget_summary()
-            categories = budget_tracker.get_spending_by_category()
-            stats = budget_tracker.get_budget_stats()
-            
-            return jsonify({
-                "summary": summary,
-                "categories": categories,
-                "stats": stats
-            })
-        except Exception as e:
-            app.logger.error(f"Error in budget API: {e}")
-            return jsonify({"error": str(e)}), 500
-
     return app
 
 

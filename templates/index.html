@@ -243,43 +243,6 @@
                 </div>
             </article>
 
-            <!-- Budget Tracker -->
-            <article class="infobox">
-                <h2 class="section-head">City Budget</h2>
-                {% if budget_stats and budget_stats.fiscal_year %}
-                <div class="stat-row">
-                    <span class="stat-row__label">Fiscal Year</span>
-                    <span class="stat-row__value">{{ budget_stats.fiscal_year }}</span>
-                </div>
-                {% if budget_stats.total_budget %}
-                <div class="stat-row">
-                    <span class="stat-row__label">Total Budget</span>
-                    <span class="stat-row__value">${{ "{:,.0f}".format(budget_stats.total_budget / 1000000) }}M</span>
-                </div>
-                {% endif %}
-                {% if budget_stats.percentage_spent is not none %}
-                <div class="stat-row">
-                    <span class="stat-row__label">Spent</span>
-                    <span class="stat-row__value">{{ "{:.1f}".format(budget_stats.percentage_spent) }}%</span>
-                </div>
-                {% endif %}
-                <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border-light);">
-                    <a href="{{ url_for('budget_tracker_page') }}" style="display: block; text-align: center; color: var(--accent-primary); text-decoration: none; font-weight: 500; font-size: 0.9rem;">
-                        View Full Budget →
-                    </a>
-                </div>
-                {% else %}
-                <div class="stat-row">
-                    <span class="stat-row__label" style="font-style: italic; color: var(--text-muted);">Budget data loading...</span>
-                </div>
-                <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border-light);">
-                    <a href="https://www.newhavenct.gov/government/departments-divisions/office-of-policy-management-and-grants/annual-city-budgets-audits" target="_blank" rel="noopener" style="display: block; text-align: center; color: var(--accent-primary); text-decoration: none; font-weight: 500; font-size: 0.9rem;">
-                        View Official Budget →
-                    </a>
-                </div>
-                {% endif %}
-            </article>
-
             <!-- Moon Phases -->
             <article class="infobox infobox--moon">
                 <h2 class="section-head">Moon Phases</h2>
@@ -388,10 +351,6 @@
             <article class="infobox infobox--links">
                 <h2 class="section-head">Quick Links</h2>
                 <div class="quick-links">
-                    <button class="quick-link" data-popup="seeclickfix">
-                        <span
-                            class="quick-link__icon quick-link__icon--report"></span>
-                        Report Issue</button>
                     <button class="quick-link" data-popup="cityhall">
                         <span
                             class="quick-link__icon quick-link__icon--phone"></span>
@@ -577,21 +536,6 @@
 <!-- Popup Panels -->
 <div class="popup-overlay" id="popup-overlay"></div>
 
-<div class="popup-panel" id="popup-seeclickfix" data-popup="seeclickfix">
-    <div class="popup-header">
-        <h3><span class="popup-header__icon popup-header__icon--report"></span>
-            Report an Issue</h3>
-        <button class="popup-close" aria-label="Close">×</button>
-    </div>
-    <div class="popup-body">
-        <iframe src="https://seeclickfix.com/new-haven"
-            title="SeeClickFix"></iframe>
-    </div>
-    <div class="popup-footer">
-        <a href="https://seeclickfix.com/new-haven" target="_blank"
-            rel="noopener">Open in new tab →</a>
-    </div>
-</div>
 
 <div class="popup-panel" id="popup-cityhall" data-popup="cityhall">
     <div class="popup-header">
