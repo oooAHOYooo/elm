@@ -21,6 +21,7 @@ from services import weather as weather_service
 from services import nws as nws_service
 from services import tides as tides_service
 from services import air_quality as aqi_service
+from services import road_closures as road_closures_service
 from feeds.aggregator import aggregate_all
 from utils.cache import TTLCache
 from modules.legislation_tracker import LegislationTracker

@@ -420,6 +420,36 @@
             </article>
             {% endif %}
 
+            <!-- Road Closures -->
+            {% if road_closures and road_closures|length > 0 %}
+            <article class="infobox">
+                <h2 class="section-head">Road Closures</h2>
+                <ul class="meeting-list">
+                    {% for closure in road_closures[:5] %}
+                    <li class="meeting-item">
+                        <div>
+                            <span class="meeting-item__title" style="display: block; margin-bottom: 0.25rem;">
+                                {% if closure.is_full_closure %}🚧{% else %}⚠️{% endif %}
+                                {{ closure.road }}
+                            </span>
+                            <span class="meeting-item__date" style="font-size: 0.75rem; color: var(--text-muted);">
+                                {{ closure.start_display }}
+                                {% if closure.end_display and closure.end_display != "Until further notice" %}
+                                - {{ closure.end_display }}
+                                {% endif %}
+                            </span>
+                            {% if closure.description %}
+                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">
+                                {{ closure.description|truncate(60) }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </article>
+            {% endif %}
+
             <!-- Upcoming Meetings -->
             {% if boards_upcoming %}
             <article class="infobox">
