@@ -318,6 +318,7 @@ def create_app() -> Flask:
             _executor.submit(fetch_legistar_events, "newhaven", 6): "legis_upcoming",
             _executor.submit(aggregate_all): "agg",
             _executor.submit(get_legislation_stats): "legislation_stats",
+            _executor.submit(road_closures_service.fetch_road_closures, timeout): "road_closures",
         }
         
         results = {}
