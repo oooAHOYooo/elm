@@ -217,6 +217,7 @@ def create_app() -> Flask:
         # Almanac facts (reference data)
         almanac_facts = _load_almanac_facts()
         daily_info = _load_daily_info()
+        city_reference = _load_city_reference()
         
         # Seasonal and historical information
         current_season = _get_current_season(today)
