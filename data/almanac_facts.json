@@ -45,26 +45,117 @@
   ],
   "historical_dates": [
     {
-      "date": "April 24, 1638",
-      "event": "New Haven Colony founded by English Puritans"
+      "month": 4,
+      "day": 24,
+      "year": 1638,
+      "event": "New Haven Colony founded by English Puritans led by Theophilus Eaton and John Davenport"
     },
     {
-      "date": "1701",
-      "event": "Yale University founded (originally Collegiate School)"
+      "month": 10,
+      "day": 9,
+      "year": 1701,
+      "event": "Yale University founded (originally Collegiate School) in Saybrook, later moved to New Haven"
     },
     {
-      "date": "1784",
+      "month": 1,
+      "day": 27,
+      "year": 1784,
       "event": "New Haven incorporated as a city"
     },
     {
-      "date": "1839",
-      "event": "Amistad trial held in New Haven"
+      "month": 9,
+      "day": 18,
+      "year": 1839,
+      "event": "Amistad trial begins in New Haven, a landmark case for abolition"
     },
     {
-      "date": "1861",
+      "month": 3,
+      "day": 1,
+      "year": 1861,
       "event": "First public library in Connecticut opens in New Haven"
+    },
+    {
+      "month": 6,
+      "day": 15,
+      "year": 1871,
+      "event": "New Haven's first public high school opens"
+    },
+    {
+      "month": 11,
+      "day": 11,
+      "year": 1918,
+      "event": "Armistice Day - World War I ends, celebrated on New Haven Green"
+    },
+    {
+      "month": 5,
+      "day": 20,
+      "year": 1931,
+      "event": "Yale Bowl hosts first football game"
+    },
+    {
+      "month": 7,
+      "day": 4,
+      "year": 1776,
+      "event": "Declaration of Independence signed (New Haven celebrates with annual parade)"
+    },
+    {
+      "month": 9,
+      "day": 5,
+      "year": 1774,
+      "event": "First Continental Congress delegates from Connecticut meet in New Haven"
+    },
+    {
+      "month": 4,
+      "day": 19,
+      "year": 1775,
+      "event": "New Haven volunteers march to Lexington and Concord"
+    },
+    {
+      "month": 8,
+      "day": 23,
+      "year": 1779,
+      "event": "British forces raid New Haven during Revolutionary War"
+    },
+    {
+      "month": 10,
+      "day": 13,
+      "year": 1846,
+      "event": "New Haven Railroad opens, connecting city to New York"
+    },
+    {
+      "month": 12,
+      "day": 25,
+      "year": 1900,
+      "event": "First electric streetcar runs in New Haven"
     }
   ],
+  "school_calendar": {
+    "district": "New Haven Public Schools",
+    "school_year_start": "September",
+    "school_year_end": "June",
+    "typical_breaks": [
+      {
+        "name": "Thanksgiving Break",
+        "month": 11,
+        "typical_days": "Last Thursday and Friday of November"
+      },
+      {
+        "name": "Winter Break",
+        "month": 12,
+        "typical_days": "Last 2 weeks of December"
+      },
+      {
+        "name": "Spring Break",
+        "month": 4,
+        "typical_days": "Usually 1 week in April"
+      },
+      {
+        "name": "Memorial Day",
+        "month": 5,
+        "typical_days": "Last Monday of May"
+      }
+    ]
+  },
   "quick_stats": {
     "colleges": 3,
     "hospitals": 2,

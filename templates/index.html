@@ -273,6 +273,48 @@
             </article>
             {% endif %}
 
+            <!-- On This Date -->
+            {% if on_this_date %}
+            <article class="infobox">
+                <h2 class="section-head">On This Date</h2>
+                {% for event in on_this_date %}
+                <div style="margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-light);">
+                    <div style="font-weight: 600; color: var(--accent-primary); margin-bottom: 0.25rem;">
+                        {{ event.year }}
+                    </div>
+                    <div style="font-size: 0.9rem; color: var(--text-body);">
+                        {{ event.event }}
+                    </div>
+                </div>
+                {% endfor %}
+            </article>
+            {% endif %}
+
+            <!-- Seasonal Info -->
+            <article class="infobox">
+                <h2 class="section-head">Season</h2>
+                <div class="stat-row">
+                    <span class="stat-row__label">Current</span>
+                    <span class="stat-row__value">{{ current_season }}</span>
+                </div>
+                {% if upcoming_holidays %}
+                <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border-light);">
+                    <div style="font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-muted);">
+                        Upcoming Holidays
+                    </div>
+                    {% for holiday in upcoming_holidays[:3] %}
+                    <div style="font-size: 0.85rem; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <span>{{ holiday.icon }}</span>
+                        <span style="flex: 1;">{{ holiday.name }}</span>
+                        <span style="color: var(--text-muted); font-size: 0.8rem;">
+                            {% if holiday.days_away == 0 %}Today{% elif holiday.days_away == 1 %}Tomorrow{% else %}{{ holiday.date }}{% endif %}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </article>
+
             <!-- Moon Phases -->
             <article class="infobox infobox--moon">
                 <h2 class="section-head">Moon Phases</h2>

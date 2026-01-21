@@ -77,6 +77,57 @@ def _load_almanac_facts() -> Dict[str, Any]:
         return {}
 
 
+def _get_current_season(now: datetime) -> str:
+    """Get current season name."""
+    month = now.month
+    if month in [12, 1, 2]:
+        return "Winter"
+    elif month in [3, 4, 5]:
+        return "Spring"
+    elif month in [6, 7, 8]:
+        return "Summer"
+    else:
+        return "Fall"
+
+
+def _get_upcoming_holidays(now: datetime, days_ahead: int = 60) -> List[Dict[str, Any]]:
+    """Get upcoming holidays in the next N days."""
+    from services.context import get_holiday_info
+    
+    upcoming = []
+    for i in range(days_ahead):
+        check_date = now + timedelta(days=i)
+        holiday = get_holiday_info(check_date)
+        if holiday:
+            upcoming.append({
+                "name": holiday["name"],
+                "icon": holiday.get("icon", "📅"),
+                "date": check_date.strftime("%B %d"),
+                "days_away": i,
+                "type": holiday.get("type", "observance")
+            })
+    
+    return upcoming[:5]  # Return next 5 holidays
+
+
+def _get_on_this_date_events(now: datetime, facts: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """Get historical events that happened on today's date."""
+    month = now.month
+    day = now.day
+    
+    events = []
+    historical = facts.get("historical_dates", [])
+    
+    for event in historical:
+        if event.get("month") == month and event.get("day") == day:
+            events.append({
+                "year": event.get("year", ""),
+                "event": event.get("event", "")
+            })
+    
+    return events
+
+
 def _load_manual_events() -> List[Dict[str, Any]]:
     """Load manually curated events (e.g., DowntownNHV email) from JSON."""
     cache_key = "manual_events"
