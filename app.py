@@ -126,6 +126,9 @@ def create_app() -> Flask:
         today = datetime.now(tz)
         date_str = today.strftime("%A, %B %d, %Y")
 
+        # Almanac facts (reference data)
+        almanac_facts = _load_almanac_facts()
+        
         # Hours directory + Trivia digest (kept lightweight; rendered on homepage)
         hours_all = _load_hours_neighborhoods()
         trivia_items: List[Dict[str, str]] = []
