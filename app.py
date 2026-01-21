@@ -333,6 +333,8 @@ def create_app() -> Flask:
                     app.logger.warning(f"Failed to fetch {key}: {e}")
                     if key == "legislation_stats":
                         results[key] = {"total_passed": 0, "this_week": 0, "this_month": 0, "last_30_days": 0}
+                    elif key == "road_closures":
+                        results[key] = []
                     else:
                         results[key] = {} if key in ("weather", "air_quality", "tax_info", "agg") else []
                     completed_count += 1
@@ -524,6 +526,8 @@ def create_app() -> Flask:
             trivia_items=trivia_items,
             legislation_stats=legislation_stats,
             almanac_facts=almanac_facts,
+            daily_info=daily_info,
+            road_closures=results.get("road_closures", []),
             current_season=current_season,
             upcoming_holidays=upcoming_holidays,
             on_this_date=on_this_date,
