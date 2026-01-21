@@ -1618,30 +1618,72 @@ img {
     border: none;
 }
 
-/* Sponsors */
+/* Sponsors - Vintage Newspaper Ad Style */
+.infobox--sponsors {
+    border: 2px double var(--border-rule);
+    background: var(--bg-card);
+    padding: var(--space-md);
+    position: relative;
+}
+
+.infobox--sponsors::before {
+    content: 'ADVERTISEMENT';
+    position: absolute;
+    top: -1px;
+    right: var(--space-sm);
+    font-family: var(--font-sans);
+    font-size: 0.55rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    background: var(--bg-card);
+    padding: 0 var(--space-xs);
+    font-weight: 600;
+}
+
 .sponsor {
     display: flex;
     align-items: center;
-    gap: var(--space-sm);
-    padding: var(--space-sm);
-    background: var(--bg-hover);
-    border-radius: 4px;
+    gap: var(--space-md);
+    padding: var(--space-md) var(--space-lg);
+    background: var(--bg-paper);
+    border: 1px solid var(--border-light);
+    border-left: 4px solid var(--accent-primary);
     margin-bottom: var(--space-sm);
-    transition: all 0.15s ease;
+    transition: all 0.2s ease;
+    font-family: var(--font-display);
+    position: relative;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.sponsor::before {
+    content: '★';
+    position: absolute;
+    left: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--accent-primary);
+    font-size: 0.7rem;
+    background: var(--bg-card);
+    padding: 0 2px;
 }
 
 .sponsor:hover {
-    background: var(--accent-primary);
-    color: white;
+    background: var(--bg-hover);
+    border-left-color: var(--accent-link);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     text-decoration: none;
+    transform: translateX(2px);
 }
 
 .sponsor__icon {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     display: inline-block;
     position: relative;
     flex-shrink: 0;
+    opacity: 0.8;
+    filter: sepia(20%);
 }
 
 .sponsor__icon--anchor::before {
@@ -1694,8 +1736,13 @@ img {
 }
 
 .sponsor__name {
-    font-size: 0.85rem;
-    font-weight: 500;
+    font-size: 0.95rem;
+    font-weight: 600;
+    font-family: var(--font-display);
+    color: var(--text-headline);
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    font-style: italic;
 }
 
 .error-message {
