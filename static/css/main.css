@@ -1707,17 +1707,6 @@ img {
     margin: 0.5rem 0;
 }
 
-.sponsor--placeholder {
-    border: 2px dashed var(--border-light);
-    background: transparent;
-    opacity: 0.6;
-}
-
-.sponsor--placeholder:hover {
-    background: transparent;
-    color: inherit;
-    opacity: 1;
-}
 
 /* --------------------------------------------------------------------------
    FOOTER

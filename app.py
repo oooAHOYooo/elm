@@ -12,6 +12,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 from flask import Flask, render_template, jsonify, request, Response
+from flask_compress import Compress
 
 from config import Config
 from services import events as events_service
