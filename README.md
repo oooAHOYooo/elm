@@ -204,7 +204,6 @@ Elm City Daily is a single-page, live-feed driven dashboard that aggregates civi
 | **Polling Location Finder** | CT SOTS | Lookup by address |
 | **Aldermanic Districts** | Board of Alders | Ward boundaries and representatives |
 | **Public Comment Queue** | Legistar | Upcoming public hearing opportunities |
-| **SeeClickFix Integration** | SeeClickFix API | Report issues, view nearby requests |
 
 ### 📡 Live Data Enhancements
 
