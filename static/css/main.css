@@ -1673,7 +1673,6 @@ img {
     border-left-color: var(--accent-link);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
     text-decoration: none;
-    transform: translateX(2px);
 }
 
 .sponsor__icon {

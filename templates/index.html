@@ -378,6 +378,48 @@
                 </div>
             </article>
 
+            <!-- Daily City Info -->
+            {% if daily_info %}
+            <article class="infobox">
+                <h2 class="section-head">Daily Info</h2>
+                {% if daily_info.parking_enforcement %}
+                <div style="margin-bottom: var(--space-md); padding-bottom: var(--space-md); border-bottom: 1px solid var(--border-light);">
+                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Parking Meters</div>
+                    <div style="font-size: 0.85rem; color: var(--text-body);">{{ daily_info.parking_enforcement.meter_hours }}</div>
+                    {% if daily_info.parking_enforcement.sunday_free %}
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Sundays & Holidays: Free</div>
+                    {% endif %}
+                </div>
+                {% endif %}
+                {% if daily_info.library_hours %}
+                <div style="margin-bottom: var(--space-md); padding-bottom: var(--space-md); border-bottom: 1px solid var(--border-light);">
+                    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem;">Library Today</div>
+                    {% set today_name = date_str.split(',')[0] %}
+                    {% if today_name == 'Monday' and daily_info.library_hours.main_branch.monday %}
+                    <div style="font-size: 0.85rem; color: var(--text-body);">{{ daily_info.library_hours.main_branch.monday }}</div>
+                    {% elif today_name == 'Tuesday' and daily_info.library_hours.main_branch.tuesday %}
+                    <div style="font-size: 0.85rem; color: var(--text-body);">{{ daily_info.library_hours.main_branch.tuesday }}</div>
+                    {% elif today_name == 'Wednesday' and daily_info.library_hours.main_branch.wednesday %}
+                    <div style="font-size: 0.85rem; color: var(--text-body);">{{ daily_info.library_hours.main_branch.wednesday }}</div>
+                    {% elif today_name == 'Thursday' and daily_info.library_hours.main_branch.thursday %}
+                    <div style="font-size: 0.85rem; color: var(--text-body);">{{ daily_info.library_hours.main_branch.thursday }}</div>
+                    {% elif today_name == 'Friday' and daily_info.library_hours.main_branch.friday %}
+                    <div style="font-size: 0.85rem; color: var(--text-body);">{{ daily_info.library_hours.main_branch.friday }}</div>
+                    {% elif today_name == 'Saturday' and daily_info.library_hours.main_branch.saturday %}
+                    <div style="font-size: 0.85rem; color: var(--text-body);">{{ daily_info.library_hours.main_branch.saturday }}</div>
+                    {% elif today_name == 'Sunday' and daily_info.library_hours.main_branch.sunday %}
+                    <div style="font-size: 0.85rem; color: var(--text-body);">{{ daily_info.library_hours.main_branch.sunday }}</div>
+                    {% endif %}
+                </div>
+                {% endif %}
+                {% if daily_info.street_sweeping %}
+                <div style="font-size: 0.75rem; color: var(--text-muted);">
+                    <strong style="text-transform: uppercase; letter-spacing: 0.05em;">Street Sweeping:</strong> {{ daily_info.street_sweeping.season }}
+                </div>
+                {% endif %}
+            </article>
+            {% endif %}
+
             <!-- Upcoming Meetings -->
             {% if boards_upcoming %}
             <article class="infobox">

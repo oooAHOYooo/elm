@@ -1,0 +1,59 @@
+{
+  "street_sweeping": {
+    "season": "April - November",
+    "schedule": "Alternate side parking on designated streets",
+    "enforcement": "8am - 2pm on posted days",
+    "info_url": "https://www.newhavenct.gov/residents/parking"
+  },
+  "parking_enforcement": {
+    "meter_hours": "Mon-Sat 8am-6pm",
+    "sunday_free": true,
+    "evening_free_after": "6pm",
+    "holidays_free": true
+  },
+  "library_hours": {
+    "main_branch": {
+      "monday": "9am-8pm",
+      "tuesday": "9am-8pm",
+      "wednesday": "9am-8pm",
+      "thursday": "9am-8pm",
+      "friday": "9am-5pm",
+      "saturday": "10am-5pm",
+      "sunday": "1pm-5pm"
+    },
+    "note": "Hours may vary by branch"
+  },
+  "farmers_markets": [
+    {
+      "name": "Wooster Square Farmers Market",
+      "day": "Saturday",
+      "time": "9am-1pm",
+      "season": "May - November",
+      "location": "Wooster Square"
+    },
+    {
+      "name": "Edgewood Farmers Market",
+      "day": "Wednesday",
+      "time": "3pm-6pm",
+      "season": "June - October",
+      "location": "Edgewood Park"
+    }
+  ],
+  "dmv_services": {
+    "note": "DMV services available at City Hall",
+    "hours": "Mon-Fri 9am-5pm",
+    "phone": "(203) 946-8350"
+  },
+  "voting": {
+    "early_voting_location": "200 Orange St, New Haven",
+    "early_voting_hours": "Mon-Fri 10am-6pm, Sat 10am-2pm",
+    "election_day_polls": "6am-8pm",
+    "info_url": "https://www.newhavenct.gov/government/departments-divisions/registrar-of-voters"
+  },
+  "seasonal_info": {
+    "beach_season": "Memorial Day - Labor Day",
+    "pool_season": "June - August",
+    "leaf_collection": "October - December",
+    "snow_emergency": "Check city website during winter storms"
+  }
+}
