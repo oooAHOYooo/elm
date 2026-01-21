@@ -5,6 +5,21 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>{{ app_name or "Elm City Daily" }}</title>
         <meta name="description" content="Elm City Daily — a civic dashboard for New Haven, CT" />
+        
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="{{ app_name or 'Elm City Daily' }}" />
+        <meta property="og:description" content="Real-time civic dashboard for New Haven, Connecticut — weather, events, legislation, and community information" />
+        <meta property="og:url" content="{{ request.url if request else 'https://elmcitydaily.com' }}" />
+        <meta property="og:site_name" content="Elm City Daily" />
+        
+        <!-- Twitter Card -->
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="{{ app_name or 'Elm City Daily' }}" />
+        <meta name="twitter:description" content="Real-time civic dashboard for New Haven, Connecticut" />
+        
+        <!-- Canonical URL -->
+        <link rel="canonical" href="{{ request.url if request else 'https://elmcitydaily.com' }}" />
         <!-- Critical CSS for loading screen -->
         <style>
             .loading-splash {

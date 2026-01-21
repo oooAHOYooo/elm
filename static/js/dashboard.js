@@ -587,6 +587,7 @@
         } catch (e) {
             console.error('Tide loading error:', e);
             output.textContent = 'Tide data unavailable';
+            output.classList.add('error-message');
         }
     }
     
@@ -811,6 +812,17 @@
             }).join('');
         } catch (e) {
             console.error('Failed to load week:', e);
+            // Show user-visible error
+            const weekContainer = document.querySelector('.events-week-grid');
+            if (weekContainer) {
+                const errorMsg = document.createElement('div');
+                errorMsg.className = 'error-message';
+                errorMsg.textContent = 'Unable to load events. Please refresh the page.';
+                errorMsg.style.padding = '1rem';
+                errorMsg.style.textAlign = 'center';
+                errorMsg.style.color = 'var(--text-muted)';
+                weekContainer.appendChild(errorMsg);
+            }
             eventsList.innerHTML = '<p class="events-error">Unable to load events. Please try again later.</p>';
         } finally {
             eventsList.classList.remove('loading');

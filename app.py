@@ -60,6 +60,23 @@ def _load_hours_neighborhoods() -> List[Dict[str, Any]]:
     return neighborhoods
 
 
+def _load_almanac_facts() -> Dict[str, Any]:
+    """Load almanac reference facts about New Haven."""
+    cache_key = "almanac_facts"
+    cached = _file_data_cache.get(cache_key)
+    if cached is not None:
+        return cached
+    
+    try:
+        data_path = Path(__file__).with_name("data") / "almanac_facts.json"
+        with open(data_path, "r", encoding="utf-8") as f:
+            facts = json.load(f)
+        _file_data_cache.set(cache_key, facts)
+        return facts
+    except Exception:
+        return {}
+
+
 def _load_manual_events() -> List[Dict[str, Any]]:
     """Load manually curated events (e.g., DowntownNHV email) from JSON."""
     cache_key = "manual_events"
@@ -424,6 +441,7 @@ def create_app() -> Flask:
             hours_all=hours_all,
             trivia_items=trivia_items,
             legislation_stats=legislation_stats,
+            almanac_facts=almanac_facts,
         )
         _index_html_cache.set("index_html", html)
         resp = Response(html, mimetype="text/html")

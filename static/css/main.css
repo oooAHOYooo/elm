@@ -1698,6 +1698,15 @@ img {
     font-weight: 500;
 }
 
+.error-message {
+    color: var(--text-error, #dc2626);
+    font-size: 0.9rem;
+    padding: 0.5rem;
+    background: var(--bg-error, rgba(220, 38, 38, 0.1));
+    border-radius: 4px;
+    margin: 0.5rem 0;
+}
+
 .sponsor--placeholder {
     border: 2px dashed var(--border-light);
     background: transparent;

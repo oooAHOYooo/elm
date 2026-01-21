@@ -1,0 +1,76 @@
+{
+  "city_info": {
+    "name": "New Haven",
+    "state": "Connecticut",
+    "nickname": "The Elm City",
+    "founded": 1638,
+    "incorporated": 1784,
+    "population": 134023,
+    "area_sq_miles": 20.1,
+    "elevation_ft": 59,
+    "timezone": "America/New_York",
+    "zip_codes": ["06510", "06511", "06513", "06515", "06519"],
+    "area_code": "203"
+  },
+  "government": {
+    "mayor": "Justin Elicker",
+    "city_hall_phone": "(203) 946-8200",
+    "city_hall_address": "165 Church St, New Haven, CT 06510",
+    "board_of_alders": 30,
+    "fiscal_year_start": "July 1",
+    "mill_rate": 43.88
+  },
+  "landmarks": [
+    {
+      "name": "Yale University",
+      "founded": 1701,
+      "type": "University"
+    },
+    {
+      "name": "New Haven Green",
+      "established": 1638,
+      "type": "Public Park",
+      "acres": 16
+    },
+    {
+      "name": "Peabody Museum",
+      "founded": 1866,
+      "type": "Museum"
+    },
+    {
+      "name": "Shubert Theatre",
+      "opened": 1914,
+      "type": "Theater"
+    }
+  ],
+  "historical_dates": [
+    {
+      "date": "April 24, 1638",
+      "event": "New Haven Colony founded by English Puritans"
+    },
+    {
+      "date": "1701",
+      "event": "Yale University founded (originally Collegiate School)"
+    },
+    {
+      "date": "1784",
+      "event": "New Haven incorporated as a city"
+    },
+    {
+      "date": "1839",
+      "event": "Amistad trial held in New Haven"
+    },
+    {
+      "date": "1861",
+      "event": "First public library in Connecticut opens in New Haven"
+    }
+  ],
+  "quick_stats": {
+    "colleges": 3,
+    "hospitals": 2,
+    "libraries": 5,
+    "parks": 100,
+    "museums": 5,
+    "theaters": 3
+  }
+}
