@@ -58,7 +58,7 @@ Elm City Daily is a single-page, live-feed driven dashboard that aggregates civi
 
 | Category | Actions |
 |----------|---------|
-| **City Services** | Report Issue (SeeClickFix), 311/City Hall, Legistar, City Plan, Maps |
+| **City Services** | 311/City Hall, Legistar, City Plan, Maps |
 | **Resources** | City Jobs, Library (NHFPL), Parking, Trash & Recycling, Health Dept |
 | **Emergency** | 911, Police Non-Emergency, Fire Non-Emergency, 211 United Way |
 

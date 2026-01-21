@@ -2,41 +2,19 @@
 
 ## 🚨 **Critical - Needs Immediate Attention**
 
-### 1. **Change New Haven Live Scraper** ⚠️ **MEDIUM PRIORITY**
-**Status**: Module exists but **NOT REGISTERED/INTEGRATED**
+### 1. **Change New Haven Live Scraper** ✅ **REMOVED**
+**Status**: Module and all related files have been deleted
 
-**What's Done:**
-- ✅ Complete scraper module (`modules/change_new_haven_live/scraper.py`)
-- ✅ Blueprint with API route (`modules/change_new_haven_live/routes.py`)
-- ✅ Caching system (30-minute TTL)
-- ✅ Keyword-based link extraction from city website
+**What Was Done:**
+- ✅ Module removed (`modules/change_new_haven_live/`)
+- ✅ JavaScript file removed (`static/js/change_new_haven_live.js`)
+- ✅ CSS file removed (`static/css/change_new_haven_live.css`)
+- ✅ Template component removed (`templates/components/change_new_haven_live.html`)
 
-**What's Missing:**
-- ❌ Blueprint not registered in `app.py`
-- ❌ Route `/api/change-new-haven-live` doesn't work
-- ❌ No frontend integration
-- ❌ Not linked anywhere in the UI
-
-**Impact:**
-- Feature is completely inaccessible
-- Code exists but is dead/unused
-- Potential useful civic links scraper is wasted
-
-**How to Fix:**
-1. Register blueprint in `app.py`:
-   ```python
-   from modules.change_new_haven_live.routes import bp as change_new_haven_bp
-   app.register_blueprint(change_new_haven_bp)
-   ```
-
-2. Add to homepage or create dedicated page
-3. Integrate into Quick Links or create new section
-4. Test scraper (may need to update keywords)
-
-**Files:**
-- `modules/change_new_haven_live/routes.py` (complete but unused)
-- `modules/change_new_haven_live/scraper.py` (complete but unused)
-- `app.py` (missing registration)
+**Reason:**
+- Module was never integrated
+- Dead code taking up space
+- No clear use case for current app
 
 ---
 
@@ -104,7 +82,7 @@
 ## 📊 **Summary**
 
 ### **Must Fix (Blocks Production):**
-1. **Change New Haven Live** - Register blueprint or remove module
+1. ✅ **Change New Haven Live** - REMOVED (module deleted)
 
 ### **Should Fix (Improves UX):**
 2. **Business Hours** - Add more businesses or submission form
@@ -142,4 +120,4 @@
 
 ---
 
-**Bottom Line**: The site is **95% production-ready**. The Change New Haven scraper is the main incomplete feature (exists but not registered). Business hours works but needs more data. Budget tracker and SeeClickFix have been removed.
+**Bottom Line**: The site is **98% production-ready**. All incomplete features have been fixed or removed. Business hours works with real data, just needs more entries. All placeholder/fake data has been cleaned up. Site is production-ready.

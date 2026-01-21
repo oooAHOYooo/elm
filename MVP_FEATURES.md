@@ -29,7 +29,6 @@ The MVP focuses on delivering essential civic information in a clean, newspaper-
   - Trash & Recycling schedules
   - Parking information
   - Transit information
-  - SeeClickFix integration
 
 #### 4. **News & Community Feeds**
 - ✅ Aggregated RSS feeds from local sources
